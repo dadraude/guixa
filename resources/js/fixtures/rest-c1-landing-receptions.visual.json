@@ -1,0 +1,927 @@
+{
+    "baseUrl": "http://127.0.0.1:5289",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "reception-show",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Receptions/Show",
+                "role": "manager,receiver"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content dt,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content button[data-slot=\"select-trigger\"]",
+                "#main-content [data-test=\"save-received-tomato\"]",
+                "#main-content [data-test=\"add-product\"] button[type=submit]"
+            ],
+            "states": [
+                {
+                    "id": "open-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-primary-bg": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "open-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-primary-bg": "rgb(143, 197, 223)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "received",
+                    "query": {
+                        "state": "received"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [data-test=\"reopen-form\"] button"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "discrepancy",
+                    "query": {
+                        "state": "discrepancy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-test=unbalanced]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=distribute-hint]",
+                                "count": 1,
+                                "contrast": 4.5
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "validation-error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-test=domain-error]",
+                                "count": 1,
+                                "contrast": 4.5
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "busy",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "put /receptions/cycle-1/producer-1/products/tomato/received"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content button[data-slot=\"select-trigger\"]",
+                            "#main-content [data-test=\"add-product\"] button[type=submit]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-light",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-popup-carries-landing": "true",
+                                    "data-ev-primary-bg": "rgb(40, 101, 133)",
+                                    "data-ev-item-min-height": "44",
+                                    "data-ev-popup-bg": "rgb(255, 250, 240)",
+                                    "data-ev-popup-fg": "rgb(44, 44, 43)",
+                                    "data-ev-highlight-bg": "rgb(231, 240, 243)",
+                                    "data-ev-highlight-fg": "rgb(29, 82, 111)"
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=select-content][data-state=open]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "data-state": "open"
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=select-content][data-state=open] [data-slot=select-item]",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open popup captures focus; the keyboard model is the select-keyboard state."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-dark",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-popup-carries-landing": "true",
+                                    "data-ev-primary-bg": "rgb(143, 197, 223)",
+                                    "data-ev-item-min-height": "44",
+                                    "data-ev-popup-bg": "rgb(36, 42, 41)",
+                                    "data-ev-popup-fg": "rgb(242, 240, 233)",
+                                    "data-ev-highlight-bg": "rgb(39, 54, 61)",
+                                    "data-ev-highlight-fg": "rgb(178, 217, 232)"
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=select-content][data-state=open]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "data-state": "open"
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=select-content][data-state=open] [data-slot=select-item]",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open popup captures focus; the keyboard model is the select-keyboard state."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-keyboard",
+                    "query": {
+                        "state": "select-keyboard"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by-enter": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-active-after-arrow": "Ceba tendra (manat)",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-focus-returned-after-escape": "true"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Focus order is the default state; this state drives the select with dispatched key events."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "total-dialog",
+                    "query": {
+                        "state": "total-dialog"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-dialog-landing": "true",
+                                    "data-ev-dialog-focus-inside": "true",
+                                    "data-ev-dialog-escape-closed": "true",
+                                    "data-ev-dialog-focus-returned": "true"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Dialog is closed by Escape in the state script; focus return is asserted as evidence."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "toast",
+                    "query": {
+                        "state": "toast"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-toaster-landing": "true"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The toast is a transient overlay; focus order is covered by the default state."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "account-menu",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-menu-landing": "true"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open menu captures focus; arrow navigation is Reka behaviour."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

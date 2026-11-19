@@ -262,6 +262,8 @@ describe('pilot theme layout and portal', () => {
             'Manage/Stock/Create/Extra',
             'Manage/ReturnItems/Index/Extra',
             'Catalogue/Stock/Movements/Extra',
+            'Receptions/Show/Extra',
+            'Receptions/Index',
             'Welcome',
         ]) {
             page.component = component;
@@ -296,6 +298,7 @@ describe('pilot theme layout and portal', () => {
             'Producer/Products/Index',
             'Producer/Products/Create',
             'Producer/Products/Edit',
+            'Receptions/Show',
         ]) {
             page.component = component;
             await nextTick();

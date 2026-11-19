@@ -73,6 +73,7 @@ const landingPages = new Set([
     'Producer/Cutoff',
     'Producer/CycleSummary',
     'Producer/Stock/Movements',
+    'Receptions/Show',
 ]);
 
 export function pilotVariantFor(pageName: string): PilotVariant | null {

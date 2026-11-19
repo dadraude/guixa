@@ -234,6 +234,9 @@ describe('landing variant admission', () => {
         ['Producer/Products', null],
         ['Producer/Stock/Movements', 'landing'],
         ['Producer/Stock/Movements/Extra', null],
+        ['Receptions/Show', 'landing'],
+        ['Receptions/Show/Extra', null],
+        ['Receptions/Index', null],
         ['Finance/Stock/Movements', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
@@ -257,6 +260,8 @@ describe('landing variant admission', () => {
             'Finance/Stock/Movements',
             'Producer/Stock/Movements/Extra',
             'Catalogue/Stock/Movements/Extra',
+            'Receptions/Show/Extra',
+            'Receptions/Index',
             'Producer/Cutoff/Extra',
             'Producer/CycleSummary/Extra',
             'Producer/Products/Index/Extra',
@@ -297,6 +302,7 @@ describe('landing variant admission', () => {
             'Producer/Stock/Movements',
             'Producer/Products/Create',
             'Producer/Products/Edit',
+            'Receptions/Show',
         ]) {
             page.component = component;
             await nextTick();

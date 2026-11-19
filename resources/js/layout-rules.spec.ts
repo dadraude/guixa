@@ -16,6 +16,7 @@ export const checkedFiles = [
     'pages/Producer/Products/Edit.vue',
     'components/StockProductFields.vue',
     'components/WeeklyProductFields.vue',
+    'pages/Receptions/Show.vue',
     'pages/Orders/Index.vue',
     'pages/Orders/Edit.vue',
     'components/orders/CycleCard.vue',
@@ -87,6 +88,8 @@ const excludedFromChecks = ['components/ui/', 'pages/Welcome.vue'];
 // T46: existing spacing retained after rendered before/after review.
 // The allowlist is exact by file and class; new off-grid values still fail.
 const retainedT46Spacing: Record<string, readonly string[]> = {
+    // 005 T17: 12 px panel padding and gap kept; changing them would alter the reception layout, not just its identity.
+    'pages/Receptions/Show.vue': ['gap-3', 'p-3'],
     'pages/auth/Login.vue': ['space-x-3'],
     'layouts/auth/AuthSimpleLayout.vue': ['md:p-10'],
     'components/Heading.vue': ['space-y-0.5', 'mb-0.5'],
