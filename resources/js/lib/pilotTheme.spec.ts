@@ -202,6 +202,10 @@ describe('landing variant admission', () => {
         ['Manage/Households/Index/Extra', null],
         ['Manage/Households/Show', 'landing'],
         ['Manage/Households/Show/Extra', null],
+        ['Manage/Producers/Index', 'landing'],
+        ['Manage/Producers/Index/Extra', null],
+        ['Manage/Settings', 'landing'],
+        ['Manage/Settings/Extra', null],
         ['Stock/Index', null],
         ['Finance/Stock/Index', 'landing'],
         ['Orders/Index', 'landing'],
@@ -287,6 +291,8 @@ describe('landing variant admission', () => {
             'Manage/Roles/Index/Extra',
             'Manage/Households/Index/Extra',
             'Manage/Households/Show/Extra',
+            'Manage/Producers/Index/Extra',
+            'Manage/Settings/Extra',
             'Manage/Stock/Create/Extra',
             'Welcome',
         ]) {
@@ -332,6 +338,8 @@ describe('landing variant admission', () => {
             'Manage/Roles/Index',
             'Manage/Households/Index',
             'Manage/Households/Show',
+            'Manage/Producers/Index',
+            'Manage/Settings',
         ]) {
             page.component = component;
             await nextTick();

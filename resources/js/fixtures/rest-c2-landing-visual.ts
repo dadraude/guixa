@@ -212,7 +212,49 @@ const householdShowProps = () => {
     };
 };
 
+// Producers (Manage/Producers/Index): `default` mixes an active producer with an active account, one with a pending
+// invitation, a deactivated one and one without an account (the invitation form); `empty` and `long-content` are the others.
+const producer = (id: string, over: Record<string, unknown> = {}) => ({
+    id,
+    name: `Productor ${id}`,
+    active: true,
+    cutoffDaysBefore: 3,
+    cutoffTime: '20:00',
+    accountEmail: null,
+    accountInvitationPending: false,
+    ...over,
+});
+const producerRows = () => {
+    if (state === 'empty') return [];
+    if (state === 'long-content')
+        return [
+            producer('long', {
+                name: longName,
+                accountEmail: longEmail,
+                accountInvitationPending: true,
+            }),
+            producer('long-open', { name: longName }),
+        ];
+    return [
+        producer('hortalisses', {
+            name: 'Hortalisses Can Roca',
+            accountEmail: 'canroca@example.test',
+        }),
+        producer('formatges', {
+            name: 'Formatges de la Vall',
+            cutoffDaysBefore: 1,
+            accountEmail: 'vall@example.test',
+            accountInvitationPending: true,
+        }),
+        producer('ous', { name: 'Ous del Pla', active: false }),
+        producer('mel', { name: 'Mel de Muntanya', cutoffDaysBefore: 5 }),
+    ];
+};
+
 const pageProps: Record<string, Record<string, unknown>> = {
+    'Manage/Producers/Index': { producers: producerRows() },
+    // `empty` is the weekday not yet set (the notice and the placeholder).
+    'Manage/Settings': { pickupWeekday: state === 'empty' ? null : 4 },
     'Manage/Households/Index': householdIndexProps(),
     'Manage/Households/Show': householdShowProps(),
     'Manage/Roles/Index': { groups: roleGroups() },
@@ -258,6 +300,8 @@ const urls: Record<string, string> = {
     'Manage/Accounts/Index': '/manage/accounts',
     'Manage/Households/Index': '/manage/households',
     'Manage/Households/Show': '/manage/households/household-1',
+    'Manage/Producers/Index': '/manage/producers',
+    'Manage/Settings': '/manage/settings',
     'Wallet/Statement': '/finance/households/household-1/wallet',
 };
 const shared = {
@@ -292,6 +336,21 @@ const pagesByPath = Object.fromEntries(
     Object.entries(urls).map(([name, path]) => [path, name]),
 );
 
+const domainErrors: Record<string, string> = {
+    default: 'No s’ha pogut canviar el rol.',
+    'Manage/Producers/Index': 'No s’ha pogut crear el productor.',
+    'Manage/Settings': 'No s’ha pogut desar el dia de recollida.',
+};
+const invalidErrors: Record<string, Record<string, string>> = {
+    default: {
+        household_id: 'El camp unitat de convivència és obligatori.',
+    },
+    'Manage/Producers/Index': { name: 'El camp nom és obligatori.' },
+    'Manage/Settings': {
+        pickup_weekday: 'El dia de recollida no és vàlid.',
+    },
+};
+
 // Request spy: the requests the real router sends, so busy and error states are proven to come from them.
 const requests: string[] = [];
 const navigation: string[] = [];
@@ -314,11 +373,12 @@ http.setClient({
                     ...page.props,
                     errors:
                         state === 'invalid'
-                            ? {
-                                  household_id:
-                                      'El camp unitat de convivència és obligatori.',
-                              }
-                            : { domain: 'No s’ha pogut canviar el rol.' },
+                            ? (invalidErrors[pageName] ?? invalidErrors.default)
+                            : {
+                                  domain:
+                                      domainErrors[pageName] ??
+                                      domainErrors.default,
+                              },
                 },
             });
         }
@@ -438,17 +498,25 @@ const runRemoveDialog = async (label: string) => {
     set('dialog-focus-returned', String(document.activeElement === opener));
 };
 
+// Waits for the request the page sent and, when an answer is expected, for the error text it renders (InputError always
+// renders its element, so the text must be non-empty).
+const awaitRequestOutcome = async (expectError: boolean) => {
+    await waitFor(() => (requests.length ? document.body : null));
+    if (expectError)
+        await waitFor(() =>
+            document.querySelector(
+                '#main-content .text-destructive:not(:empty)',
+            ),
+        );
+    await sleep(400);
+    set('requests', requests.join(' ; '));
+};
+
 // Confirms a removal through the real dialog, so busy and error states come from the request the page sends.
 const runRoleRequest = async () => {
     (await removeButton('Retira el rol «Economia» a Anna Puig')).click();
     confirmButton(await waitFor(dialogOpen)).click();
-    await waitFor(() => (requests.length ? document.body : null));
-    if (state === 'error')
-        await waitFor(() =>
-            document.querySelector('#main-content .text-destructive'),
-        );
-    await sleep(400);
-    set('requests', requests.join(' ; '));
+    await awaitRequestOutcome(state === 'error');
 };
 // Submits the household move of the first account (its select has a default), proving busy and error from the request.
 const runAccountRequest = async () => {
@@ -460,13 +528,7 @@ const runAccountRequest = async () => {
         ].find((button) => button.textContent?.trim() === 'Mou'),
     );
     move.click();
-    await waitFor(() => (requests.length ? document.body : null));
-    if (state !== 'busy')
-        await waitFor(() =>
-            document.querySelector('#main-content .text-destructive'),
-        );
-    await sleep(400);
-    set('requests', requests.join(' ; '));
+    await awaitRequestOutcome(state !== 'busy');
 };
 
 // Settlement details (S22): the open-basket links are native anchors. Records how many are visible, that focus() lands
@@ -484,6 +546,35 @@ const runSettlementKeyboard = async () => {
         'settlement-link-height',
         String(links[0]?.getBoundingClientRect().height),
     );
+};
+
+// Submits the new-producer form with a name, proving busy and error from the request the page sends.
+const runProducerRequest = async () => {
+    const name = await waitFor(() =>
+        document.querySelector<HTMLInputElement>('#producer-name'),
+    );
+    name.value = 'Productor nou';
+    document
+        .querySelector<HTMLElement>('[data-test="create-producer"]')!
+        .click();
+    await awaitRequestOutcome(state !== 'busy');
+};
+// Saves the pickup weekday (the select has a default), proving busy and error from the request.
+const runSettingsRequest = async () => {
+    (
+        await waitFor(() =>
+            document.querySelector<HTMLElement>(
+                '[data-test="save-pickup-weekday"]',
+            ),
+        )
+    ).click();
+    await awaitRequestOutcome(state !== 'busy');
+};
+
+const requestRunners: Record<string, () => Promise<void>> = {
+    'Manage/Roles/Index': runRoleRequest,
+    'Manage/Producers/Index': runProducerRequest,
+    'Manage/Settings': runSettingsRequest,
 };
 
 const popupSelector = '[data-slot="select-content"][data-state="open"]';
@@ -649,9 +740,7 @@ void createInertiaApp({
         if (state === 'select') recordPopup((await openSelect()).popup);
         if (state === 'select-keyboard') await runSelectKeyboard();
         if (['busy', 'error', 'invalid'].includes(state))
-            await (pageName === 'Manage/Roles/Index'
-                ? runRoleRequest()
-                : runAccountRequest());
+            await (requestRunners[pageName] ?? runAccountRequest)();
         if (state === 'settlement-keyboard') await runSettlementKeyboard();
     } catch (error) {
         set('error', String(error));
