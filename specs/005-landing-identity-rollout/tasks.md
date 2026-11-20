@@ -10,6 +10,8 @@ of the plan and spec only (worktree `origin/main`).
 
 **Checkpoint C1 (T17–T23): approved (2026-11-19).** T23 (DRA-295) recorded the C1 acceptance and asked for visual approval (Q&A `history/2026-11-19T21-23-30.594Z-DRA-295-5b4045f8-9319-41c0-b8cc-a38da89b3c85.md`); the user approved the seven C1 pages and the received-total dialog in light and dark (Q&A `history/2026-11-19T22-22-49.544Z-DRA-295-18f726e1-6cd2-40fe-b0ff-b007f478fe5c.md`). C2 (T24) may start (S30).
 
+**Checkpoint C2 (T24–T30): awaiting approval.** T30 (DRA-306) recorded the C2 acceptance and asked the user for visual approval of the nine C2 pages and their overlays in light and dark (Q&A `history/2026-11-20T18-10-46.715Z-DRA-306-0e4e1132-8fe4-4c97-a9fe-bdeeb42d8012.md`; multi-role case left open in Deviation `history/2026-11-20T18-07-42.179Z-DRA-306-680247b1-c5dc-4677-92e6-5fd01d7c1bbb.md`; variant-off decision in Deviation `history/2026-11-20T18-07-42.128Z-DRA-306-f00cf996-da33-4bfc-849f-3bdd7a509bd3.md`). No approval is recorded; C3 (T31) does not start until it is (S30).
+
 ## Architecture and safe sequence
 
 A page joins the landing look only by exact name in `landingPages` (`resources/js/lib/pilotTheme.ts`); the shell and
@@ -991,6 +993,7 @@ PHP guards for C2: `tests/Feature/Manage/RolesPageTest.php`, `tests/Feature/Memb
   - Task deviation (DRA-300): decide the variant-off fixture state for C1 and C2 pages (page-task contract point 7), citing DRA-294 `177f0307` (6) and DRA-300 `ca774442`.
 - **First checkpoint.** Run the C2 shared manifest. **Size.** Documentation and evidence only. **Limits.** No C3 work.
 - **Acceptance record.** C2 record; verdict "pending approval".
+- **Status.** Awaiting approval. Record (R20, R27, R30; S21, S22, S26, S27, S30; R28, R29 have no C2 allocation; per-page R5–R9 text, manifest counts 187 + 122 + 260 + 144, Vitest 550, multi-role tracked case open (Deviation), Pest guards and `DemoSeederTest` green) is in the Q&A cited in the status line at the top; the DRA-300 task deviation is decided there (no variant-off fixture state, Deviation cited at the top); verdict pending approval, remainder owner: the user's decision, then T31.
 
 ## Checkpoint C3 — Wallet and member (T31–T33)
 
