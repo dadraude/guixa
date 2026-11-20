@@ -934,6 +934,7 @@ PHP guards for C2: `tests/Feature/Manage/RolesPageTest.php`, `tests/Feature/Memb
 - **Done when.** Specs fail first (deactivated row text, settlement shown, `SettlementDetails` by keyboard); both pages and the overlay measured per the method (deactivated household, unpaid, settled, long names, select on `Show`); money to the cent unchanged; `HouseholdPagesTest.php` unchanged.
 - **First checkpoint.** Failing specs. **Size.** ~250–400 lines (plan; medium, likely to exceed). **Limits.** No `SettlementDetails` markup change beyond classes under the variant.
 - **Acceptance record.** As T24 for these surfaces.
+- **Status.** Implemented (DRA-302): admission rows, `/* 005 T25 */` (tabular balances, wrapping status pill), three specs, `rest-c2-landing-households.visual.json`. `SettlementDetails` is inline, not an overlay, and the variant-off state is left to T30 (Deviations DRA-302 `37829198`, `76bfd001`). Remainder: closure T30; seeded balances T29.
 
 ### T26 Show the producer table and the manager settings in the landing identity
 

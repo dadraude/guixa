@@ -2520,3 +2520,30 @@ html.dark:has(.reference-style)
 .landing [data-test='finance-stock-product'] > :first-child > p {
     font-variant-numeric: tabular-nums;
 }
+
+/* 005 T25 */
+/*
+ * Households and settlement details, limited to the two household pages by their own structure so no page approved earlier
+ * changes (Receptions, Finance baskets, Accounts, Roles and Catalogue producers share `.pilot-manager-page`, `dd` and
+ * `.material-status`). The balance in `SettlementDetails` is plain text with proportional figures; it takes tabular figures
+ * inside the "to settle" and deactivation sections (R22, as T19 and T21). The member status pill keeps `nowrap` text inside a
+ * flex row, so at 375px and 200% text "Invitació pendent" overflowed its pill; on the household detail page (the one with the
+ * deactivation or reactivation section) the member list lets the text wrap. Markup, amounts and 44px heights are unchanged.
+ */
+.landing
+    .pilot-manager-page
+    section:is(
+        [aria-labelledby='to-settle-heading'],
+        [aria-labelledby='deactivation-heading']
+    )
+    dl
+    dd {
+    font-variant-numeric: tabular-nums;
+}
+
+.landing
+    .pilot-manager-page:has(#deactivation-heading, #reactivation-heading)
+    .pilot-list
+    .material-status {
+    white-space: normal;
+}
