@@ -56,11 +56,13 @@ const setQuantity = (wrapper: ReturnType<typeof mountDialog>, value: string) =>
 // and keeps the destructive status change behind a confirmation drawn as the danger action. Escape and focus return are
 // the NativeDialog's (NativeDialog.spec.ts) and the manifest's.
 // The first form in the dialog is the title bar's close form; the count form is the one holding the input.
-const submit = (wrapper: ReturnType<typeof mountDialog>) =>
+const submit = (wrapper: ReturnType<typeof mountDialog>) => {
     wrapper
         .get('[data-test="stock-available"]')
         .element.closest('form')!
         .dispatchEvent(new Event('submit', { cancelable: true }));
+    return wrapper.vm.$nextTick();
+};
 
 describe('stock edit dialog', () => {
     beforeEach(() => {
