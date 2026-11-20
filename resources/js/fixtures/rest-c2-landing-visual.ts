@@ -742,6 +742,11 @@ const runCycleDialog = async (openerSelector: string, close: boolean) => {
     set('dialog-ink', style.color);
     set('dialog-border', style.borderTopColor);
     set('dialog-focus-inside', String(dialog.contains(document.activeElement)));
+    // A modal dialog makes the page behind it inert: the opener cannot take focus while the dialog is open (the focus trap).
+    const inside = document.activeElement;
+    opener.focus();
+    set('dialog-outside-inert', String(document.activeElement !== opener));
+    (inside as HTMLElement | null)?.focus();
     set('dialog-requests', String(requests.length));
     if (!close) return;
     dialog.requestClose();
