@@ -30,10 +30,6 @@ function mountDialog(
     HTMLDialogElement.prototype.showModal = function () {
         this.open = true;
     };
-    HTMLDialogElement.prototype.close = function () {
-        this.open = false;
-        this.dispatchEvent(new Event('close'));
-    };
     return mount(CycleCreateDialog, {
         props: {
             open: true,
@@ -48,7 +44,7 @@ function mountDialog(
 }
 
 // R21/R22/R26/S22 (T27): the create dialog reads as text, offers the weekday only while the cooperative has none, and
-// keeps the submit action disabled while the request runs; Escape closes it and gives focus back to the opener.
+// keeps the submit action disabled while the request runs. Escape and focus return are the NativeDialog's (NativeDialog.spec.ts) and the manifest's.
 describe('cycle create dialog', () => {
     afterEach(() => {
         document.body.innerHTML = '';
@@ -106,21 +102,5 @@ describe('cycle create dialog', () => {
 
         expect(wrapper.text()).toContain('No s’ha pogut obrir el cicle.');
         expect(wrapper.text()).toContain('El camp data és obligatori.');
-    });
-
-    it('closes on Escape without a request and returns focus to the opener', async () => {
-        const opener = document.createElement('button');
-        document.body.append(opener);
-        const wrapper = mountDialog();
-        await wrapper.setProps({ open: false });
-        await wrapper.setProps({ open: true, returnFocusTo: opener });
-        await wrapper.vm.$nextTick();
-
-        const dialog = wrapper.get('dialog').element as HTMLDialogElement;
-        expect(dialog.open).toBe(true);
-        dialog.close();
-
-        expect(wrapper.emitted('close')).toHaveLength(1);
-        expect(document.activeElement).toBe(opener);
     });
 });
