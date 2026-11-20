@@ -396,7 +396,133 @@ const cycleShowProps = () => ({
             : { count: 3, href: '/finance/baskets?pending=1&cycle=cycle-1' },
 });
 
+// Stock (Manage/Stock/Movements and the StockEditDialog opened from Manage/Stock/Index). `default` is a short history,
+// `paged` the second page of 51 movements (the slice 2 seeder size), `long-content` seven-figure quantities and long names.
+const stockProduct = (
+    id: string,
+    name: string,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    producerId: 'producer-1',
+    name,
+    unit: 'pot',
+    price: '4.50',
+    available: '12.000',
+    active: true,
+    ...over,
+});
+const stockName = state === 'long-content' ? longName : 'Mel de farigola';
+const stockRows = () => [
+    stockProduct('stock-1', stockName),
+    stockProduct('stock-2', 'Melmelada de figa', {
+        active: false,
+        available: '0.000',
+        price: '3.80',
+    }),
+    stockProduct('stock-3', 'Oli d’oliva verge extra', {
+        unit: 'ampolla',
+        price: '9.90',
+        available: '40.500',
+    }),
+];
+const movementLine = (
+    id: string,
+    type: string,
+    quantity: string,
+    balanceAfter: string,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    occurredAt: '2026-11-10 09:30',
+    type,
+    quantity,
+    balanceAfter,
+    note: null as string | null,
+    authorName: 'Maria Soler',
+    cycleId: 'cycle-1',
+    pickupDate: '2026-11-14',
+    basketId: null as string | null,
+    ...over,
+});
+const movementHistory = () => {
+    const empty = {
+        lines: [],
+        total: 0,
+        page: 1,
+        prevUrl: null,
+        nextUrl: null,
+    };
+    if (state === 'empty') return empty;
+    if (state === 'long-content')
+        return {
+            ...empty,
+            total: 2,
+            lines: [
+                movementLine(
+                    'line-1',
+                    'adjustment',
+                    '-1234567.000',
+                    '1234567.500',
+                    {
+                        note: `Ajust per inventari complet del magatzem de ${longName}`,
+                        authorName: longName,
+                    },
+                ),
+                movementLine('line-2', 'entry', '1234567.000', '2469134.500', {
+                    basketId: 'basket-1',
+                }),
+            ],
+        };
+    if (state === 'paged')
+        return {
+            lines: Array.from({ length: 10 }, (_, index) =>
+                movementLine(
+                    `line-${index}`,
+                    'sale',
+                    '-1.000',
+                    `${40 - index}.000`,
+                    { basketId: `basket-${index}` },
+                ),
+            ),
+            total: 51,
+            page: 2,
+            prevUrl: '/manage/stock/stock-1/movements?page=1',
+            nextUrl: '/manage/stock/stock-1/movements?page=3',
+        };
+    return {
+        ...empty,
+        total: 4,
+        lines: [
+            movementLine('line-1', 'sale', '-3.000', '12.000', {
+                basketId: 'basket-1',
+            }),
+            movementLine('line-2', 'entry', '10.500', '15.000', {
+                note: 'Recepció setmanal',
+            }),
+            movementLine('line-3', 'adjustment', '-1.250', '4.500', {
+                note: 'Pot trencat',
+                pickupDate: null,
+                cycleId: null,
+            }),
+            movementLine('line-4', 'correction', '2.000', '5.750'),
+        ],
+    };
+};
+const stockMovementsProps = () => ({
+    product: stockProduct('stock-1', stockName, {
+        available: state === 'long-content' ? '1234567.500' : '12.000',
+    }),
+    cycles: [
+        { id: 'cycle-1', pickupDate: '2026-11-14' },
+        { id: 'cycle-2', pickupDate: '2026-11-07' },
+    ],
+    history: movementHistory(),
+});
+
 const pageProps: Record<string, Record<string, unknown>> = {
+    'Manage/Stock/Index': { products: stockRows() },
+    'Manage/Stock/Movements': stockMovementsProps(),
     'Manage/Cycles/Index': cycleIndexProps(),
     'Manage/Cycles/Show': cycleShowProps(),
     'Manage/Producers/Index': { producers: producerRows() },
@@ -451,6 +577,8 @@ const urls: Record<string, string> = {
     'Manage/Settings': '/manage/settings',
     'Manage/Cycles/Index': '/manage/cycles',
     'Manage/Cycles/Show': '/manage/cycles/cycle-1',
+    'Manage/Stock/Index': '/manage/stock',
+    'Manage/Stock/Movements': '/manage/stock/stock-1/movements',
     'Wallet/Statement': '/finance/households/household-1/wallet',
 };
 const shared = {
@@ -490,6 +618,7 @@ const domainErrors: Record<string, string> = {
     'Manage/Producers/Index': 'No s’ha pogut crear el productor.',
     'Manage/Settings': 'No s’ha pogut desar el dia de recollida.',
     'Manage/Cycles/Index': 'No s’ha pogut obrir el cicle.',
+    'Manage/Stock/Movements': 'No s’ha pogut registrar l’entrada.',
 };
 const invalidErrors: Record<string, Record<string, string>> = {
     default: {
@@ -500,6 +629,7 @@ const invalidErrors: Record<string, Record<string, string>> = {
         pickup_weekday: 'El dia de recollida no és vàlid.',
     },
     'Manage/Cycles/Index': { pickup_date: 'El camp data és obligatori.' },
+    'Manage/Stock/Movements': { quantity: 'El camp quantitat és obligatori.' },
 };
 
 // Request spy: the requests the real router sends, so busy and error states are proven to come from them.
@@ -773,7 +903,66 @@ const runCycleRequest = async () => {
     await awaitRequestOutcome(state !== 'busy');
 };
 
+// Stock edit dialog (S22): opens from the product row, then `status` opens the status section and asks to deactivate, so the
+// danger confirmation is measured, and `error` submits a count the field pattern lets through but the page refuses, so the text error is measured.
+const runStockDialog = async () => {
+    // The row button (narrow) and the table's pencil button (wide) both open it; the layout shows one of them.
+    const opener = await waitFor(() =>
+        [
+            ...document.querySelectorAll<HTMLElement>(
+                'button[aria-label="Edita Mel de farigola"], button[aria-label="Edita: Mel de farigola"]',
+            ),
+        ].find(visible),
+    );
+    opener.dataset.visualOpener = 'true';
+    await runCycleDialog('[data-visual-opener]', state.endsWith('-escape'));
+    if (state === 'edit-status') {
+        const dialog = cycleDialog()!;
+        dialog.querySelector<HTMLElement>('details summary')!.click();
+        const deactivate = await waitFor(() =>
+            [...dialog.querySelectorAll<HTMLElement>('details button')].find(
+                visible,
+            ),
+        );
+        deactivate.click();
+        const confirm = await waitFor(() =>
+            dialog.querySelector<HTMLElement>(
+                '[data-test="confirm-status-stock-1"]',
+            ),
+        );
+        await settle();
+        // The confirmation is the destructive action (S22): it must resolve to --destructive, not to the primary.
+        set('dialog-destructive-bg', getComputedStyle(confirm).backgroundColor);
+    }
+    if (state === 'edit-error') {
+        const dialog = cycleDialog()!;
+        const count =
+            dialog.querySelector<HTMLInputElement>('#stock-available')!;
+        count.value = '12345678';
+        count.dispatchEvent(new Event('input', { bubbles: true }));
+        // The input's passive v-model reaches the page on the next tick; saving before it would read the old count.
+        await sleep(100);
+        dialog
+            .querySelector<HTMLElement>('[data-test="save-available"]')!
+            .click();
+        await waitFor(() =>
+            dialog.querySelector('.text-destructive:not(:empty)'),
+        );
+        await settle();
+    }
+};
+// Records an entry through the real form, so busy and error come from the request the movements page sends.
+const runStockEntryRequest = async () => {
+    const quantity = await waitFor(() =>
+        document.querySelector<HTMLInputElement>('#entry-quantity'),
+    );
+    quantity.value = '5';
+    document.querySelector<HTMLElement>('[data-test="record-entry"]')!.click();
+    await awaitRequestOutcome(state !== 'busy');
+};
+
 const requestRunners: Record<string, () => Promise<void>> = {
+    'Manage/Stock/Movements': runStockEntryRequest,
     'Manage/Cycles/Index': runCycleRequest,
     'Manage/Roles/Index': runRoleRequest,
     'Manage/Producers/Index': runProducerRequest,
@@ -948,6 +1137,7 @@ void createInertiaApp({
                 `[data-test="${state.startsWith('manage-producer') ? 'manage-cycle-1-baker' : 'manage-cycle-1'}"]`,
                 state.endsWith('-escape'),
             );
+        if (state.startsWith('edit-')) await runStockDialog();
         if (state === 'nav-sheet') await runNavSheet();
         if (state === 'account-menu') await runAccountMenu();
         if (state === 'select') recordPopup((await openSelect()).popup);
