@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Laravel\Fortify\Fortify;
 use Tests\Support\FrozenClock;
 
 it('seeds a usable cooperative with accounts, orders, reception and pickups', function () {
@@ -213,6 +214,23 @@ it('seeds the Manager states: a role with no holder, a deactivated household and
         ->and($accounts['anna@demo.guixa.test']->active)->toBeTrue();
 });
 
+it('seeds one account with confirmed two-factor and no passkey, shown by the Security settings (R27, S25)', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+
+    $enabled = User::query()->whereNotNull('two_factor_secret')->get();
+    expect($enabled)->toHaveCount(1)
+        ->and($enabled->first()->email)->toBe('carla@demo.guixa.test')
+        ->and($enabled->first()->hasEnabledTwoFactorAuthentication())->toBeTrue()
+        ->and(json_decode(Fortify::currentEncrypter()->decrypt($enabled->first()->two_factor_recovery_codes)))->toHaveCount(8)
+        ->and($enabled->first()->passkeys()->count())->toBe(0);
+
+    $props = $this->actingAs($enabled->first())->withSession(['auth.password_confirmed_at' => time()])
+        ->get('/settings/security')->assertOk()->viewData('page')['props'];
+    expect($props['twoFactorEnabled'])->toBeTrue()
+        ->and($props['passkeys'])->toBe([]);
+});
+
 it('shows the combined member and Finance demo account one collection group, the unlinked account an explanation, and caught-up members their opportunity instead (S1, S10, R14)', function () {
     $this->seed(DemoSeeder::class);
     $this->withoutVite();
@@ -294,8 +312,11 @@ it('can be repeated without duplicating data or resetting demo edits', function 
     app(SetOrderLine::class)(app(ActorResolver::class)->forAccount($user->id), $cycle, $product, '3.250');
     $tables = ['users', 'households', 'producers', 'products', 'cycles', 'orders', 'order_lines', 'wallet_movements', 'stock_movements', 'received_totals', 'return_items', 'product_unavailabilities'];
     $counts = array_map(fn (string $table) => DB::table($table)->count(), $tables);
+    $secret = DB::table('users')->whereNotNull('two_factor_secret')->value('two_factor_secret');
 
     $this->seed(DemoSeeder::class);
+
+    expect(DB::table('users')->whereNotNull('two_factor_secret')->pluck('two_factor_secret')->all())->toBe([$secret]);
 
     expect(array_map(fn (string $table) => DB::table($table)->count(), $tables))->toBe($counts);
     expect($manager->fresh()->email)->toBe('changed-manager@example.test');

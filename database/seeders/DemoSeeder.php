@@ -43,7 +43,11 @@ use Guixa\Stock\Application\SetStockAvailable;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
+use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
+use Laravel\Fortify\Fortify;
 use LogicException;
+use PragmaRX\Google2FA\Google2FA;
 
 final class DemoSeeder extends Seeder
 {
@@ -62,6 +66,8 @@ final class DemoSeeder extends Seeder
     private const string FORMER_MEMBER_NAME = 'Jan Roca';
 
     private const string FORMER_MEMBER_EMAIL = 'jan@demo.guixa.test';
+
+    private const string TWO_FACTOR_EMAIL = 'carla@demo.guixa.test';
 
     private const array HOUSEHOLDS = [
         ['Can Roca', 'Anna Roca', 'anna@demo.guixa.test', 10000],
@@ -167,6 +173,19 @@ final class DemoSeeder extends Seeder
         $this->createCatalogueStates($manager, $cycles[2], $catalog);
         $this->createProducerStates($manager, $catalog);
         $this->createManagerStates($manager, $members[0]['householdId']);
+        $this->enableTwoFactor();
+    }
+
+    /**
+     * Created after the cycles, like the other states, so no cycle, order or count changes. The account has no passkey; passkeys
+     * come from the landing fixture. The login test avoids this account because its login now asks for a code.
+     */
+    private function enableTwoFactor(): void
+    {
+        $user = User::query()->where('email', self::TWO_FACTOR_EMAIL)->firstOrFail();
+        app(EnableTwoFactorAuthentication::class)($user);
+        $secret = Fortify::currentEncrypter()->decrypt($user->two_factor_secret);
+        app(ConfirmTwoFactorAuthentication::class)($user, app(Google2FA::class)->getCurrentOtp($secret));
     }
 
     /**
