@@ -66,6 +66,41 @@
                                 "contrast": 4.5
                             },
                             {
+                                "selector": "#main-content .material-status",
+                                "count": 8,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(1) > div:first-child .material-status",
+                                "count": 1,
+                                "text": "Obert",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(1) ul.divide-y > li:nth-child(1) .material-status",
+                                "count": 1,
+                                "text": "Obert",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(1) ul.divide-y > li:nth-child(2) > span:nth-of-type(2) > .material-status:nth-child(2)",
+                                "count": 1,
+                                "text": "Enviada",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(2) > div:first-child .material-status",
+                                "count": 1,
+                                "text": "Tancat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(3) .material-status",
+                                "count": 1,
+                                "text": "Cancel·lades",
+                                "contrast": 4.5
+                            },
+                            {
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-primary": "rgb(40, 101, 133)",
@@ -148,6 +183,41 @@
                                 "selector": "#main-content [data-slot=\"button\"]",
                                 "minHeight": 44,
                                 "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .material-status",
+                                "count": 8,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(1) > div:first-child .material-status",
+                                "count": 1,
+                                "text": "Obert",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(1) ul.divide-y > li:nth-child(1) .material-status",
+                                "count": 1,
+                                "text": "Obert",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(1) ul.divide-y > li:nth-child(2) > span:nth-of-type(2) > .material-status:nth-child(2)",
+                                "count": 1,
+                                "text": "Enviada",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(2) > div:first-child .material-status",
+                                "count": 1,
+                                "text": "Tancat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li:nth-child(3) .material-status",
+                                "count": 1,
+                                "text": "Cancel·lades",
                                 "contrast": 4.5
                             },
                             {
@@ -283,6 +353,11 @@
                                 "count": 1
                             },
                             {
+                                "selector": "#main-content .material-status",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
                                 "selector": "#main-content [data-slot=\"button\"]",
                                 "minHeight": 44,
                                 "minWidth": 44,
@@ -346,6 +421,11 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .material-status",
+                                "count": 2,
                                 "contrast": 4.5
                             },
                             {
