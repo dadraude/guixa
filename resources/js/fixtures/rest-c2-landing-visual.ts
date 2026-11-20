@@ -133,7 +133,88 @@ const households = [
     { id: 'household-3', name: longName },
 ].map((h) => ({ ...h, active: true, memberCount: 1 }));
 
+// Households (Manage/Households/{Index,Show}): `default` mixes an active household, a deactivated one and a long name;
+// the to-settle list shows an unpaid household (negative balance, open baskets) and a settled one (zero, none).
+// Show's `inactive`, `settled` and `long-content` states cover reactivation, the empty settlement and long text.
+const householdRows = [
+    { id: 'household-1', name: 'Família Soler', memberCount: 3, active: true },
+    { id: 'household-2', name: 'Família Puig', memberCount: 1, active: false },
+    { id: 'household-3', name: longName, memberCount: 12, active: true },
+];
+const unpaidSettlement = {
+    householdId: 'household-1',
+    householdName: 'Família Soler',
+    balanceCents: -1250,
+    openBaskets: [
+        { basketId: 'basket-1', date: '2026-11-12', status: 'draft' },
+        { basketId: 'basket-2', date: '2026-11-19', status: 'validated' },
+    ],
+};
+const settledSettlement = {
+    householdId: 'household-2',
+    householdName: 'Família Puig',
+    balanceCents: 0,
+    openBaskets: [],
+};
+const householdIndexProps = () => {
+    if (state === 'empty') return { households: [], toSettle: [] };
+    if (state === 'long-content')
+        return {
+            households: [householdRows[2]],
+            toSettle: [
+                {
+                    ...unpaidSettlement,
+                    householdId: 'household-3',
+                    householdName: longName,
+                },
+            ],
+        };
+    return {
+        households: householdRows,
+        toSettle: [unpaidSettlement, settledSettlement],
+    };
+};
+const member = (
+    id: string,
+    name: string,
+    over: Record<string, unknown> = {},
+) => ({
+    accountId: id,
+    name,
+    email: `${id}@example.test`,
+    invitationPending: false,
+    invitationExpired: false,
+    invitationExpiresAt: null,
+    ...over,
+});
+const householdShowProps = () => {
+    const long = state === 'long-content';
+    return {
+        household: {
+            id: 'household-1',
+            name: long ? longName : 'Família Soler',
+            active: state !== 'inactive',
+            members: [
+                member(
+                    'anna',
+                    long ? longName : 'Anna Soler',
+                    long ? { email: longEmail } : {},
+                ),
+                member('pau', 'Pau Soler', {
+                    invitationPending: true,
+                    invitationExpiresAt: '2026-12-01T10:00:00Z',
+                }),
+            ],
+        },
+        otherHouseholds: householdRows.filter((h) => h.id !== 'household-1'),
+        deactivationWarning:
+            state === 'settled' ? settledSettlement : unpaidSettlement,
+    };
+};
+
 const pageProps: Record<string, Record<string, unknown>> = {
+    'Manage/Households/Index': householdIndexProps(),
+    'Manage/Households/Show': householdShowProps(),
     'Manage/Roles/Index': { groups: roleGroups() },
     'Manage/Accounts/Index': { accounts: accountRows(), households },
     // Unmigrated leakage probe: Wallet/Statement stays old-theme until C3 and carries the select control.
@@ -175,6 +256,8 @@ const pageProps: Record<string, Record<string, unknown>> = {
 const urls: Record<string, string> = {
     'Manage/Roles/Index': '/manage/roles',
     'Manage/Accounts/Index': '/manage/accounts',
+    'Manage/Households/Index': '/manage/households',
+    'Manage/Households/Show': '/manage/households/household-1',
     'Wallet/Statement': '/finance/households/household-1/wallet',
 };
 const shared = {
@@ -386,6 +469,23 @@ const runAccountRequest = async () => {
     set('requests', requests.join(' ; '));
 };
 
+// Settlement details (S22): the open-basket links are native anchors. Records how many are visible, that focus() lands
+// on the first one, and its height; the manifest's focus list reaches them with real Tab presses.
+const runSettlementKeyboard = async () => {
+    const links = [
+        ...document.querySelectorAll<HTMLAnchorElement>(
+            '#main-content dl a[href]',
+        ),
+    ].filter(visible);
+    set('settlement-links', String(links.length));
+    links[0]?.focus();
+    set('settlement-focused', String(document.activeElement === links[0]));
+    set(
+        'settlement-link-height',
+        String(links[0]?.getBoundingClientRect().height),
+    );
+};
+
 const popupSelector = '[data-slot="select-content"][data-state="open"]';
 const firstTrigger = () =>
     [
@@ -552,6 +652,7 @@ void createInertiaApp({
             await (pageName === 'Manage/Roles/Index'
                 ? runRoleRequest()
                 : runAccountRequest());
+        if (state === 'settlement-keyboard') await runSettlementKeyboard();
     } catch (error) {
         set('error', String(error));
     }
