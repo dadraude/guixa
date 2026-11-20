@@ -83,8 +83,4 @@ describe('Producer stock movement history (005 R14, R16, S16)', () => {
         expect(pilotVariantFor('Producer/Stock/Movements')).toBe('landing');
         expect(pilotVariantFor('Producer/Stock/Movements/Extra')).toBeNull();
     });
-
-    it('leaves the Manager history on its own identity', () => {
-        expect(pilotVariantFor('Manage/Stock/Movements')).toBeNull();
-    });
 });

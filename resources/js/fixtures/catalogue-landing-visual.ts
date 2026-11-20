@@ -276,8 +276,8 @@ const returnItem = makeReturnItem(
     '0.25',
 );
 // --- end T07
-// --- T08 (DRA-276): read-only stock movement history. Catalogue is the migrated page; Producer, Finance and
-// Manage consumers of MovementHistory stay unmigrated and serve as the leakage probe.
+// --- T08 (DRA-276): read-only stock movement history. Catalogue is the migrated page; Every other
+// consumer of MovementHistory is migrated since T28, so no leakage probe remains.
 const movementLine = (
     id: string,
     type: string,
@@ -395,27 +395,13 @@ const pageProps: Record<string, Record<string, unknown>> = {
         canDelete: state !== 'used' && state !== 'read-only',
     },
     // --- end T05 ---
-    // --- T06 (DRA-278): stock product forms and the unmigrated Movements neighbour ---
+    // --- T06 (DRA-278): stock product forms ---
     'Manage/Stock/Create': {
         producer: { id: 'producer-1', name: 'Hort de la Vall' },
     },
     'Manage/Stock/Edit': {
         product: stockProduct,
         used: state === 'used',
-    },
-    'Manage/Stock/Movements': {
-        product: { ...stockProduct, available: '12.000' },
-        cycles: [],
-        history:
-            state === 'history'
-                ? movementHistory
-                : {
-                      lines: [],
-                      total: 0,
-                      page: 1,
-                      prevUrl: null,
-                      nextUrl: null,
-                  },
     },
     // --- end T06 ---
     // --- T08 (DRA-276)
@@ -495,7 +481,6 @@ const urls: Record<string, string> = {
         '/catalogue/producers/producer-1/products/stock/create',
     'Manage/Stock/Edit':
         '/catalogue/producers/producer-1/products/stock/stock-1/edit',
-    'Manage/Stock/Movements': '/manage/stock/stock-1/movements',
     // --- end T06
     // --- T08 (DRA-276)
     'Catalogue/Stock/Movements': '/catalogue/stock/stock-1/movements',

@@ -251,7 +251,7 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Product',
             'Catalogue/Producers/Availability/Extra',
             'Catalogue/Producers/WeeklyProduct/Create/Extra',
-            'Manage/Stock/Movements',
+            'Manage/Stock/Movements/Extra',
             'Producer/Stock/Movements/Extra',
             'Producer/Cutoff/Extra',
             'Producer/CycleSummary/Extra',
@@ -295,6 +295,7 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/WeeklyProduct/Edit',
             'Manage/Stock/Create',
             'Manage/Stock/Edit',
+            'Manage/Stock/Movements',
             'Manage/Accounts/Index',
             'Manage/Roles/Index',
             'Manage/Households/Index',
@@ -406,7 +407,7 @@ describe('pilot theme layout and portal', () => {
 
         for (const component of [
             'Orders/Other',
-            'Manage/Stock/Movements',
+            'Manage/Stock/Movements/Extra',
             'Producer/Stock/Movements/Extra',
             'Producer/Cutoff/Extra',
             'Producer/CycleSummary/Extra',
@@ -430,6 +431,7 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/WeeklyProduct/Edit',
             'Manage/Stock/Create',
             'Manage/Stock/Edit',
+            'Manage/Stock/Movements',
             'Manage/ReturnItems/Index',
             'Manage/ReturnItems/Create',
             'Manage/ReturnItems/Edit',
