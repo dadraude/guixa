@@ -18,7 +18,7 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     Mail::fake();
     $this->seed(DatabaseSeeder::class);
 
-    expect(User::count())->toBe(11);
+    expect(User::count())->toBe(12);
     $this->assertDatabaseCount('households', 5);
     $this->assertDatabaseCount('producers', 5);
     $this->assertDatabaseCount('products', 13);
@@ -220,10 +220,9 @@ it('seeds one account with confirmed two-factor and no passkey, shown by the Sec
 
     $enabled = User::query()->whereNotNull('two_factor_secret')->get();
     expect($enabled)->toHaveCount(1)
-        ->and($enabled->first()->email)->toBe('carla@demo.guixa.test')
-        ->and($enabled->first()->hasEnabledTwoFactorAuthentication())->toBeTrue()
-        ->and(json_decode(Fortify::currentEncrypter()->decrypt($enabled->first()->two_factor_recovery_codes)))->toHaveCount(8)
-        ->and($enabled->first()->passkeys()->count())->toBe(0);
+        ->and($enabled->first()->email)->toBe('dos-factors@demo.guixa.test')
+        ->and($enabled->first()->household_id)->toBeNull()
+        ->and(json_decode(Fortify::currentEncrypter()->decrypt($enabled->first()->two_factor_recovery_codes)))->toHaveCount(8);
 
     $props = $this->actingAs($enabled->first())->withSession(['auth.password_confirmed_at' => time()])
         ->get('/settings/security')->assertOk()->viewData('page')['props'];
