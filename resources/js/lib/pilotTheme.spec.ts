@@ -205,6 +205,8 @@ describe('landing variant admission', () => {
         ['Manage/Producers/Index', 'landing'],
         ['Manage/Producers/Index/Extra', null],
         ['Manage/Settings', 'landing'],
+        ['Manage/Cycles/Index', 'landing'],
+        ['Manage/Cycles/Show', 'landing'],
         ['Manage/Settings/Extra', null],
         ['Stock/Index', null],
         ['Finance/Stock/Index', 'landing'],

@@ -87,6 +87,8 @@ const landingPages = new Set([
     'Manage/Households/Show',
     'Manage/Producers/Index',
     'Manage/Settings',
+    'Manage/Cycles/Index',
+    'Manage/Cycles/Show',
 ]);
 
 export function pilotVariantFor(pageName: string): PilotVariant | null {

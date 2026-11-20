@@ -251,7 +251,154 @@ const producerRows = () => {
     ];
 };
 
+// Cycles (Manage/Cycles/Index and Show). `default` mixes an open cycle with an unsent and a sent producer order, a closed
+// cycle with a pending collection and a cancelled one; `empty` has none and `long-content` long producer names.
+const cycleParticipant = (
+    producerId: string,
+    producerName: string,
+    over: Record<string, unknown> = {},
+) => ({
+    producerId,
+    producerName,
+    participating: true,
+    cutoff: '2026-11-04T20:00:00',
+    open: true,
+    sent: false,
+    canSendManually: true,
+    ...over,
+});
+const cycleProducers = [
+    { id: 'baker', name: 'Forn de Pa' },
+    { id: 'dairy', name: 'Formatges de la Vall' },
+    { id: 'honey', name: 'Mel de Muntanya' },
+];
+const cycleRows = () => {
+    if (state === 'empty') return [];
+    if (state === 'long-content')
+        return [
+            {
+                id: 'cycle-1',
+                pickupDate: '2026-11-07',
+                cancelled: false,
+                closed: false,
+                settled: false,
+                participants: [
+                    cycleParticipant('long', longName, { cutoff: null }),
+                ],
+            },
+        ];
+    return [
+        {
+            id: 'cycle-1',
+            pickupDate: '2026-11-07',
+            cancelled: false,
+            closed: false,
+            settled: false,
+            participants: [
+                cycleParticipant('baker', 'Forn de Pa'),
+                cycleParticipant('dairy', 'Formatges de la Vall', {
+                    sent: true,
+                    canSendManually: false,
+                }),
+            ],
+        },
+        {
+            id: 'cycle-2',
+            pickupDate: '2026-10-31',
+            cancelled: false,
+            closed: true,
+            settled: true,
+            participants: [
+                cycleParticipant('baker', 'Forn de Pa', {
+                    open: false,
+                    sent: true,
+                    canSendManually: false,
+                }),
+            ],
+        },
+        {
+            id: 'cycle-3',
+            pickupDate: '2026-10-24',
+            cancelled: true,
+            closed: false,
+            settled: false,
+            participants: [],
+        },
+    ];
+};
+const cycleIndexProps = () => ({
+    cycles: cycleRows(),
+    producers: state === 'empty' ? [] : cycleProducers,
+    pickupWeekday: state === 'create-weekday' ? null : 4,
+    pendingCollections: state === 'empty' ? {} : { 'cycle-2': 3 },
+});
+const cycleShowProps = () => ({
+    summary: {
+        cycleId: 'cycle-1',
+        pickupDate: '2026-11-07',
+        cancelled: state === 'cancelled',
+        producers:
+            state === 'empty' || state === 'cancelled'
+                ? []
+                : [
+                      {
+                          producerId: 'baker',
+                          producerName: 'Forn de Pa',
+                          products: [
+                              {
+                                  productId: 'bread',
+                                  name:
+                                      state === 'long-content'
+                                          ? longName
+                                          : 'Pa de pagès',
+                                  unit: 'unitat',
+                                  quantity: '7.00',
+                                  households: [
+                                      {
+                                          householdId: 'household-1',
+                                          householdName: 'Família Soler',
+                                          quantity: '4.00',
+                                      },
+                                      {
+                                          householdId: 'household-2',
+                                          householdName: 'Família Puig',
+                                          quantity: '3.00',
+                                      },
+                                  ],
+                              },
+                          ],
+                      },
+                  ],
+    },
+    containers: {
+        total: state === 'empty' ? 0 : 5,
+        households:
+            state === 'empty'
+                ? []
+                : [
+                      {
+                          householdId: 'household-1',
+                          householdName: 'Família Soler',
+                          count: 3,
+                          balance: 1,
+                      },
+                      {
+                          householdId: 'household-2',
+                          householdName: 'Família Puig',
+                          count: 2,
+                          balance: 0,
+                      },
+                  ],
+    },
+    pendingCollections:
+        state === 'empty'
+            ? { count: 0, href: null }
+            : { count: 3, href: '/finance/baskets?pending=1&cycle=cycle-1' },
+});
+
 const pageProps: Record<string, Record<string, unknown>> = {
+    'Manage/Cycles/Index': cycleIndexProps(),
+    'Manage/Cycles/Show': cycleShowProps(),
     'Manage/Producers/Index': { producers: producerRows() },
     // `empty` is the weekday not yet set (the notice and the placeholder).
     'Manage/Settings': { pickupWeekday: state === 'empty' ? null : 4 },
@@ -302,6 +449,8 @@ const urls: Record<string, string> = {
     'Manage/Households/Show': '/manage/households/household-1',
     'Manage/Producers/Index': '/manage/producers',
     'Manage/Settings': '/manage/settings',
+    'Manage/Cycles/Index': '/manage/cycles',
+    'Manage/Cycles/Show': '/manage/cycles/cycle-1',
     'Wallet/Statement': '/finance/households/household-1/wallet',
 };
 const shared = {
@@ -340,6 +489,7 @@ const domainErrors: Record<string, string> = {
     default: 'No s’ha pogut canviar el rol.',
     'Manage/Producers/Index': 'No s’ha pogut crear el productor.',
     'Manage/Settings': 'No s’ha pogut desar el dia de recollida.',
+    'Manage/Cycles/Index': 'No s’ha pogut obrir el cicle.',
 };
 const invalidErrors: Record<string, Record<string, string>> = {
     default: {
@@ -349,6 +499,7 @@ const invalidErrors: Record<string, Record<string, string>> = {
     'Manage/Settings': {
         pickup_weekday: 'El dia de recollida no és vàlid.',
     },
+    'Manage/Cycles/Index': { pickup_date: 'El camp data és obligatori.' },
 };
 
 // Request spy: the requests the real router sends, so busy and error states are proven to come from them.
@@ -571,7 +722,59 @@ const runSettingsRequest = async () => {
     await awaitRequestOutcome(state !== 'busy');
 };
 
+// Cycle dialogs (S22): opened from the focused trigger as Enter/Space would. The dialog is modal with focus inside and its
+// surface is recorded; `close` also sends a native close request (Escape) and records that nothing was sent and that
+// focus returned to the opener. Without `close` it stays open so the runner measures and tabs inside it.
+const cycleDialog = () =>
+    document.querySelector<HTMLDialogElement>('dialog.manager-dialog[open]');
+const runCycleDialog = async (openerSelector: string, close: boolean) => {
+    const opener = await waitFor(() =>
+        document.querySelector<HTMLElement>(openerSelector),
+    );
+    opener.focus();
+    opener.click();
+    const dialog = await waitFor(cycleDialog);
+    await settle();
+    await sleep(350);
+    const style = getComputedStyle(dialog);
+    set('dialog-modal', String(dialog.matches(':modal')));
+    set('dialog-bg', style.backgroundColor);
+    set('dialog-ink', style.color);
+    set('dialog-border', style.borderTopColor);
+    set('dialog-focus-inside', String(dialog.contains(document.activeElement)));
+    // A modal dialog makes the page behind it inert: the opener cannot take focus while the dialog is open (the focus trap).
+    const inside = document.activeElement;
+    opener.focus();
+    set('dialog-outside-inert', String(document.activeElement !== opener));
+    (inside as HTMLElement | null)?.focus();
+    set('dialog-requests', String(requests.length));
+    if (!close) return;
+    dialog.requestClose();
+    await waitFor(() => (cycleDialog() ? null : document.body));
+    await sleep(200);
+    set('dialog-escape-closed', 'true');
+    set('dialog-requests', String(requests.length));
+    set('dialog-focus-returned', String(document.activeElement === opener));
+};
+// Submits the create dialog with a date, so busy (button disabled) and error come from the request the page sends.
+const runCycleRequest = async () => {
+    (
+        await waitFor(() =>
+            document.querySelector<HTMLElement>(
+                '[data-test="open-create-cycle"]',
+            ),
+        )
+    ).click();
+    const date = await waitFor(() =>
+        document.querySelector<HTMLInputElement>('#pickup-date'),
+    );
+    date.value = '2026-11-14';
+    document.querySelector<HTMLElement>('[data-test="open-cycle"]')!.click();
+    await awaitRequestOutcome(state !== 'busy');
+};
+
 const requestRunners: Record<string, () => Promise<void>> = {
+    'Manage/Cycles/Index': runCycleRequest,
     'Manage/Roles/Index': runRoleRequest,
     'Manage/Producers/Index': runProducerRequest,
     'Manage/Settings': runSettingsRequest,
@@ -735,6 +938,16 @@ void createInertiaApp({
             await runRemoveDialog('Retira el rol «Economia» a Anna Puig');
         if (state === 'own-manager-dialog')
             await runRemoveDialog('Retira el rol «Gestor» a Maria Soler');
+        if (state.startsWith('create-'))
+            await runCycleDialog(
+                '[data-test="open-create-cycle"]',
+                state.endsWith('-escape'),
+            );
+        if (state.startsWith('manage-'))
+            await runCycleDialog(
+                `[data-test="${state.startsWith('manage-producer') ? 'manage-cycle-1-baker' : 'manage-cycle-1'}"]`,
+                state.endsWith('-escape'),
+            );
         if (state === 'nav-sheet') await runNavSheet();
         if (state === 'account-menu') await runAccountMenu();
         if (state === 'select') recordPopup((await openSelect()).popup);

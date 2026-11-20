@@ -2547,3 +2547,17 @@ html.dark:has(.reference-style)
     .material-status {
     white-space: normal;
 }
+
+/* 005 T27 */
+/*
+ * Cycles list and detail. The "Pending collections: N" link is a button-styled anchor with `nowrap` text and a fixed height
+ * class, so at 375px and 200% text it ran past the viewport. It is used only on the two cycle pages; there it wraps and
+ * grows past its 44px minimum. The dialogs of the cycle pages inherit the landing tokens through the shell DOM
+ * (`.landing .manager-dialog`) and need no rule.
+ */
+.landing [data-test='pending-collections'] {
+    height: auto;
+    max-width: 100%;
+    white-space: normal;
+    text-align: start;
+}
