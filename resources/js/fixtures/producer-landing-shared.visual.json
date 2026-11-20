@@ -1,5 +1,5 @@
 {
-    "baseUrl": "http://127.0.0.1:5281",
+    "baseUrl": "http://127.0.0.1:5289",
     "rootFontPx": 16,
     "darkSelector": "html.dark",
     "matrix": {
@@ -1068,18 +1068,18 @@
             ]
         },
         {
-            "id": "accounts-unmigrated",
+            "id": "wallet-unmigrated",
             "path": "/resources/js/fixtures/producer-landing.html",
             "query": {
-                "page": "Manage/Accounts/Index",
+                "page": "Wallet/Statement",
                 "role": "manager"
             },
             "root": ".reference-style",
-            "panels": "#main-content",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements))",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label",
             "fonts": ["16px Nunito Variable"],
             "focus": [],
-            "noFocusReason": "Unmigrated Manager-only route; only the absence of landing is checked.",
+            "noFocusReason": "Unmigrated route; only the absence of landing is checked.",
             "states": [
                 {
                     "id": "light",
@@ -1216,7 +1216,7 @@
                                     "data-s2-shell-bg": "rgb(248, 247, 244)",
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
-                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
                                 }
                             }
                         ]
@@ -1247,7 +1247,7 @@
                                     "data-s2-shell-bg": "rgb(27, 30, 28)",
                                     "data-s3-shell-primary": "rgb(143, 197, 223)",
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
-                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
                                 }
                             }
                         ]
@@ -1278,7 +1278,7 @@
                                     "data-s2-shell-bg": "rgb(248, 247, 244)",
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
-                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
                                 }
                             }
                         ]
@@ -1309,7 +1309,7 @@
                                     "data-s2-shell-bg": "rgb(27, 30, 28)",
                                     "data-s3-shell-primary": "rgb(143, 197, 223)",
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
-                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
                                 }
                             }
                         ]
@@ -1340,7 +1340,7 @@
                                     "data-s2-shell-bg": "rgb(27, 30, 28)",
                                     "data-s3-shell-primary": "rgb(143, 197, 223)",
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
-                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
                                 }
                             }
                         ]
@@ -1371,7 +1371,7 @@
                                     "data-s2-shell-bg": "rgb(248, 247, 244)",
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
-                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
                                 }
                             }
                         ]
@@ -1418,7 +1418,7 @@
                                     "data-s2-shell-bg": "rgb(248, 247, 244)",
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
-                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
                                 }
                             }
                         ]

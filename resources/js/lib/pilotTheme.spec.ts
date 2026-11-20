@@ -134,6 +134,7 @@ describe('pilot theme page selection', () => {
         ['Producer/Products/Create', true],
         ['Producer/Products/Edit', true],
         ['Manage/Accounts/Index', true],
+        ['Manage/Roles/Index', true],
         ['Manage/Households/Index', true],
         ['Manage/Households/Show', true],
         ['Manage/Producers/Index', true],
@@ -192,7 +193,11 @@ describe('landing variant admission', () => {
         ['Manage/Stock/IndexOld', null],
         ['manage/stock/index', null],
         ['Manage/', null],
-        ['Manage/Accounts/Index', null],
+        ['Manage/Accounts/Index', 'landing'],
+        ['Manage/Accounts/Index/Extra', null],
+        ['Manage/Roles/Index', 'landing'],
+        ['Manage/Roles/Index/Extra', null],
+        ['Manage/Roles', null],
         ['Stock/Index', null],
         ['Finance/Stock/Index', 'landing'],
         ['Orders/Index', 'landing'],
@@ -274,7 +279,8 @@ describe('landing variant admission', () => {
             'Producer/Products/Index/Extra',
             'Producer/Products/Create/Extra',
             'Producer/Products/Edit/Extra',
-            'Manage/Accounts/Index',
+            'Manage/Accounts/Index/Extra',
+            'Manage/Roles/Index/Extra',
             'Manage/Stock/Create/Extra',
             'Welcome',
         ]) {
@@ -316,6 +322,8 @@ describe('landing variant admission', () => {
             'Finance/Baskets/Show',
             'Finance/Stock/Index',
             'Finance/Stock/Movements',
+            'Manage/Accounts/Index',
+            'Manage/Roles/Index',
         ]) {
             page.component = component;
             await nextTick();

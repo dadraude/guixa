@@ -1912,7 +1912,7 @@
                                     "data-s5-h1-font": "\"Nunito Variable\"",
                                     "data-s5-panel-bg": "rgb(243, 233, 208)",
                                     "data-s5-panel-border": "rgb(44, 44, 43)",
-                                    "data-nav-requests": "get /catalogue/producers,get /catalogue/producers/producer-1/products,get /manage/accounts,get /catalogue/producers/producer-1/availability"
+                                    "data-nav-requests": "get /catalogue/producers,get /catalogue/producers/producer-1/products,get /finance/households/household-1/wallet,get /catalogue/producers/producer-1/availability"
                                 }
                             }
                         ]
@@ -1965,7 +1965,7 @@
                                     "data-s5-h1-font": "\"Nunito Variable\"",
                                     "data-s5-panel-bg": "rgb(42, 49, 48)",
                                     "data-s5-panel-border": "rgb(242, 240, 233)",
-                                    "data-nav-requests": "get /catalogue/producers,get /catalogue/producers/producer-1/products,get /manage/accounts,get /catalogue/producers/producer-1/availability"
+                                    "data-nav-requests": "get /catalogue/producers,get /catalogue/producers/producer-1/products,get /finance/households/household-1/wallet,get /catalogue/producers/producer-1/availability"
                                 }
                             }
                         ]

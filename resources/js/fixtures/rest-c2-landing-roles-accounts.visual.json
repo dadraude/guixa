@@ -1,0 +1,1478 @@
+{
+    "baseUrl": "http://127.0.0.1:5289",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "roles",
+            "path": "/resources/js/fixtures/rest-c2-landing.html",
+            "query": {
+                "page": "Manage/Roles/Index",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content .material-status",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [aria-label^=\"Retira\"]",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content [aria-label^=\"Retira\"]:not([disabled])",
+                                "count": 5,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [aria-labelledby=\"role-catalogue\"] > p",
+                                "count": 1,
+                                "text": "Encara no hi ha ningú amb aquest rol.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .material-status span:not(.material-status-dot)",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"candidate-search-finance\"] input",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .material-status[data-tone=\"neutral\"] span:last-child",
+                                "count": 1,
+                                "text": "Desactivat"
+                            },
+                            {
+                                "selector": "#main-content .material-status[data-tone=\"warning\"] span:last-child",
+                                "count": 1,
+                                "text": "Invitació pendent"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [aria-label^=\"Retira\"]:not([disabled])",
+                            "#main-content #search-receiver"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "default-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [aria-label^=\"Retira\"]",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content [aria-label^=\"Retira\"]:not([disabled])",
+                                "count": 5,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [aria-labelledby=\"role-catalogue\"] > p",
+                                "count": 1,
+                                "text": "Encara no hi ha ningú amb aquest rol.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .material-status span:not(.material-status-dot)",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"candidate-search-finance\"] input",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .material-status[data-tone=\"neutral\"] span:last-child",
+                                "count": 1,
+                                "text": "Desactivat"
+                            },
+                            {
+                                "selector": "#main-content .material-status[data-tone=\"warning\"] span:last-child",
+                                "count": 1,
+                                "text": "Invitació pendent"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(143, 197, 223)",
+                                    "data-ev-background": "rgb(28, 32, 31)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [aria-label^=\"Retira\"]:not([disabled])",
+                            "#main-content #search-receiver"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-light",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 4
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [aria-label^=\"Retira\"]:not([disabled])",
+                            "#main-content #search-receiver"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-dark",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 4
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(143, 197, 223)",
+                                    "data-ev-background": "rgb(28, 32, 31)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [aria-label^=\"Retira\"]:not([disabled])",
+                            "#main-content #search-receiver"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "remove-dialog-light",
+                    "query": {
+                        "state": "remove-dialog"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[role=dialog][data-state=open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-dialog-landing": "true",
+                                    "data-ev-dialog-focus-inside": "true",
+                                    "data-ev-dialog-escape-closed": "true",
+                                    "data-ev-dialog-focus-returned": "true",
+                                    "data-ev-dialog-requests": "0",
+                                    "data-ev-dialog-bg": "rgb(250, 241, 220)",
+                                    "data-ev-dialog-destructive-contrast": "6.56",
+                                    "data-ev-dialog-destructive-bg": "rgb(163, 58, 47)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The dialog opens and closes by dispatched events; focus inside and its return are recorded as data-ev attributes."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "remove-dialog-dark",
+                    "query": {
+                        "state": "remove-dialog"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[role=dialog][data-state=open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(143, 197, 223)",
+                                    "data-ev-background": "rgb(28, 32, 31)",
+                                    "data-ev-error": null,
+                                    "data-ev-dialog-landing": "true",
+                                    "data-ev-dialog-focus-inside": "true",
+                                    "data-ev-dialog-escape-closed": "true",
+                                    "data-ev-dialog-focus-returned": "true",
+                                    "data-ev-dialog-requests": "0",
+                                    "data-ev-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-ev-dialog-destructive-contrast": "8.58",
+                                    "data-ev-dialog-destructive-bg": "rgb(240, 161, 153)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The dialog opens and closes by dispatched events; focus inside and its return are recorded as data-ev attributes."
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "own-manager-dialog-light",
+                    "query": {
+                        "state": "own-manager-dialog"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[role=dialog][data-state=open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-dialog-landing": "true",
+                                    "data-ev-dialog-focus-inside": "true",
+                                    "data-ev-dialog-escape-closed": "true",
+                                    "data-ev-dialog-focus-returned": "true",
+                                    "data-ev-dialog-requests": "0",
+                                    "data-ev-dialog-bg": "rgb(250, 241, 220)",
+                                    "data-ev-dialog-destructive-contrast": "6.56",
+                                    "data-ev-dialog-destructive-bg": "rgb(163, 58, 47)",
+                                    "data-ev-dialog-text": "Estàs retirant el teu propi rol de gestor. Perdràs l’accés a la gestió de seguida."
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The dialog opens and closes by dispatched events; focus inside and its return are recorded as data-ev attributes."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "error-light",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "delete /manage/roles/finance/holders/anna"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Request state recorded by the fixture spy; the busy request never answers."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "busy-light",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [aria-label^=\"Retira\"][disabled]",
+                                "count": 6
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "delete /manage/roles/finance/holders/anna"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Request state recorded by the fixture spy; the busy request never answers."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ],
+            "noFocusReason": "Each state names its own focus list or reason."
+        },
+        {
+            "id": "accounts",
+            "path": "/resources/js/fixtures/rest-c2-landing.html",
+            "query": {
+                "page": "Manage/Accounts/Index",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content .material-status",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content li:nth-child(2) .pilot-status-switch span",
+                                "text": "Desactivat"
+                            },
+                            {
+                                "selector": "#main-content li:nth-child(3) .material-status span:last-child",
+                                "text": "Invitació pendent"
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"button\"]",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content input[type=\"checkbox\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "default-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content li:nth-child(2) .pilot-status-switch span",
+                                "text": "Desactivat"
+                            },
+                            {
+                                "selector": "#main-content li:nth-child(3) .material-status span:last-child",
+                                "text": "Invitació pendent"
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"button\"]",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(143, 197, 223)",
+                                    "data-ev-background": "rgb(28, 32, 31)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content input[type=\"checkbox\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-light",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-notice",
+                                "count": 1,
+                                "text": "Encara no hi ha comptes.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Empty list: no control other than the roles link."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-light",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "text": "Cooperativa agrícola de la Vall de les Hortes i del Ganxet tradicional de la plana"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content input[type=\"checkbox\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-dark",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "text": "Cooperativa agrícola de la Vall de les Hortes i del Ganxet tradicional de la plana"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(143, 197, 223)",
+                                    "data-ev-background": "rgb(28, 32, 31)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content input[type=\"checkbox\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-light",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-slot=select-content][data-state=open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-item-min-height": "44",
+                                    "data-ev-popup-carries-landing": "true",
+                                    "data-ev-popup-inside-viewport": "true",
+                                    "data-ev-popup-bg": "rgb(255, 250, 240)",
+                                    "data-ev-popup-fg": "rgb(44, 44, 43)",
+                                    "data-ev-popup-text-contrast": "13.44"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open popup captures focus."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-dark",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-slot=select-content][data-state=open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(143, 197, 223)",
+                                    "data-ev-background": "rgb(28, 32, 31)",
+                                    "data-ev-error": null,
+                                    "data-ev-item-min-height": "44",
+                                    "data-ev-popup-carries-landing": "true",
+                                    "data-ev-popup-inside-viewport": "true",
+                                    "data-ev-popup-bg": "rgb(36, 42, 41)",
+                                    "data-ev-popup-fg": "rgb(242, 240, 233)",
+                                    "data-ev-popup-text-contrast": "12.80"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open popup captures focus."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-keyboard-light",
+                    "query": {
+                        "state": "select-keyboard"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-focus-returned-after-escape": "true"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched keyboard events."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "invalid-light",
+                    "query": {
+                        "state": "invalid"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "post /manage/accounts/account-1/household"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Request state recorded by the fixture spy."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "error-light",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "post /manage/accounts/account-1/household"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Request state recorded by the fixture spy."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "busy-light",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"button\"][disabled]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "post /manage/accounts/account-1/household"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Request state recorded by the fixture spy."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ],
+            "noFocusReason": "Each state names its own focus list or reason."
+        }
+    ]
+}
