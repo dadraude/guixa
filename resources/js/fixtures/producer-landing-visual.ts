@@ -248,7 +248,40 @@ const pageProps: Record<string, Record<string, unknown>> = {
         history: movementHistory,
     },
     // Unmigrated neighbour: the navigation target that must keep its own look.
-    'Manage/Accounts/Index': { accounts: [], households: [] },
+    'Wallet/Statement': {
+        wallet: {
+            balance: '35.00',
+            movements: [
+                {
+                    id: 'movement-1',
+                    type: 'top_up',
+                    amount: '20.00',
+                    occurredAt: '2026-10-30 09:00',
+                    note: 'Ingrés',
+                    cycleId: null,
+                    basketId: null,
+                    sourceMovementId: null,
+                    authorName: 'Marta Soler',
+                },
+                {
+                    id: 'movement-2',
+                    type: 'top_up',
+                    amount: '15.00',
+                    occurredAt: '2026-10-29 10:00',
+                    note: 'Ingrés',
+                    cycleId: null,
+                    basketId: null,
+                    sourceMovementId: null,
+                    authorName: 'Marta Soler',
+                },
+            ],
+        },
+        household: { id: 'household-1', name: 'Família Soler' },
+        canManageReceipts: true,
+        receiptAction: '/finance/households/household-1/wallet/receipts',
+        correctionAction: '/finance/households/household-1/wallet/corrections',
+        correctionId: 'correction-1',
+    },
     Welcome: {},
 };
 const areas = [
@@ -262,7 +295,7 @@ const urls: Record<string, string> = {
     'Producer/Cutoff': '/producer/cutoff',
     'Producer/CycleSummary': '/producer/cycles/cycle-1',
     'Producer/Stock/Movements': '/producer/stock/stock-1/movements',
-    'Manage/Accounts/Index': '/manage/accounts',
+    'Wallet/Statement': '/finance/households/household-1/wallet',
     Welcome: '/',
 };
 const page = {
@@ -309,7 +342,7 @@ const cutoffStates = ['cutoff-invalid', 'cutoff-busy'];
 // Cycle summary availability toggle (spec 005 T13): the PUT the real router sends for a not-sent cycle.
 const availabilityRequests: string[] = [];
 const pagesByPath: Record<string, string> = {
-    '/manage/accounts': 'Manage/Accounts/Index',
+    '/finance/households/household-1/wallet': 'Wallet/Statement',
     '/producer/products': 'Producer/Products/Index',
 };
 http.setClient({
@@ -946,11 +979,14 @@ void createInertiaApp({
     progress: false,
 }).then(async () => {
     if (state === 'nav-sheet' || state === 'nav-menu') {
-        // S17 first states: Producer products (landing) -> Accounts (unmigrated) -> products again.
+        // S17 first states: Producer products (landing) -> Wallet statement (unmigrated) -> products again.
         const open = state === 'nav-sheet' ? openSheet : openMenu;
         await open();
         await snapshot('s1');
-        await visit('/manage/accounts', 'Comptes');
+        await visit(
+            '/finance/households/household-1/wallet',
+            'Moneder de Família Soler',
+        );
         await open();
         await snapshot('s2');
         await visit('/producer/products', 'Productes');

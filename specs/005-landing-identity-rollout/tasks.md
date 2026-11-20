@@ -987,6 +987,7 @@ PHP guards for C2: `tests/Feature/Manage/RolesPageTest.php`, `tests/Feature/Memb
 - **Files/surfaces reserved.** History entries; `tasks.md` status.
 - **Dependencies.** T24–T29 integrated.
 - **Done when.** As T23 for C2: C2, C1, slice 1 and slice 2 manifests on the integrated base SHA; one C3 and one C4 page unchanged (S26); multi-role navigation case; full Vitest and C2 PHP guards green; `DemoSeederTest.php` green; approval requested, never recorded by the task.
+  - Task deviation (DRA-300): decide the variant-off fixture state for C1 and C2 pages (page-task contract point 7), citing DRA-294 `177f0307` (6) and DRA-300 `ca774442`.
 - **First checkpoint.** Run the C2 shared manifest. **Size.** Documentation and evidence only. **Limits.** No C3 work.
 - **Acceptance record.** C2 record; verdict "pending approval".
 

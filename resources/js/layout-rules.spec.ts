@@ -45,6 +45,7 @@ export const checkedFiles = [
     'components/pickup/StockLines.vue',
     'components/pickup/ReturnLines.vue',
     'pages/Manage/Accounts/Index.vue',
+    'pages/Manage/Roles/Index.vue',
     'pages/Manage/Households/Index.vue',
     'pages/Manage/Households/Show.vue',
     'pages/Manage/Producers/Index.vue',

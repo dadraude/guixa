@@ -275,27 +275,6 @@ const returnItem = makeReturnItem(
     state === 'long-name' ? longName : 'Pot de vidre 500 ml',
     '0.25',
 );
-// Probe for the shared ActiveSwitch consumer left unmigrated: Accounts with an active and a deactivated account.
-const accountsForSwitchProbe = [
-    {
-        accountId: 'account-a',
-        name: 'Anna Puig',
-        email: 'anna@example.test',
-        roles: ['member'],
-        active: true,
-        invitationPending: false,
-        householdName: 'Cal Puig',
-    },
-    {
-        accountId: 'account-b',
-        name: 'Biel Roca',
-        email: 'biel@example.test',
-        roles: ['member'],
-        active: false,
-        invitationPending: false,
-        householdName: null,
-    },
-];
 // --- end T07
 // --- T08 (DRA-276): read-only stock movement history. Catalogue is the migrated page; Producer, Finance and
 // Manage consumers of MovementHistory stay unmigrated and serve as the leakage probe.
@@ -452,9 +431,39 @@ const pageProps: Record<string, Record<string, unknown>> = {
         pickupWeekday: null,
         pendingCollections: {},
     },
-    'Manage/Accounts/Index': {
-        accounts: state === 'accounts-switch' ? accountsForSwitchProbe : [],
-        households: [],
+    'Wallet/Statement': {
+        wallet: {
+            balance: '35.00',
+            movements: [
+                {
+                    id: 'movement-1',
+                    type: 'top_up',
+                    amount: '20.00',
+                    occurredAt: '2026-10-30 09:00',
+                    note: 'Ingrés',
+                    cycleId: null,
+                    basketId: null,
+                    sourceMovementId: null,
+                    authorName: 'Marta Soler',
+                },
+                {
+                    id: 'movement-2',
+                    type: 'top_up',
+                    amount: '15.00',
+                    occurredAt: '2026-10-29 10:00',
+                    note: 'Ingrés',
+                    cycleId: null,
+                    basketId: null,
+                    sourceMovementId: null,
+                    authorName: 'Marta Soler',
+                },
+            ],
+        },
+        household: { id: 'household-1', name: 'Família Soler' },
+        canManageReceipts: true,
+        receiptAction: '/finance/households/household-1/wallet/receipts',
+        correctionAction: '/finance/households/household-1/wallet/corrections',
+        correctionId: 'correction-1',
     },
     // --- T07 (DRA-275)
     'Manage/ReturnItems/Index': {
@@ -497,7 +506,7 @@ const urls: Record<string, string> = {
     'Manage/ReturnItems/Edit': '/catalogue/return-items/item-1/edit',
     // --- end T07
     'Manage/Cycles/Index': '/manage/cycles',
-    'Manage/Accounts/Index': '/manage/accounts',
+    'Wallet/Statement': '/finance/households/household-1/wallet',
     Welcome: '/',
 };
 const page = {
@@ -549,7 +558,7 @@ const pagesByPath: Record<string, string> = {
         'Catalogue/Producers/Availability',
     '/catalogue/producers/producer-1/products': 'Catalogue/Producers/Products',
     '/catalogue/producers': 'Catalogue/Producers/Index',
-    '/manage/accounts': 'Manage/Accounts/Index',
+    '/finance/households/household-1/wallet': 'Wallet/Statement',
 };
 const flashMessage = 'Classificació del producte actualitzada.';
 http.setClient({
@@ -1347,11 +1356,14 @@ void createInertiaApp({
     progress: false,
 }).then(async () => {
     if (state === 'nav-sheet' || state === 'nav-menu') {
-        // S8 first states: Producers (landing) -> Accounts (unmigrated) -> Producers again.
+        // S8 first states: Producers (landing) -> Wallet statement (unmigrated) -> Producers again.
         const open = state === 'nav-sheet' ? openSheet : openMenu;
         await open();
         await snapshot('s1');
-        await visit('/manage/accounts', 'Comptes');
+        await visit(
+            '/finance/households/household-1/wallet',
+            'Moneder de Família Soler',
+        );
         await open();
         await snapshot('s2');
         await visit('/catalogue/producers', 'Productors');
@@ -1361,7 +1373,7 @@ void createInertiaApp({
     }
     if (state === 'nav-neighbours') {
         // R2: the neighbours of Availability keep their own look. Availability (landing) -> Producers
-        // (landing, previous page) -> Products (landing, next page) -> Accounts (unmigrated) -> Availability.
+        // (landing, previous page) -> Products (landing, next page) -> Wallet statement (unmigrated) -> Availability.
         await snapshotPage('s1');
         await visit('/catalogue/producers', 'Productors');
         await snapshotPage('s2');
@@ -1370,7 +1382,10 @@ void createInertiaApp({
             'Productes de Hort de la Vall',
         );
         await snapshotPage('s3');
-        await visit('/manage/accounts', 'Comptes');
+        await visit(
+            '/finance/households/household-1/wallet',
+            'Moneder de Família Soler',
+        );
         await snapshotPage('s4');
         await visit(
             '/catalogue/producers/producer-1/availability',
@@ -1587,10 +1602,7 @@ void createInertiaApp({
             returnItemRequests.join(' ; '),
         );
     }
-    if (
-        pageName === 'Manage/ReturnItems/Index' ||
-        (pageName === 'Manage/Accounts/Index' && state === 'accounts-switch')
-    ) {
+    if (pageName === 'Manage/ReturnItems/Index') {
         recordSwitchGeometry('#main-content');
         recordControlContrast('#main-content', 'page');
     }

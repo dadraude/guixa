@@ -102,7 +102,41 @@ const pageProps: Record<string, Record<string, unknown>> = {
         },
         preview: { totalCents: 0, amountCents: {} },
     },
-    'Manage/Accounts/Index': { accounts: [], households: [] },
+    // Unmigrated control page (Wallet/Statement stays old-theme until C3).
+    'Wallet/Statement': {
+        wallet: {
+            balance: '35.00',
+            movements: [
+                {
+                    id: 'movement-1',
+                    type: 'top_up',
+                    amount: '20.00',
+                    occurredAt: '2026-10-30 09:00',
+                    note: 'Ingrés',
+                    cycleId: null,
+                    basketId: null,
+                    sourceMovementId: null,
+                    authorName: 'Marta Soler',
+                },
+                {
+                    id: 'movement-2',
+                    type: 'top_up',
+                    amount: '15.00',
+                    occurredAt: '2026-10-29 10:00',
+                    note: 'Ingrés',
+                    cycleId: null,
+                    basketId: null,
+                    sourceMovementId: null,
+                    authorName: 'Marta Soler',
+                },
+            ],
+        },
+        household: { id: 'household-1', name: 'Família Soler' },
+        canManageReceipts: true,
+        receiptAction: '/finance/households/household-1/wallet/receipts',
+        correctionAction: '/finance/households/household-1/wallet/corrections',
+        correctionId: 'correction-1',
+    },
     Welcome: {},
 };
 const areas = [
@@ -114,7 +148,7 @@ const urls: Record<string, string> = {
     'Manage/Stock/Index': '/manage/stock',
     'Orders/Index': '/',
     'Orders/Edit': '/cycles/cycle-1/order',
-    'Manage/Accounts/Index': '/manage/accounts',
+    'Wallet/Statement': '/finance/households/household-1/wallet',
     Welcome: '/',
 };
 const page = {
@@ -173,7 +207,7 @@ const requestLog: string[] = [];
 const pagesByPath: Record<string, string> = {
     '/': 'Orders/Index',
     '/cycles/cycle-1/order': 'Orders/Edit',
-    '/manage/accounts': 'Manage/Accounts/Index',
+    '/finance/households/household-1/wallet': 'Wallet/Statement',
     '/manage/stock': 'Manage/Stock/Index',
 };
 if (
@@ -468,7 +502,10 @@ void createInertiaApp({
         const open = state === 'nav-sheet' ? openSheet : openMenu;
         await open();
         await snapshot('s1');
-        await visit('/manage/accounts', 'Comptes');
+        await visit(
+            '/finance/households/household-1/wallet',
+            'Moneder de Família Soler',
+        );
         await open();
         await snapshot('s2');
         await visit('/manage/stock', 'Estoc');

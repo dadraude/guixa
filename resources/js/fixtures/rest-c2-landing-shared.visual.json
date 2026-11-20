@@ -1,0 +1,253 @@
+{
+    "baseUrl": "http://127.0.0.1:5289",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "roles-shell",
+            "path": "/resources/js/fixtures/rest-c2-landing.html",
+            "query": {
+                "page": "Manage/Roles/Index",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "nav-sheet-light",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open sheet or menu captures focus.",
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /finance/households/household-1/wallet,get /manage/roles",
+                                    "data-ev-s1-shell-landing": "true",
+                                    "data-ev-s1-sheet-landing": "true",
+                                    "data-ev-s1-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-ev-s2-shell-landing": "false",
+                                    "data-ev-s2-sheet-landing": "false",
+                                    "data-ev-s2-sheet-bg": "rgb(36, 107, 87)",
+                                    "data-ev-s3-shell-landing": "true",
+                                    "data-ev-s3-sheet-landing": "true",
+                                    "data-ev-s3-sheet-bg": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "nav-sheet-dark",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open sheet or menu captures focus.",
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /finance/households/household-1/wallet,get /manage/roles",
+                                    "data-ev-s1-shell-landing": "true",
+                                    "data-ev-s1-sheet-landing": "true",
+                                    "data-ev-s1-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-ev-s2-shell-landing": "false",
+                                    "data-ev-s2-sheet-landing": "false",
+                                    "data-ev-s2-sheet-bg": "rgb(32, 37, 33)",
+                                    "data-ev-s3-shell-landing": "true",
+                                    "data-ev-s3-sheet-landing": "true",
+                                    "data-ev-s3-sheet-bg": "rgb(35, 72, 92)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "account-menu-light",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open sheet or menu captures focus.",
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-menu-landing": "true",
+                                    "data-ev-menu-bg": "rgb(255, 250, 240)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "account-menu-dark",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open sheet or menu captures focus.",
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-menu-landing": "true",
+                                    "data-ev-menu-bg": "rgb(36, 42, 41)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ],
+            "noFocusReason": "Shell overlays capture focus; focus order is covered by the roles view."
+        },
+        {
+            "id": "wallet-unmigrated",
+            "path": "/resources/js/fixtures/rest-c2-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements))",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(36, 107, 87)",
+                                    "data-ev-background": "rgb(248, 247, 244)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(167, 215, 193)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "noFocusReason": "Unmigrated control page: only the absence of landing and its token values are checked."
+        }
+    ]
+}
