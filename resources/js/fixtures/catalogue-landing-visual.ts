@@ -737,12 +737,12 @@ const snapshot = async (label: string) => {
     }
 };
 // Own look of the page in view: heading ink and font, and the first panel's surface and border.
-const snapshotPage = async (label: string) => {
+const snapshotPage = async (
+    label: string,
+    titleSelector = '#main-content h1:not(.sr-only)',
+) => {
     await snapshot(label);
-    // The unmigrated Profile page has no visible h1: its panel heading is the page's own title.
-    const title =
-        document.querySelector('#main-content h1:not(.sr-only)') ??
-        document.querySelector('#main-content h2');
+    const title = document.querySelector(titleSelector);
     if (title) {
         document.body.setAttribute(
             `data-${label}-h1-ink`,
@@ -1336,7 +1336,8 @@ void createInertiaApp({
         );
         await snapshotPage('s3');
         await visit('/settings/profile', 'Configuració del perfil');
-        await snapshotPage('s4');
+        // The unmigrated Profile page has no visible h1: its panel heading is the page's own title.
+        await snapshotPage('s4', '#main-content h2');
         await visit(
             '/catalogue/producers/producer-1/availability',
             'Disponibilitat de Hort de la Vall',

@@ -39,6 +39,7 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /settings/profile,get /wallet",
                                     "data-ev-s1-shell-landing": "true",
                                     "data-ev-s1-primary": "rgb(40, 101, 133)",
                                     "data-ev-s2-shell-landing": "false",
@@ -92,6 +93,7 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /settings/profile,get /finance/households/household-1/wallet",
                                     "data-ev-s1-shell-landing": "true",
                                     "data-ev-s1-primary": "rgb(40, 101, 133)",
                                     "data-ev-s2-shell-landing": "false",
@@ -145,6 +147,7 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /settings/profile,get /finance/households/household-1/wallet",
                                     "data-ev-s1-shell-landing": "true",
                                     "data-ev-s1-primary": "rgb(40, 101, 133)",
                                     "data-ev-s2-shell-landing": "false",
@@ -198,6 +201,7 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /settings/profile,get /finance/households/household-1/wallet",
                                     "data-ev-s1-shell-landing": "true",
                                     "data-ev-s1-primary": "rgb(40, 101, 133)",
                                     "data-ev-s2-shell-landing": "false",

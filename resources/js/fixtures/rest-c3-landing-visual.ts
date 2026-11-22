@@ -83,7 +83,7 @@ const walletProps = () => {
         };
     if (state === 'long-content')
         return {
-            balance: '-1234567.89',
+            balance: '-1234567.88',
             movements: [
                 movement('m-2', 'charge', '-1234567.89', '2026-11-12 10:00', {
                     basketId: 'basket-with-a-very-long-identifier-1234567890',
@@ -96,7 +96,7 @@ const walletProps = () => {
             ],
         };
     return {
-        balance: '35.05',
+        balance: '13.05',
         movements: [
             movement('m-6', 'correction', '-5.00', '2026-11-13 12:00', {
                 note: 'Ingrés duplicat',
@@ -112,10 +112,10 @@ const walletProps = () => {
             movement('m-3', 'charge', '-8.00', '2026-11-05 10:00', {
                 cycleId: 'cycle-1',
             }),
-            movement('m-2', 'top_up', '15.00', '2026-10-29 10:00', {
+            movement('m-1', 'top_up', '20.00', '2026-10-30 09:00', {
                 note: 'Ingrés',
             }),
-            movement('m-1', 'top_up', '20.00', '2026-10-30 09:00', {
+            movement('m-2', 'top_up', '15.00', '2026-10-29 10:00', {
                 note: 'Ingrés',
             }),
         ],
@@ -123,6 +123,7 @@ const walletProps = () => {
 };
 const statementProps = () => ({
     wallet: walletProps(),
+    ...(state === 'status' ? { status: 'Ingrés registrat.' } : {}),
     household: showsForms
         ? {
               id: 'household-1',
@@ -188,18 +189,37 @@ const pagesByPath = Object.fromEntries(
 );
 
 // Request spy: the requests the real router sends, so busy and error states are proven to come from them.
+const requests: string[] = [];
 const navigation: string[] = [];
+const invalidErrors = {
+    amount: 'El camp import és obligatori.',
+    note: 'El camp nota és obligatori.',
+    source_movement_id: 'El camp ingrés original és obligatori.',
+};
 http.setClient({
     request: async (config: { url: string; method?: string }) => {
         const url = new URL(config.url, window.location.origin);
+        const method = (config.method ?? 'get').toLowerCase();
         const reply = (body: Record<string, unknown>) => ({
             status: 200,
             data: JSON.stringify(body),
             headers: { 'x-inertia': 'true' },
         });
-        navigation.push(
-            `${(config.method ?? 'get').toLowerCase()} ${url.pathname}`,
-        );
+        if (method !== 'get') {
+            requests.push(`${method} ${url.pathname}`);
+            // Busy: the request never answers, so the page stays in `processing`.
+            if (state === 'busy') return new Promise(() => {});
+            return reply({
+                ...page,
+                props: {
+                    ...page.props,
+                    errors: state.startsWith('invalid')
+                        ? invalidErrors
+                        : { domain: 'No s’ha pogut registrar l’ingrés.' },
+                },
+            });
+        }
+        navigation.push(`get ${url.pathname}`);
         const target = pagesByPath[url.pathname];
         return reply(
             target ? buildPage(target) : { ...page, url: url.pathname },
@@ -306,6 +326,52 @@ const runNavigation = async () => {
     set('nav-requests', navigation.join(','));
 };
 
+// Submits the top-up form (or, for `invalid-correction`, the correction form) so busy, error and invalid come from the request the page sends.
+const fill = (input: HTMLInputElement, value: string) => {
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+};
+const runFormRequest = async () => {
+    if (state === 'invalid-correction') {
+        // The receipt is chosen through the real select, then the correction form is submitted.
+        const { popup } = await openSelect();
+        key(popup.querySelector('[data-slot="select-item"]')!, 'Enter');
+        await closedPopup();
+        fill(
+            await waitFor(() =>
+                document.querySelector<HTMLInputElement>('#correction-amount'),
+            ),
+            '-5',
+        );
+        fill(
+            document.querySelector<HTMLInputElement>('#correction-note')!,
+            'x',
+        );
+        document
+            .querySelector<HTMLElement>('[data-test="record-correction"]')!
+            .click();
+    } else {
+        fill(
+            await waitFor(() =>
+                document.querySelector<HTMLInputElement>('#top-up-amount'),
+            ),
+            '5',
+        );
+        document
+            .querySelector<HTMLElement>('[data-test="record-top-up"]')!
+            .click();
+    }
+    await waitFor(() => (requests.length ? document.body : null));
+    if (state !== 'busy')
+        await waitFor(() =>
+            document.querySelector(
+                '#main-content .text-destructive:not(:empty)',
+            ),
+        );
+    await sleep(400);
+    set('requests', requests.join(' ; '));
+};
+
 const popupSelector = '[data-slot="select-content"][data-state="open"]';
 const firstTrigger = () =>
     [
@@ -397,6 +463,8 @@ void createInertiaApp({
     await settle();
     try {
         if (state === 'navigate') await runNavigation();
+        if (['busy', 'error', 'invalid', 'invalid-correction'].includes(state))
+            await runFormRequest();
         if (state === 'select') recordPopup((await openSelect()).popup);
         if (state === 'select-keyboard') await runSelectKeyboard();
     } catch (error) {
