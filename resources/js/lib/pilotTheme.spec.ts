@@ -260,6 +260,8 @@ describe('landing variant admission', () => {
         ['Finance/Baskets/Show/Extra', null],
         ['Finance/Baskets/Create', 'landing'],
         ['Finance/Stock/Movements', 'landing'],
+        ['Wallet/Statement', 'landing'],
+        ['Wallet/Statement/Extra', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
         expect(pilotVariantFor(page)).toBe(expected);
@@ -343,6 +345,7 @@ describe('landing variant admission', () => {
             'Manage/Households/Show',
             'Manage/Producers/Index',
             'Manage/Settings',
+            'Wallet/Statement',
         ]) {
             page.component = component;
             await nextTick();

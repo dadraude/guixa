@@ -40,7 +40,7 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
-                                    "data-ev-nav-requests": "get /finance/households/household-1/wallet,get /manage/roles",
+                                    "data-ev-nav-requests": "get /settings/profile,get /manage/roles",
                                     "data-ev-s1-shell-landing": "true",
                                     "data-ev-s1-sheet-landing": "true",
                                     "data-ev-s1-sheet-bg": "rgb(40, 101, 133)",
@@ -81,7 +81,7 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
-                                    "data-ev-nav-requests": "get /finance/households/household-1/wallet,get /manage/roles",
+                                    "data-ev-nav-requests": "get /settings/profile,get /manage/roles",
                                     "data-ev-s1-shell-landing": "true",
                                     "data-ev-s1-sheet-landing": "true",
                                     "data-ev-s1-sheet-bg": "rgb(35, 72, 92)",
@@ -173,15 +173,15 @@
             "noFocusReason": "Shell overlays capture focus; focus order is covered by the roles view."
         },
         {
-            "id": "wallet-unmigrated",
+            "id": "profile-unmigrated",
             "path": "/resources/js/fixtures/rest-c2-landing.html",
             "query": {
-                "page": "Wallet/Statement",
+                "page": "settings/Profile",
                 "role": "manager"
             },
             "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements))",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label",
+            "panels": "#main-content",
+            "content": "#main-content h2,#main-content label",
             "fonts": ["16px Nunito Variable"],
             "focus": [],
             "states": [

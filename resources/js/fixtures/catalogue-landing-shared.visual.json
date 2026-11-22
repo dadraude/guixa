@@ -795,15 +795,15 @@
             ]
         },
         {
-            "id": "wallet-unmigrated",
+            "id": "profile-unmigrated",
             "path": "/resources/js/fixtures/catalogue-landing.html",
             "query": {
-                "page": "Wallet/Statement",
+                "page": "settings/Profile",
                 "role": "manager"
             },
             "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements))",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label",
+            "panels": "#main-content",
+            "content": "#main-content h2,#main-content label",
             "fonts": ["16px Nunito Variable"],
             "focus": [],
             "noFocusReason": "Unmigrated route; only the absence of landing is checked.",
@@ -976,7 +976,7 @@
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
                                     "data-s3-sheet-primary": "rgb(40, 101, 133)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /catalogue/producers"
+                                    "data-nav-requests": "get /settings/profile,get /catalogue/producers"
                                 }
                             }
                         ]
@@ -1009,7 +1009,7 @@
                                     "data-s3-shell-primary": "rgb(143, 197, 223)",
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
                                     "data-s3-sheet-primary": "rgb(143, 197, 223)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /catalogue/producers"
+                                    "data-nav-requests": "get /settings/profile,get /catalogue/producers"
                                 }
                             }
                         ]
@@ -1042,7 +1042,7 @@
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
                                     "data-s3-menu-primary": "rgb(40, 101, 133)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /catalogue/producers"
+                                    "data-nav-requests": "get /settings/profile,get /catalogue/producers"
                                 }
                             }
                         ]
@@ -1075,7 +1075,7 @@
                                     "data-s3-shell-primary": "rgb(143, 197, 223)",
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
                                     "data-s3-menu-primary": "rgb(143, 197, 223)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /catalogue/producers"
+                                    "data-nav-requests": "get /settings/profile,get /catalogue/producers"
                                 }
                             }
                         ]

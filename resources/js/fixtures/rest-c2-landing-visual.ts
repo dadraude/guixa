@@ -532,41 +532,8 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Manage/Households/Show': householdShowProps(),
     'Manage/Roles/Index': { groups: roleGroups() },
     'Manage/Accounts/Index': { accounts: accountRows(), households },
-    // Unmigrated leakage probe: Wallet/Statement stays old-theme until C3 and carries the select control.
-    'Wallet/Statement': {
-        wallet: {
-            balance: '35.00',
-            movements: [
-                {
-                    id: 'movement-1',
-                    type: 'top_up',
-                    amount: '20.00',
-                    occurredAt: '2026-10-30 09:00',
-                    note: 'Ingrés',
-                    cycleId: null,
-                    basketId: null,
-                    sourceMovementId: null,
-                    authorName: 'Marta Soler',
-                },
-                {
-                    id: 'movement-2',
-                    type: 'top_up',
-                    amount: '15.00',
-                    occurredAt: '2026-10-29 10:00',
-                    note: 'Ingrés',
-                    cycleId: null,
-                    basketId: null,
-                    sourceMovementId: null,
-                    authorName: 'Marta Soler',
-                },
-            ],
-        },
-        household: { id: 'household-1', name: 'Família Soler' },
-        canManageReceipts: true,
-        receiptAction: '/finance/households/household-1/wallet/receipts',
-        correctionAction: '/finance/households/household-1/wallet/corrections',
-        correctionId: 'correction-1',
-    },
+    // Unmigrated control page (settings/Profile stays old-theme until C4).
+    'settings/Profile': { verificationLinkSent: false },
 };
 const urls: Record<string, string> = {
     'Manage/Roles/Index': '/manage/roles',
@@ -579,7 +546,7 @@ const urls: Record<string, string> = {
     'Manage/Cycles/Show': '/manage/cycles/cycle-1',
     'Manage/Stock/Index': '/manage/stock',
     'Manage/Stock/Movements': '/manage/stock/stock-1/movements',
-    'Wallet/Statement': '/finance/households/household-1/wallet',
+    'settings/Profile': '/settings/profile',
 };
 const shared = {
     name: 'Guixa',
@@ -1082,13 +1049,10 @@ const snapshot = async (label: string) => {
     set(`${label}-sheet-landing`, String(sheet.classList.contains('landing')));
     set(`${label}-sheet-bg`, getComputedStyle(sheet).backgroundColor);
 };
-// S26 start: Roles (landing) -> Wallet statement (unmigrated, keeps its own look) -> Roles again, sheet open each time.
+// S26 start: Roles (landing) -> Profile settings (unmigrated, keeps its own look) -> Roles again, sheet open each time.
 const runNavSheet = async () => {
     await snapshot('s1');
-    await visit(
-        '/finance/households/household-1/wallet',
-        'Moneder de Família Soler',
-    );
+    await visit('/settings/profile', 'Configuració del perfil');
     await snapshot('s2');
     await visit('/manage/roles', 'Rols');
     await snapshot('s3');

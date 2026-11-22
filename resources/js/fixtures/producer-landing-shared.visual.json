@@ -1068,15 +1068,15 @@
             ]
         },
         {
-            "id": "wallet-unmigrated",
+            "id": "profile-unmigrated",
             "path": "/resources/js/fixtures/producer-landing.html",
             "query": {
-                "page": "Wallet/Statement",
+                "page": "settings/Profile",
                 "role": "manager"
             },
             "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements))",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label",
+            "panels": "#main-content",
+            "content": "#main-content h2,#main-content label",
             "fonts": ["16px Nunito Variable"],
             "focus": [],
             "noFocusReason": "Unmigrated route; only the absence of landing is checked.",
@@ -1216,7 +1216,7 @@
                                     "data-s2-shell-bg": "rgb(248, 247, 244)",
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
+                                    "data-nav-requests": "get /settings/profile,get /producer/products"
                                 }
                             }
                         ]
@@ -1247,7 +1247,7 @@
                                     "data-s2-shell-bg": "rgb(27, 30, 28)",
                                     "data-s3-shell-primary": "rgb(143, 197, 223)",
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
+                                    "data-nav-requests": "get /settings/profile,get /producer/products"
                                 }
                             }
                         ]
@@ -1278,7 +1278,7 @@
                                     "data-s2-shell-bg": "rgb(248, 247, 244)",
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
+                                    "data-nav-requests": "get /settings/profile,get /producer/products"
                                 }
                             }
                         ]
@@ -1309,7 +1309,7 @@
                                     "data-s2-shell-bg": "rgb(27, 30, 28)",
                                     "data-s3-shell-primary": "rgb(143, 197, 223)",
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
+                                    "data-nav-requests": "get /settings/profile,get /producer/products"
                                 }
                             }
                         ]
@@ -1340,7 +1340,7 @@
                                     "data-s2-shell-bg": "rgb(27, 30, 28)",
                                     "data-s3-shell-primary": "rgb(143, 197, 223)",
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
+                                    "data-nav-requests": "get /settings/profile,get /producer/products"
                                 }
                             }
                         ]
@@ -1371,7 +1371,7 @@
                                     "data-s2-shell-bg": "rgb(248, 247, 244)",
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
+                                    "data-nav-requests": "get /settings/profile,get /producer/products"
                                 }
                             }
                         ]
@@ -1418,7 +1418,7 @@
                                     "data-s2-shell-bg": "rgb(248, 247, 244)",
                                     "data-s3-shell-primary": "rgb(40, 101, 133)",
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
-                                    "data-nav-requests": "get /finance/households/household-1/wallet,get /producer/products"
+                                    "data-nav-requests": "get /settings/profile,get /producer/products"
                                 }
                             }
                         ]
