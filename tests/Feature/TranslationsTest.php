@@ -73,7 +73,7 @@ it('uses Catalan framework authentication, password, pagination and validation m
 });
 
 it('translates each passkey validation error emitted by the installed package', function (string $source, string $translated) {
-    expect(InvalidPasskeyException::make($source)->errors()['credential'][0])->toBe($translated);
+    expect(InvalidPasskeyException::make(__($source))->errors()['credential'][0])->toBe($translated);
 })->with([
     ['Unable to sign in with this account.', 'No s’ha pogut iniciar sessió amb aquest compte.'],
     ['Unable to register this passkey.', 'No s’ha pogut registrar aquesta clau d’accés.'],
