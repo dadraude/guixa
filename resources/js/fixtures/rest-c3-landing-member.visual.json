@@ -1,0 +1,2467 @@
+{
+    "baseUrl": "http://127.0.0.1:5308",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "baskets-list",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Member/Baskets/Index",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content a,#main-content li,#main-content span,#main-content dt,#main-content dd,#main-content p,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout.",
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistelles"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-draft\"]",
+                                "count": 1,
+                                "text": "En preparació",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-validated\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-collected\"]",
+                                "count": 1,
+                                "text": "Recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] a",
+                                "count": 3,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "default-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistelles"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-draft\"]",
+                                "count": 1,
+                                "text": "En preparació",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-validated\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-collected\"]",
+                                "count": 1,
+                                "text": "Recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] a",
+                                "count": 3,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-light",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistelles"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"empty-baskets\"]",
+                                "count": 1,
+                                "text": "Encara no hi ha cap cistella.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Read-only list without links or controls: nothing to reach with Tab."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-dark",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistelles"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"empty-baskets\"]",
+                                "count": 1,
+                                "text": "Encara no hi ha cap cistella.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Read-only list without links or controls: nothing to reach with Tab."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-light",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistelles"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] > li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] a",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-dark",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistelles"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] > li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] a",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "pending-light",
+                    "query": {
+                        "state": "pending"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] a",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"validated-at\"]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] > li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-validated\"]",
+                                "count": 2,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-collected\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "pending-dark",
+                    "query": {
+                        "state": "pending"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] a",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"validated-at\"]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] > li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-validated\"]",
+                                "count": 2,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-collected\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "pending-empty-light",
+                    "query": {
+                        "state": "pending-empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"empty-baskets\"]",
+                                "count": 1,
+                                "text": "Cap cistella pendent de recollida.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "basket-detail",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Member/Baskets/Show",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content a,#main-content li,#main-content span,#main-content dt,#main-content dd,#main-content p,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout.",
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-draft\"]",
+                                "count": 1,
+                                "text": "En preparació",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"draft-preparation\"]",
+                                "count": 1,
+                                "text": "Aquesta cistella encara s’està preparant.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "default-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-draft\"]",
+                                "count": 1,
+                                "text": "En preparació",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"draft-preparation\"]",
+                                "count": 1,
+                                "text": "Aquesta cistella encara s’està preparant.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "validated-light",
+                    "query": {
+                        "state": "validated"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-validated\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "text": "Marca com a recollida",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"pending-collection\"] > p:first-child",
+                                "count": 1,
+                                "text": "Validada i pendent de recollida física.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-adjustments\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-panel\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-collection\"]",
+                                "count": 1,
+                                "text": "Encara no s’ha recollit",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-collection\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a",
+                            "#main-content [data-test=\"collect-basket\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "validated-dark",
+                    "query": {
+                        "state": "validated"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-validated\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "text": "Marca com a recollida",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"pending-collection\"] > p:first-child",
+                                "count": 1,
+                                "text": "Validada i pendent de recollida física.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-adjustments\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-panel\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-collection\"]",
+                                "count": 1,
+                                "text": "Encara no s’ha recollit",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-collection\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a",
+                            "#main-content [data-test=\"collect-basket\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "validated-busy-light",
+                    "query": {
+                        "state": "validated-busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-validated\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"pending-collection\"] > p:first-child",
+                                "count": 1,
+                                "text": "Validada i pendent de recollida física.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-adjustments\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-panel\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-collection\"]",
+                                "count": 1,
+                                "text": "Encara no s’ha recollit",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-collection\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "disabled": ""
+                                },
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-requests": "put /baskets/basket-1/collection"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "validated-error-light",
+                    "query": {
+                        "state": "validated-error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-validated\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"pending-collection\"] > p:first-child",
+                                "count": 1,
+                                "text": "Validada i pendent de recollida física.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-adjustments\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-panel\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-collection\"]",
+                                "count": 1,
+                                "text": "Encara no s’ha recollit",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-collection\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"domain-error\"] p",
+                                "count": 1,
+                                "text": "Només es poden recollir cistelles validades.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "disabled": null
+                                },
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-requests": "put /baskets/basket-1/collection"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a",
+                            "#main-content [data-test=\"collect-basket\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "validated-error-dark",
+                    "query": {
+                        "state": "validated-error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-validated\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"pending-collection\"] > p:first-child",
+                                "count": 1,
+                                "text": "Validada i pendent de recollida física.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-adjustments\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-panel\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-collection\"]",
+                                "count": 1,
+                                "text": "Encara no s’ha recollit",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-collection\"]",
+                                "count": 1,
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"domain-error\"] p",
+                                "count": 1,
+                                "text": "Només es poden recollir cistelles validades.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "disabled": null
+                                },
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-requests": "put /baskets/basket-1/collection"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a",
+                            "#main-content [data-test=\"collect-basket\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "collected-light",
+                    "query": {
+                        "state": "collected"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-collected\"]",
+                                "count": 1,
+                                "text": "Recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collected\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Aquesta cistella s’ha recollit."
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-history\"] li",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-collection\"]",
+                                "count": 1,
+                                "text": "Maria Soler · 2026-11-07T10:00:00+01:00",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-collection\"]",
+                                "count": 1,
+                                "text": "Recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "collected-dark",
+                    "query": {
+                        "state": "collected"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-collected\"]",
+                                "count": 1,
+                                "text": "Recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collection-history\"] li",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-collection\"]",
+                                "count": 1,
+                                "text": "Maria Soler · 2026-11-07T10:00:00+01:00",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-collection\"]",
+                                "count": 1,
+                                "text": "Recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-light",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Cooperativa agrícola de la Vall de les Hortes i del Ganxet tradicional de la plana"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:first-child dd",
+                                "count": 1,
+                                "text": "-1.234.567,89 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "count": 3
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-dark",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Cooperativa agrícola de la Vall de les Hortes i del Ganxet tradicional de la plana"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:first-child dd",
+                                "count": 1,
+                                "text": "-1.234.567,89 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "count": 3
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "weekly-light",
+                    "query": {
+                        "state": "weekly"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Cistella: Família Soler"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-status-draft\"]",
+                                "count": 1,
+                                "text": "En preparació",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"wallet-link\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"draft-preparation\"]",
+                                "count": 1,
+                                "text": "Aquesta cistella encara s’està preparant.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"weekly-lines\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test^=\"weekly-line-\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "stock-list",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Stock/Index",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content a,#main-content li,#main-content span,#main-content dt,#main-content dd,#main-content p,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout.",
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Catàleg d’estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-sold-out\"]",
+                                "count": 1,
+                                "text": "Esgotat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"] .tabular-nums",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content button, #main-content form, #main-content input",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"] .min-w-0 > p",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Read-only list without links or controls: nothing to reach with Tab."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "default-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Catàleg d’estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-sold-out\"]",
+                                "count": 1,
+                                "text": "Esgotat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"] .tabular-nums",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content button, #main-content form, #main-content input",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"] .min-w-0 > p",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Read-only list without links or controls: nothing to reach with Tab."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-light",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Catàleg d’estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-empty\"]",
+                                "count": 1,
+                                "text": "Encara no hi ha productes d’estoc disponibles.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Read-only list without links or controls: nothing to reach with Tab."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-dark",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Catàleg d’estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-empty\"]",
+                                "count": 1,
+                                "text": "Encara no hi ha productes d’estoc disponibles.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Read-only list without links or controls: nothing to reach with Tab."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-light",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Catàleg d’estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-sold-out\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button, #main-content form, #main-content input",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"] .min-w-0 > p",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Read-only list without links or controls: nothing to reach with Tab."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-dark",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Catàleg d’estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-sold-out\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button, #main-content form, #main-content input",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-offer\"] .min-w-0 > p",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Read-only list without links or controls: nothing to reach with Tab."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

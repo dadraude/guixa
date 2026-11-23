@@ -7,7 +7,7 @@ import { initializeTheme } from '@/composables/useAppearance';
 import { installTranslations } from '@/lib/i18n';
 
 /*
- * Deterministic review fixture for checkpoint C3 (spec 005, slices 3-7): the wallet statement in the landing identity.
+ * Deterministic review fixture for checkpoint C3 (spec 005, slices 3-7): the wallet statement, the member baskets and the stock list in the landing identity.
  * Only the HTTP client is mocked: the real Inertia router, layouts, pages and portals run. It proves presentation, never
  * persistence or authorization. Each C3 task adds its pages and states here.
  */
@@ -144,12 +144,229 @@ const statementProps = () => ({
         : {}),
 });
 
+// Member baskets (`/baskets`): `default` mixes an unsent (draft) basket, one pending collection (validated, a debt) and a collected one;
+// `empty` has none; `long-content` a long household name and a seven-digit total (R22, R25 cents).
+const basketSummary = (
+    id: string,
+    status: string,
+    totalCents: number,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    householdName: 'Família Soler',
+    state: status,
+    status,
+    totalCents,
+    createdAt: '2026-11-10 09:00',
+    validatedAt: null as string | null,
+    pendingCollection: status === 'validated',
+    ...over,
+});
+// The producers (`BasketSummaryRow`, `ListMemberPendingCollections`): a validated or collected basket has its validation instant,
+// the pending-collections variant (`/baskets?pending=1`, linked from the dashboard) lists validated baskets only.
+const basketListProps = () => {
+    if (state === 'pending-empty') return { baskets: [], pending: true };
+    if (state === 'pending')
+        return {
+            baskets: [
+                basketSummary('basket-2', 'validated', -100, {
+                    createdAt: '2026-11-05 10:00',
+                    validatedAt: '2026-11-06 10:00',
+                }),
+                basketSummary('basket-4', 'validated', 4580, {
+                    householdName: longName,
+                    createdAt: '2026-11-07 10:00',
+                    validatedAt: '2026-11-08 18:30',
+                }),
+            ],
+            pending: true,
+        };
+    if (state === 'empty') return { baskets: [], pending: false };
+    if (state === 'long-content')
+        return {
+            baskets: [
+                basketSummary('basket-1', 'validated', -123456789, {
+                    householdName: longName,
+                    validatedAt: '2026-11-12 10:00',
+                }),
+                basketSummary('basket-2', 'draft', 123456789, {
+                    householdName: longName,
+                }),
+            ],
+            pending: false,
+        };
+    return {
+        baskets: [
+            basketSummary('basket-1', 'draft', 2300),
+            basketSummary('basket-2', 'validated', -100, {
+                createdAt: '2026-11-05 10:00',
+                validatedAt: '2026-11-06 10:00',
+            }),
+            basketSummary('basket-3', 'collected', 1245, {
+                createdAt: '2026-10-29 10:00',
+                validatedAt: '2026-10-30 10:00',
+            }),
+        ],
+        pending: false,
+    };
+};
+const stockLine = (
+    name: string,
+    quantity: string,
+    unitPriceCents: number,
+    amountCents: number,
+) => ({
+    stockProductId: `stock-${name}`,
+    name,
+    unit: 'kg',
+    quantity,
+    unitPriceCents,
+    amountCents,
+    effectiveQuantity: quantity,
+    effectiveAmountCents: amountCents,
+});
+const weeklyLine = (name: string, ordered: string, allocated: string) => ({
+    productId: `weekly-${name}`,
+    name,
+    unit: 'kg',
+    ordered,
+    allocated,
+    quantity: allocated,
+    unitPriceCents: 320,
+    amountCents: 960,
+    effectiveQuantity: allocated,
+    effectiveAmountCents: 960,
+    differsFromAllocation: false,
+});
+// Basket detail as `BasketData` and `BasketActions::forMember` produce it. `default` is an unsent draft; `validated` (and its
+// `validated-busy` / `validated-error` request states) waits for collection: `settled` is true for validated and collected
+// (`BasketState::isSettled`), the member may mark it collected (`markCollected` is `isPendingCollection`) and no collected event
+// exists yet; `collected` has the one `collected` event that collecting appends; `weekly` is a weekly draft; `long-content` has a long
+// household and product name and a seven-digit total. Quantities have three decimals, dates are ATOM strings, kind is `stock` or `weekly`.
+const basketProps = () => {
+    const status = state.startsWith('validated')
+        ? 'validated'
+        : state === 'collected'
+          ? 'collected'
+          : 'draft';
+    const long = state === 'long-content';
+    const weekly = state === 'weekly';
+    const total = long ? 123456789 : weekly ? 960 : 1350;
+    const unitPriceCents = long ? 41152263 : 450;
+    return {
+        basket: {
+            id: 'basket-1',
+            householdId: 'household-1',
+            householdName: long ? longName : 'Família Soler',
+            state: status,
+            stockLines: weekly
+                ? []
+                : [
+                      stockLine(
+                          long ? longName : 'Mongetes',
+                          '3.000',
+                          unitPriceCents,
+                          total,
+                      ),
+                  ],
+            returnLines: [],
+            totalCents: total,
+            balanceCents: long ? -123456789 : -1250,
+            projectedBalanceCents: status === 'draft' ? -2600 : null,
+            validatedAt:
+                status === 'draft' ? null : '2026-11-06T10:00:00+01:00',
+            collectedAt:
+                status === 'collected' ? '2026-11-07T10:00:00+01:00' : null,
+            effectiveTotalCents: total,
+            adjustments: [],
+            collectionEvents:
+                status === 'collected'
+                    ? [
+                          {
+                              id: 'event-1',
+                              type: 'collected',
+                              authorName: 'Maria Soler',
+                              occurredAt: '2026-11-07T10:00:00+01:00',
+                              reason: null,
+                          },
+                      ]
+                    : [],
+            pendingCollection: status === 'validated',
+            can: {
+                edit: false,
+                validate: false,
+                cancel: false,
+                markCollected: status === 'validated',
+                correct: false,
+                correctCollection: false,
+            },
+            status,
+            settled: status !== 'draft',
+            collected: status === 'collected',
+            weekly,
+            weeklyLines: weekly
+                ? [
+                      weeklyLine('Cols', '3.000', '3.000'),
+                      weeklyLine(longName, '3.000', '3.000'),
+                  ]
+                : [],
+            kind: weekly ? 'weekly' : 'stock',
+            late: false,
+        },
+    };
+};
+const stockOffer = (
+    id: string,
+    name: string,
+    available: string,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    producerId: 'producer-1',
+    producerName: 'Cal Pagès',
+    name,
+    unit: 'kg',
+    price: '4.50',
+    available,
+    soldOut: Number(available) <= 0,
+    ...over,
+});
+// Stock list (`/stock`): `default` has offers and a sold-out one; `empty` none; `long-content` long names and a seven-digit price.
+const stockProps = () => {
+    if (state === 'empty') return { products: [] };
+    if (state === 'long-content')
+        return {
+            products: [
+                stockOffer('stock-1', longName, '1234567.500', {
+                    producerName: longName,
+                    price: '1234567.89',
+                }),
+                stockOffer('stock-2', longName, '0.000'),
+            ],
+        };
+    return {
+        products: [
+            stockOffer('stock-1', 'Mongetes', '12.000'),
+            stockOffer('stock-2', 'Oli d’oliva', '0.000', { unit: 'l' }),
+            stockOffer('stock-3', 'Llenties', '3.500'),
+        ],
+    };
+};
+
 const pageProps: Record<string, Record<string, unknown>> = {
+    'Orders/Index': { cycles: [] },
+    'Member/Baskets/Index': basketListProps(),
+    'Member/Baskets/Show': basketProps(),
+    'Stock/Index': stockProps(),
     'Wallet/Statement': statementProps(),
     // Unmigrated page of a later checkpoint (C4): the shell must go back to the old identity on it and return (S26).
     'settings/Profile': { verificationLinkSent: false },
 };
 const urls: Record<string, string> = {
+    'Orders/Index': '/orders',
+    'Member/Baskets/Index': '/baskets',
+    'Member/Baskets/Show': '/baskets/basket-1',
+    'Stock/Index': '/stock',
     'Wallet/Statement': walletUrl,
     'settings/Profile': '/settings/profile',
 };
@@ -208,14 +425,20 @@ http.setClient({
         if (method !== 'get') {
             requests.push(`${method} ${url.pathname}`);
             // Busy: the request never answers, so the page stays in `processing`.
-            if (state === 'busy') return new Promise(() => {});
+            if (state === 'busy' || state === 'validated-busy')
+                return new Promise(() => {});
             return reply({
                 ...page,
                 props: {
                     ...page.props,
                     errors: state.startsWith('invalid')
                         ? invalidErrors
-                        : { domain: 'No s’ha pogut registrar l’ingrés.' },
+                        : {
+                              domain:
+                                  pageName === 'Member/Baskets/Show'
+                                      ? 'Només es poden recollir cistelles validades.'
+                                      : 'No s’ha pogut registrar l’ingrés.',
+                          },
                 },
             });
         }
@@ -324,6 +547,37 @@ const runNavigation = async () => {
     await visit(walletUrl, title);
     snapshot('s3');
     set('nav-requests', navigation.join(','));
+};
+
+// S23: the member journey Orders -> baskets -> a basket -> the statement -> stock; each step reads the landing shell and its primary.
+const runJourney = async () => {
+    snapshot('j0');
+    const steps = ['/baskets', '/baskets/basket-1', '/wallet', '/stock'];
+    for (const [index, path] of steps.entries()) {
+        const previous = heading();
+        router.visit(path);
+        await waitFor(() =>
+            heading() && heading() !== previous ? document.body : null,
+        );
+        await sleep(150);
+        snapshot(`j${index + 1}`);
+        set(`j${index + 1}-title`, heading() ?? '');
+    }
+    set('nav-requests', navigation.join(','));
+};
+
+// The member's only write action: the real button sends the real PUT, so busy and the server error come from the request.
+const runCollect = async () => {
+    document
+        .querySelector<HTMLElement>('[data-test="collect-basket"]')!
+        .click();
+    await waitFor(() => (requests.length ? document.body : null));
+    if (state === 'validated-error')
+        await waitFor(() =>
+            document.querySelector('[data-test="domain-error"] p'),
+        );
+    await sleep(400);
+    set('requests', requests.join(' ; '));
 };
 
 // Submits the top-up form (or, for `invalid-correction`, the correction form) so busy, error and invalid come from the request the page sends.
@@ -463,7 +717,12 @@ void createInertiaApp({
     await settle();
     try {
         if (state === 'navigate') await runNavigation();
-        if (['busy', 'error', 'invalid', 'invalid-correction'].includes(state))
+        if (state === 'journey') await runJourney();
+        if (['validated-busy', 'validated-error'].includes(state))
+            await runCollect();
+        else if (
+            ['busy', 'error', 'invalid', 'invalid-correction'].includes(state)
+        )
             await runFormRequest();
         if (state === 'select') recordPopup((await openSelect()).popup);
         if (state === 'select-keyboard') await runSelectKeyboard();

@@ -3,6 +3,8 @@ const pilotPages = new Set([
     'Orders/Edit',
     'Dashboard',
     'Wallet/Statement',
+    'Member/Baskets/Index',
+    'Member/Baskets/Show',
     'Finance/Baskets/Index',
     'Finance/Baskets/Create',
     'Finance/Baskets/Show',
@@ -91,6 +93,9 @@ const landingPages = new Set([
     'Manage/Cycles/Show',
     'Manage/Stock/Movements',
     'Wallet/Statement',
+    'Member/Baskets/Index',
+    'Member/Baskets/Show',
+    'Stock/Index',
 ]);
 
 export function pilotVariantFor(pageName: string): PilotVariant | null {

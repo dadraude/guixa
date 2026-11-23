@@ -636,6 +636,84 @@
                     ]
                 },
                 {
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "id": "balance-columns-phone",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"]",
+                                "count": 1,
+                                "styles": {
+                                    "grid-template-columns": "309px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "count": 3,
+                                "styles": {
+                                    "overflow-wrap": "normal"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Pins the balance list columns of the finance basket, which the member basket rule of T32 must not change."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "id": "balance-columns-desktop",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"]",
+                                "count": 1,
+                                "styles": {
+                                    "grid-template-columns": "303.328px 303.328px 303.344px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "count": 3,
+                                "styles": {
+                                    "overflow-wrap": "normal"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Pins the balance list columns of the finance basket, which the member basket rule of T32 must not change."
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
                     "id": "sent-dark",
                     "query": {
                         "state": "default"
