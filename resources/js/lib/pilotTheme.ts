@@ -90,6 +90,7 @@ const landingPages = new Set([
     'Manage/Cycles/Index',
     'Manage/Cycles/Show',
     'Manage/Stock/Movements',
+    'Wallet/Statement',
 ]);
 
 export function pilotVariantFor(pageName: string): PilotVariant | null {

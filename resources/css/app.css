@@ -2561,3 +2561,59 @@ html.dark:has(.reference-style)
     white-space: normal;
     text-align: start;
 }
+
+/* 005 T31 */
+/*
+ * Wallet statement (Wallet/Statement), limited to its own structure so no page approved earlier changes: its table has no
+ * `data-test` (the movement history table and notices carry one) and its empty notice sits in a section after the h2. The
+ * balance is plain text in the heading description with proportional figures; it takes tabular figures like the amounts
+ * (R22, R25). At phone width the visually hidden table header laid its five labels out as one row, so their text ran past
+ * the viewport and the page read as horizontally clipped; stacking the labels keeps them inside, as T08 does for the history.
+ */
+.landing
+    .pilot-t44-page:is(
+        :has(
+            > section.pilot-layout-panel
+                > .pilot-wallet-movements
+                > .pilot-wallet-table:not([data-test])
+        ),
+        :has(
+            > section.pilot-layout-panel
+                > h2
+                + p.pilot-layout-notice:not([data-test])
+        )
+    )
+    header
+    > p {
+    font-variant-numeric: tabular-nums;
+}
+
+@container pilot-wallet (max-width: 52rem) {
+    .landing .pilot-wallet-table:not([data-test]) thead th {
+        display: block;
+        white-space: normal;
+    }
+
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table:not([data-test])
+        tbody
+        td.pilot-amount {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        white-space: normal;
+    }
+}
+
+/* The amount sits beside the type only where both still fit at the current text size; a seven-digit amount at 200 % does not. */
+@container pilot-wallet (min-width: 17rem) and (max-width: 52rem) {
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table:not([data-test])
+        tbody
+        td.pilot-amount {
+        grid-column: 2;
+        grid-row: 2;
+        white-space: nowrap;
+    }
+}

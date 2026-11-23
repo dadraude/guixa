@@ -1,0 +1,2246 @@
+{
+    "baseUrl": "http://127.0.0.1:5307",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "statement-manager",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-layout-notice",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout or capture focus in an overlay.",
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 13,05 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table a",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"button\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input:not([type=\"hidden\"])",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content .pilot-wallet-table a"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "default-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 13,05 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table a",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"button\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input:not([type=\"hidden\"])",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content .pilot-wallet-table a"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-light",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 0,00 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-notice",
+                                "count": 1,
+                                "text": "Encara no hi ha moviments."
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"button\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"record-correction\"][disabled]",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-dark",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 0,00 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-notice",
+                                "count": 1,
+                                "text": "Encara no hi ha moviments."
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "negative-dark",
+                    "query": {
+                        "state": "negative"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: -12,50 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input:not([type=\"hidden\"])",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content .pilot-wallet-table a"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "negative-light",
+                    "query": {
+                        "state": "negative"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: -12,50 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input:not([type=\"hidden\"])",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content .pilot-wallet-table a"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-light",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: -1.234.567,88 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input:not([type=\"hidden\"])",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content .pilot-wallet-table a"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-dark",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input:not([type=\"hidden\"])",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content .pilot-wallet-table a"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "invalid-light",
+                    "query": {
+                        "state": "invalid"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"button\"]",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-requests": "post /finance/households/household-1/wallet/top-ups"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "invalid-dark",
+                    "query": {
+                        "state": "invalid"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"button\"]",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-requests": "post /finance/households/household-1/wallet/top-ups"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "invalid-correction-light",
+                    "query": {
+                        "state": "invalid-correction"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"button\"]",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-requests": "post /finance/households/household-1/wallet/corrections"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "error-light",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"button\"]",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-requests": "post /finance/households/household-1/wallet/top-ups"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "busy-light",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .text-destructive:not(:empty)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"record-top-up\"][disabled]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"button\"]",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-requests": "post /finance/households/household-1/wallet/top-ups"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "status-light",
+                    "query": {
+                        "state": "status"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content p[role=\"status\"].pilot-layout-notice",
+                                "count": 1,
+                                "text": "Ingrés registrat.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-light",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-popup-carries-landing": "true",
+                                    "data-ev-popup-bg": "rgb(255, 250, 240)",
+                                    "data-ev-popup-inside-viewport": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-dark",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-popup-carries-landing": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-keyboard-light",
+                    "query": {
+                        "state": "select-keyboard"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-focus-returned-after-escape": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "statement-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-layout-notice",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout or capture focus in an overlay.",
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 13,05 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"button\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/manage/households/household-1\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input:not([type=\"hidden\"])",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content .pilot-wallet-table a"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "default-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"button\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input:not([type=\"hidden\"])",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-slot=\"button\"]:not([disabled])",
+                            "#main-content .pilot-wallet-table a"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "statement-member",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-layout-notice",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout or capture focus in an overlay.",
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 13,05 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table a",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content .pilot-wallet-table a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "default-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 13,05 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 6
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table a",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content .pilot-wallet-table a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-light",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 0,00 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-notice",
+                                "count": 1,
+                                "text": "Encara no hi ha moviments."
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty-dark",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 0,00 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-notice",
+                                "count": 1,
+                                "text": "Encara no hi ha moviments."
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No interactive control is present or the state only measures text and layout."
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "negative-dark",
+                    "query": {
+                        "state": "negative"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: -12,50 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content .pilot-wallet-table a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "negative-light",
+                    "query": {
+                        "state": "negative"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: -12,50 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content .pilot-wallet-table a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-light",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: -1.234.567,88 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(40, 101, 133)",
+                                    "data-ev-background": "rgb(250, 241, 220)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content .pilot-wallet-table a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content-dark",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content .pilot-wallet-table a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

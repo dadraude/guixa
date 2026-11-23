@@ -487,41 +487,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
         },
         households,
     },
-    // Old-theme control: the shared select must look the same here (R23). Wallet/Statement stays old-theme until C3.
-    'Wallet/Statement': {
-        wallet: {
-            balance: '35.00',
-            movements: [
-                {
-                    id: 'movement-1',
-                    type: 'top_up',
-                    amount: '20.00',
-                    occurredAt: '2026-10-30 09:00',
-                    note: 'Ingrés',
-                    cycleId: null,
-                    basketId: null,
-                    sourceMovementId: null,
-                    authorName: 'Marta Soler',
-                },
-                {
-                    id: 'movement-2',
-                    type: 'top_up',
-                    amount: '15.00',
-                    occurredAt: '2026-10-29 10:00',
-                    note: 'Ingrés',
-                    cycleId: null,
-                    basketId: null,
-                    sourceMovementId: null,
-                    authorName: 'Marta Soler',
-                },
-            ],
-        },
-        household: { id: 'household-1', name: 'Família Soler' },
-        canManageReceipts: true,
-        receiptAction: '/finance/households/household-1/wallet/receipts',
-        correctionAction: '/finance/households/household-1/wallet/corrections',
-        correctionId: 'correction-1',
-    },
 };
 const urls: Record<string, string> = {
     'Receptions/Index': '/receptions',
@@ -531,7 +496,6 @@ const urls: Record<string, string> = {
     'Finance/Stock/Index': '/finance/stock',
     'Finance/Stock/Movements': '/finance/stock/stock-1/movements',
     'Receptions/Show': '/receptions/cycle-1/producer-1',
-    'Wallet/Statement': '/finance/households/household-1/wallet',
 };
 const page = {
     component: pageName,

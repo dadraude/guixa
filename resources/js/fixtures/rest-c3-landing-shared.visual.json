@@ -1,0 +1,305 @@
+{
+    "baseUrl": "http://127.0.0.1:5307",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "navigate-member",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-layout-notice",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout or capture focus in an overlay.",
+            "states": [
+                {
+                    "id": "navigate-light",
+                    "query": {
+                        "state": "navigate"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /settings/profile,get /wallet",
+                                    "data-ev-s1-shell-landing": "true",
+                                    "data-ev-s1-primary": "rgb(40, 101, 133)",
+                                    "data-ev-s2-shell-landing": "false",
+                                    "data-ev-s2-primary": "rgb(36, 107, 87)",
+                                    "data-ev-s3-shell-landing": "true",
+                                    "data-ev-s3-primary": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Navigation case: only the shell identity before, during and after the visit is recorded."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "navigate-manager",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-layout-notice",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout or capture focus in an overlay.",
+            "states": [
+                {
+                    "id": "navigate-light",
+                    "query": {
+                        "state": "navigate"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /settings/profile,get /finance/households/household-1/wallet",
+                                    "data-ev-s1-shell-landing": "true",
+                                    "data-ev-s1-primary": "rgb(40, 101, 133)",
+                                    "data-ev-s2-shell-landing": "false",
+                                    "data-ev-s2-primary": "rgb(36, 107, 87)",
+                                    "data-ev-s3-shell-landing": "true",
+                                    "data-ev-s3-primary": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Navigation case: only the shell identity before, during and after the visit is recorded."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "navigate-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-layout-notice",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout or capture focus in an overlay.",
+            "states": [
+                {
+                    "id": "navigate-light",
+                    "query": {
+                        "state": "navigate"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /settings/profile,get /finance/households/household-1/wallet",
+                                    "data-ev-s1-shell-landing": "true",
+                                    "data-ev-s1-primary": "rgb(40, 101, 133)",
+                                    "data-ev-s2-shell-landing": "false",
+                                    "data-ev-s2-primary": "rgb(36, 107, 87)",
+                                    "data-ev-s3-shell-landing": "true",
+                                    "data-ev-s3-primary": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Navigation case: only the shell identity before, during and after the visit is recorded."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "navigate-member-manager",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-layout-notice",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout or capture focus in an overlay.",
+            "states": [
+                {
+                    "id": "navigate-light",
+                    "query": {
+                        "state": "navigate"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /settings/profile,get /finance/households/household-1/wallet",
+                                    "data-ev-s1-shell-landing": "true",
+                                    "data-ev-s1-primary": "rgb(40, 101, 133)",
+                                    "data-ev-s2-shell-landing": "false",
+                                    "data-ev-s2-primary": "rgb(36, 107, 87)",
+                                    "data-ev-s3-shell-landing": "true",
+                                    "data-ev-s3-primary": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Navigation case: only the shell identity before, during and after the visit is recorded."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "profile-control",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "settings/Profile",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h2,#main-content label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Unmigrated control page: only the absence of landing and its token values are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(36, 107, 87)",
+                                    "data-ev-background": "rgb(248, 247, 244)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-primary": "rgb(167, 215, 193)",
+                                    "data-ev-error": null
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
