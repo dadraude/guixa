@@ -35,7 +35,8 @@ reviewer's conclusions before returning your own.
 
 Check the whole diff for:
 
-- Spec: public-use-case tests prove each linked rule/scenario; code and design/spec agree; authorized
+- Spec: public-use-case tests prove each linked rule/scenario, checked against the handoff's
+  [acceptance-to-test map](handoff.md#acceptance-to-test-map); code and design/spec agree; authorized
   deviations are recorded; no out-of-scope product behavior.
 - Red-proof: a test asserting that something is blocked goes red with the blocking mechanism removed.
   Ask for that evidence; red because the component does not exist yet does not count.

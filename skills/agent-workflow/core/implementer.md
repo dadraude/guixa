@@ -15,9 +15,10 @@ means pause and request coordinator admission before writing it. Do not omit req
    Apply the profile's framework-reuse preference before introducing custom infrastructure or wrappers;
    for Guixa this means Laravel built-ins first, within the constitution's domain boundaries.
    Open other documents only for a concrete gap, by section (list headings, then read a line range),
-   never whole long files. Before writing code, write a coverage map: each linked requirement/scenario
-   and done-when row -> the test that will prove it, whether it uses doubles or real infrastructure, and
-   the setup line that establishes its Given. Repeat that map in the report. For rendered UI changes,
+   never whole long files. Before writing code, write the handoff's [acceptance-to-test map](handoff.md#acceptance-to-test-map):
+   each linked requirement/scenario and done-when row -> the test that will prove it, whether it uses
+   doubles or real infrastructure, and the setup line that establishes its Given. Update it with the
+   final test titles, run `check-map-tests.mjs` before returning `committed`, and repeat the map in the report. For rendered UI changes,
    follow [visual verification](../references/visual.md): inspect and map existing components before
    building screens, declare the page/role/state inventory and selected cases, run the manifest plan
    command, and share the count/rationale with the coordinator before broad implementation.
