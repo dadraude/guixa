@@ -10,7 +10,9 @@ of the plan and spec only (worktree `origin/main`).
 
 **Checkpoint C1 (T17–T23): approved (2026-11-19).** T23 (DRA-295) recorded the C1 acceptance and asked for visual approval (Q&A `history/2026-11-19T21-23-30.594Z-DRA-295-5b4045f8-9319-41c0-b8cc-a38da89b3c85.md`); the user approved the seven C1 pages and the received-total dialog in light and dark (Q&A `history/2026-11-19T22-22-49.544Z-DRA-295-18f726e1-6cd2-40fe-b0ff-b007f478fe5c.md`). C2 (T24) may start (S30).
 
-**Checkpoint C2 (T24–T30): awaiting approval.** T30 (DRA-306) recorded the C2 acceptance and asked the user for visual approval of the nine C2 pages and their overlays in light and dark (Q&A `history/2026-11-20T18-10-46.715Z-DRA-306-0e4e1132-8fe4-4c97-a9fe-bdeeb42d8012.md`; multi-role case left open in Deviation `history/2026-11-20T18-07-42.179Z-DRA-306-680247b1-c5dc-4677-92e6-5fd01d7c1bbb.md`; variant-off decision in Deviation `history/2026-11-20T18-07-42.128Z-DRA-306-f00cf996-da33-4bfc-849f-3bdd7a509bd3.md`). No approval is recorded; C3 (T31) does not start until it is (S30).
+**Checkpoint C2 (T24–T30): approved (2026-11-22).** T30 (DRA-306) recorded the C2 acceptance and asked the user for visual approval of the nine C2 pages and their overlays in light and dark (Q&A `history/2026-11-20T18-10-46.715Z-DRA-306-0e4e1132-8fe4-4c97-a9fe-bdeeb42d8012.md`; multi-role case left open in Deviation `history/2026-11-20T18-07-42.179Z-DRA-306-680247b1-c5dc-4677-92e6-5fd01d7c1bbb.md`; variant-off decision in Deviation `history/2026-11-20T18-07-42.128Z-DRA-306-f00cf996-da33-4bfc-849f-3bdd7a509bd3.md`). The user approved C2 with no page or mode named for correction (Q&A `history/2026-11-22T22-08-22.798Z-DRA-306-f02f624c-0841-49ac-b6d5-e9e4806f03e6.md`). C3 (T31) may start (S30).
+
+**Checkpoint C3 (T31–T33): awaiting approval.** T33 (DRA-309) recorded the C3 acceptance and asked the user for visual approval of the four C3 pages and the statement select popup in light and dark (Q&A `history/2026-11-24T23-17-16.266Z-DRA-309-983aa583-dc16-4ddf-a07a-499c26e60e2a.md`; unmeasured items left open in Deviation `history/2026-11-24T23-16-50.258Z-DRA-309-c745d845-2df1-4882-b8fa-f2bcb17e9e00.md`; demo seeder read in Deviation `history/2026-11-24T23-16-50.353Z-DRA-309-42c1ef9c-0265-4296-92e6-d5321f9e1867.md`). No approval is recorded; C4 (T34) does not start until it is (S30).
 
 ## Architecture and safe sequence
 
@@ -1032,6 +1034,7 @@ PHP guards for C3: `tests/Feature/Wallet/WalletPagesTest.php`, `tests/Feature/St
 - **Done when.** As T23 for C3; one C4 page (`settings/Profile` or `auth/Login`) unchanged; seeder handoff states "no change" with the read evidence for sent/unsent baskets and settled/unpaid balances (or points to T29); approval requested, never recorded by the task.
 - **First checkpoint.** Run the C3 shared manifest. **Size.** Documentation and evidence only. **Limits.** No C4 work.
 - **Acceptance record.** C3 record; verdict "pending approval".
+- **Status.** Awaiting approval. Record (R20, R21, R22, R25, R27, R30; S23, S26, S27, S30; R28, R29 have no C3 allocation; per-page R5–R9 text, manifest counts 106 + 187 + 118 + 260 + 144 + 74 (`dashboard`), Vitest 560, Pest guards 31 and `DemoSeederTest` 20 green; S27 partly met) is in the Q&A cited in the status line at the top; demo seeder: no change; verdict pending approval, remainder owner: the user's decision, then T34.
 
 ## Checkpoint C4 — Sign-in and settings (T34–T39)
 
