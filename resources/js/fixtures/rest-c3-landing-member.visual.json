@@ -1391,7 +1391,7 @@
                             {
                                 "selector": "#main-content [data-test=\"domain-error\"] p",
                                 "count": 1,
-                                "text": "Només es poden recollir cistelles validades.",
+                                "text": "Només es pot recollir una cistella validada.",
                                 "contrast": 4.5
                             },
                             {
@@ -1523,7 +1523,7 @@
                             {
                                 "selector": "#main-content [data-test=\"domain-error\"] p",
                                 "count": 1,
-                                "text": "Només es poden recollir cistelles validades.",
+                                "text": "Només es pot recollir una cistella validada.",
                                 "contrast": 4.5
                             },
                             {

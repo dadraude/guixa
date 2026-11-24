@@ -251,8 +251,9 @@ const basketProps = () => {
           : 'draft';
     const long = state === 'long-content';
     const weekly = state === 'weekly';
-    const total = long ? 123456789 : weekly ? 960 : 1350;
+    const total = long ? 123456789 : weekly ? 1920 : 1350;
     const unitPriceCents = long ? 41152263 : 450;
+    const balance = long ? -123456789 : -1250;
     return {
         basket: {
             id: 'basket-1',
@@ -271,8 +272,8 @@ const basketProps = () => {
                   ],
             returnLines: [],
             totalCents: total,
-            balanceCents: long ? -123456789 : -1250,
-            projectedBalanceCents: status === 'draft' ? -2600 : null,
+            balanceCents: balance,
+            projectedBalanceCents: status === 'draft' ? balance - total : null,
             validatedAt:
                 status === 'draft' ? null : '2026-11-06T10:00:00+01:00',
             collectedAt:
@@ -436,7 +437,7 @@ http.setClient({
                         : {
                               domain:
                                   pageName === 'Member/Baskets/Show'
-                                      ? 'Només es poden recollir cistelles validades.'
+                                      ? 'Només es pot recollir una cistella validada.'
                                       : 'No s’ha pogut registrar l’ingrés.',
                           },
                 },

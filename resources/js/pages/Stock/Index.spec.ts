@@ -23,7 +23,7 @@ const offer = (
     name: 'Mongetes',
     unit: 'kg',
     price: '4.50',
-    available: '12',
+    available: '12.000',
     soldOut: false,
     ...overrides,
 });
@@ -35,7 +35,7 @@ describe('member stock list (R26)', () => {
             offer({
                 id: 'two',
                 name: 'Oli de la cooperativa de productors de la Garrotxa',
-                available: '0',
+                available: '0.000',
                 soldOut: true,
             }),
         ]);
@@ -44,7 +44,7 @@ describe('member stock list (R26)', () => {
         expect(html.match(/data-test="stock-offer"/g)).toHaveLength(2);
         expect(html).toContain('Mongetes');
         expect(html).toMatch(/Cal Pagès · kg ·/);
-        expect(html).toMatch(/12[\s\u00a0]+kg/);
+        expect(html).toMatch(/12,000[\s\u00a0]+kg/);
         expect(html).toContain('4,50 €');
         expect(html.match(/data-test="stock-sold-out"/g)).toHaveLength(1);
         expect(html).toContain('Esgotat');
