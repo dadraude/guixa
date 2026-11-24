@@ -127,6 +127,8 @@ describe('pilot theme page selection', () => {
         ['Orders/Edit', true],
         ['Dashboard', true],
         ['Wallet/Statement', true],
+        ['Member/Baskets/Index', true],
+        ['Member/Baskets/Show', true],
         ['Stock/Index', true],
         ['Producer/Cutoff', true],
         ['Producer/CycleSummary', true],
@@ -209,7 +211,11 @@ describe('landing variant admission', () => {
         ['Manage/Cycles/Index', 'landing'],
         ['Manage/Cycles/Show', 'landing'],
         ['Manage/Settings/Extra', null],
-        ['Stock/Index', null],
+        ['Stock/Index', 'landing'],
+        ['Stock/Index/Extra', null],
+        ['Member/Baskets/Index', 'landing'],
+        ['Member/Baskets/Show', 'landing'],
+        ['Member/Baskets/Show/Extra', null],
         ['Finance/Stock/Index', 'landing'],
         ['Orders/Index', 'landing'],
         ['Orders/Edit', 'landing'],
@@ -346,6 +352,9 @@ describe('landing variant admission', () => {
             'Manage/Producers/Index',
             'Manage/Settings',
             'Wallet/Statement',
+            'Stock/Index',
+            'Member/Baskets/Index',
+            'Member/Baskets/Show',
         ]) {
             page.component = component;
             await nextTick();

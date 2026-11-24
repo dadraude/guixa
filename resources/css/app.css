@@ -2617,3 +2617,31 @@ html.dark:has(.reference-style)
         white-space: nowrap;
     }
 }
+
+/* 005 T32 */
+/*
+ * Member basket detail (Member/Baskets/Show), limited to the member page root: the finance basket carries the same
+ * `basket-balance` list but its root has `pilot-manager-page`, so it keeps its own columns. The two fixed columns held a
+ * seven-digit amount at 200 % text wider than their cell at phone width; the columns now collapse to one when a cell
+ * would be narrower than 9rem, and an amount may break instead of running past the page (R22, R25: only wrapping).
+ */
+.landing
+    .pilot-layout-page:not(.pilot-manager-page)
+    [data-test='basket-balance'] {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+}
+
+.landing
+    .pilot-layout-page:not(.pilot-manager-page)
+    [data-test='basket-balance']
+    dd {
+    overflow-wrap: anywhere;
+}
+
+/*
+ * Stock list (Stock/Index): the offer's producer, unit and price line is plain text with proportional figures, so the
+ * price takes tabular figures like the quantity beside it (R22, R25: cents unchanged).
+ */
+.landing [data-test='stock-offer'] .min-w-0 > p {
+    font-variant-numeric: tabular-nums;
+}

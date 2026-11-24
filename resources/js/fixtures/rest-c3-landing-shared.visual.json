@@ -63,6 +63,68 @@
             ]
         },
         {
+            "id": "navigate-member-journey",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Orders/Index",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content header > p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-layout-notice",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Focus lists are declared per state; states without a list measure text and layout or capture focus in an overlay.",
+            "states": [
+                {
+                    "id": "journey-light",
+                    "query": {
+                        "state": "journey"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-nav-requests": "get /baskets,get /baskets/basket-1,get /wallet,get /stock",
+                                    "data-ev-j0-shell-landing": "true",
+                                    "data-ev-j0-primary": "rgb(40, 101, 133)",
+                                    "data-ev-j1-shell-landing": "true",
+                                    "data-ev-j1-primary": "rgb(40, 101, 133)",
+                                    "data-ev-j2-shell-landing": "true",
+                                    "data-ev-j2-primary": "rgb(40, 101, 133)",
+                                    "data-ev-j3-shell-landing": "true",
+                                    "data-ev-j3-primary": "rgb(40, 101, 133)",
+                                    "data-ev-j4-shell-landing": "true",
+                                    "data-ev-j4-primary": "rgb(40, 101, 133)",
+                                    "data-ev-j1-title": "Cistelles",
+                                    "data-ev-j2-title": "Cistella: Família Soler",
+                                    "data-ev-j3-title": "Moneder",
+                                    "data-ev-j4-title": "Catàleg d’estoc"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Journey case: only the shell identity at each step of the member journey is recorded."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "navigate-manager",
             "path": "/resources/js/fixtures/rest-c3-landing.html",
             "query": {
