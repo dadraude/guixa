@@ -54,9 +54,22 @@ The coordinator writes the profile's task handoff with these sections, in order:
 context pack as exact paths and heading anchors), `## Conventions`, `## Commands` (resolved setup,
 isolation and focused checks), `## Allowed edit surfaces`, `## First contract case` (the
 [minimum contract case](implementer.md#minimum-contract-case), or `not required` when the first
-done-when row's test is the checkpoint) and `## Evidence` (contract consumers, check plan, findings
-files). A worker reads its `## Read` list and opens anything else only for a named gap. Update the file
+done-when row's test is the checkpoint), `## Acceptance-to-test map` and `## Evidence` (contract
+consumers, check plan, findings files). A worker reads its `## Read` list and opens anything else only for a named gap. Update the file
 on every continuation rather than restating it in messages.
+
+## Acceptance-to-test map
+
+The implementer completes the map in the handoff before coding and updates it with the final titles.
+Each test is one table row: a short ID, its title in backticks, its repository-relative path, the
+doubles-or-real-infrastructure choice, and every `R#`/`S#` and done-when row it proves. Record partial or
+pending coverage with its owner. For atomicity, recovery or concurrency add the setup, fault or ordering and
+the assertion that proves the outcome.
+
+`node .agent-workflow/scripts/check-map-tests.mjs <handoff> [--root <dir>]` fails on a title that does not
+exist in `tests/` or `resources/js/`, or whose `…` prefix is ambiguous. It proves existence, not that the
+assertion proves the row: the reviewer inspects the mapped assertions for what each row claims. On resume
+without a map, seed it from recorded evidence and mark missing proof as pending.
 
 ## Implementation ownership
 

@@ -36,6 +36,8 @@ yarn-error.log
 !/.agents/skills/agent-workflow-to-tickets/
 !/.agents/skills/agent-workflow-spec-flow/
 !/.agents/skills/agent-workflow-spec-gaps/
+!/.agents/skills/agent-workflow-spec-readiness/
+!/.agents/skills/agent-workflow-weekly-batch/
 /.agents/skills/agent-workflow-*/*
 !/.agents/skills/agent-workflow-*/SKILL.md
 !/.agents/skills/agent-workflow-*/agents/
@@ -52,6 +54,8 @@ yarn-error.log
 /.claude/skills/*
 !/.claude/skills/implement-session/
 !/.claude/skills/to-tickets/
+!/.claude/skills/spec-readiness/
+!/.claude/skills/weekly-batch/
 /.claude/skills/implement-session/*
 !/.claude/skills/implement-session/SKILL.md
 !/.claude/skills/implement-session/scheduling.md
@@ -77,3 +81,4 @@ yarn-error.log
 /.agent-workflow/handoff-*.md
 /skills/agent-workflow/tests/__pycache__/
 /.agent-workflow/tests/__pycache__/
+/.scratch/
