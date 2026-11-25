@@ -12,7 +12,7 @@ of the plan and spec only (worktree `origin/main`).
 
 **Checkpoint C2 (T24–T30): approved (2026-11-22).** T30 (DRA-306) recorded the C2 acceptance and asked the user for visual approval of the nine C2 pages and their overlays in light and dark (Q&A `history/2026-11-20T18-10-46.715Z-DRA-306-0e4e1132-8fe4-4c97-a9fe-bdeeb42d8012.md`; multi-role case left open in Deviation `history/2026-11-20T18-07-42.179Z-DRA-306-680247b1-c5dc-4677-92e6-5fd01d7c1bbb.md`; variant-off decision in Deviation `history/2026-11-20T18-07-42.128Z-DRA-306-f00cf996-da33-4bfc-849f-3bdd7a509bd3.md`). The user approved C2 with no page or mode named for correction (Q&A `history/2026-11-22T22-08-22.798Z-DRA-306-f02f624c-0841-49ac-b6d5-e9e4806f03e6.md`). C3 (T31) may start (S30).
 
-**Checkpoint C3 (T31–T33): open, awaiting approval.** T33 (DRA-309) recorded the C3 acceptance and asks the user for visual approval of the four C3 pages, the statement select popup and the overlays the pages open (account menu, mobile sheet, tooltips and toasts) in light and dark. The current state (verdicts, remainders, owners, condition scope and approval question) is Q&A `history/2026-11-25T06-34-04.046Z-DRA-309-9c2b2c1e-8bc7-46c4-b6ca-051389aade5c.md`, which replaces those statements of the earlier T33 entries, as amended by Q&A `history/2026-11-25T09-04-59.519Z-DRA-309-2d9accad-6d1c-47bd-9179-5901233e58a7.md` (scope of the open-ended gap, approval question and R21 remainder). Measurements are in Q&A `history/2026-11-24T23-17-16.266Z-DRA-309-983aa583-dc16-4ddf-a07a-499c26e60e2a.md` (diff argument as restated in Deviation `history/2026-11-25T06-25-35.636Z-DRA-309-6ab30c5d-69aa-4009-9f45-63db8babbc67.md`), unmeasured items in Deviation `history/2026-11-24T23-16-50.258Z-DRA-309-c745d845-2df1-4882-b8fa-f2bcb17e9e00.md`, and the demo seeder read in Deviation `history/2026-11-24T23-16-50.353Z-DRA-309-42c1ef9c-0265-4296-92e6-d5321f9e1867.md`, corrected in Deviation `history/2026-11-25T06-25-35.581Z-DRA-309-7898130f-286f-4c19-b3fd-35fb3ac7f5a2.md`. By the user's decision (for the R5, R6 and R9 items it named) and the record's reading of R20 (for the other unmeasured R5–R9 items), visual approval alone does not complete C3: it stays open until a new C3 task measures those items or the user accepts the gap (OQ5); no ticket for that task is published. No approval is recorded; C4 (T34) does not start until C3 is complete (R20, S30), and approval alone does not satisfy T34's "C3 approved" dependency.
+**Checkpoint C3 (T31–T33, T46): open, awaiting approval.** T33 (DRA-309) recorded the C3 acceptance and asks the user for visual approval of the four C3 pages, the statement select popup and the overlays the pages open (account menu, mobile sheet, tooltips and toasts) in light and dark. The current state (verdicts, remainders, owners, condition scope and approval question) is Q&A `history/2026-11-25T06-34-04.046Z-DRA-309-9c2b2c1e-8bc7-46c4-b6ca-051389aade5c.md`, which replaces those statements of the earlier T33 entries, as amended by Q&A `history/2026-11-25T09-04-59.519Z-DRA-309-2d9accad-6d1c-47bd-9179-5901233e58a7.md` (scope of the open-ended gap, approval question and R21 remainder). Measurements are in Q&A `history/2026-11-24T23-17-16.266Z-DRA-309-983aa583-dc16-4ddf-a07a-499c26e60e2a.md` (diff argument as restated in Deviation `history/2026-11-25T06-25-35.636Z-DRA-309-6ab30c5d-69aa-4009-9f45-63db8babbc67.md`), unmeasured items in Deviation `history/2026-11-24T23-16-50.258Z-DRA-309-c745d845-2df1-4882-b8fa-f2bcb17e9e00.md`, and the demo seeder read in Deviation `history/2026-11-24T23-16-50.353Z-DRA-309-42c1ef9c-0265-4296-92e6-d5321f9e1867.md`, corrected in Deviation `history/2026-11-25T06-25-35.581Z-DRA-309-7898130f-286f-4c19-b3fd-35fb3ac7f5a2.md`. By the user's decision (for the R5, R6 and R9 items it named) and the record's reading of R20 (for the other unmeasured R5–R9 items), visual approval alone does not complete C3: it stays open until a new C3 task measures those items or the user accepts the gap (OQ5); that task is T46 (DRA-333), published with the user's approval (Q&A `history/2026-11-25T15-21-22.908Z-DRA-333-77966f54-61f2-48d1-876c-5b4d190be88a.md`). No approval is recorded; C4 (T34) does not start until C3 is complete (R20, S30), and approval alone does not satisfy T34's "C3 approved" dependency.
 
 ## Architecture and safe sequence
 
@@ -118,7 +118,8 @@ No Linear column: tickets are not published. "After" lists genuine prerequisites
 | T31 | <a id="t31"></a>[Show the wallet statement to every audience in the landing identity](#t31-show-the-wallet-statement-to-every-audience-in-the-landing-identity) | R21, R22, R24 (reuse), R25 for `Wallet/Statement`; S23 start; S26 start | T30 approved |
 | T32 | <a id="t32"></a>[Show the member baskets and the stock list in the landing identity](#t32-show-the-member-baskets-and-the-stock-list-in-the-landing-identity) | R21, R22, R25, R26 (`Stock/Index` spec) for `Member/Baskets/{Index,Show}`, `Stock/Index`; S23 | T31 |
 | T33 | <a id="t33"></a>[Record checkpoint C3 acceptance and request visual approval](#t33-record-checkpoint-c3-acceptance-and-request-visual-approval) | R20, R27, R30 for C3; S23, S26, S27, S30 for C3 | T31, T32 |
-| T34 | <a id="t34"></a>[Show the auth shell and the sign-in cards in the landing identity](#t34-show-the-auth-shell-and-the-sign-in-cards-in-the-landing-identity) | R21–R23, R25, R26 (`Login`, `ForgotPassword`, `ResetPassword`, `AuthSimpleLayout` specs); S24 start; S26 start | T33 approved |
+| T46 | <a id="t46"></a>[Measure the unmeasured C3 conditions](#t46-measure-the-unmeasured-c3-conditions) | R5–R9, R22 for the C3 pages and overlays; R20, R27; S27 for C3 | T33 |
+| T34 | <a id="t34"></a>[Show the auth shell and the sign-in cards in the landing identity](#t34-show-the-auth-shell-and-the-sign-in-cards-in-the-landing-identity) | R21–R23, R25, R26 (`Login`, `ForgotPassword`, `ResetPassword`, `AuthSimpleLayout` specs); S24 start; S26 start | T33 approved, T46 |
 | T35 | <a id="t35"></a>[Show verification, confirmation, two-factor challenge and invitation in the landing identity](#t35-show-verification-confirmation-two-factor-challenge-and-invitation-in-the-landing-identity) | R21, R22, R25, R26 (four specs) for `VerifyEmail`, `ConfirmPassword`, `TwoFactorChallenge`, `AcceptInvitation`; S24 | T34 |
 | T36 | <a id="t36"></a>[Show the profile, appearance and delete-account dialog in the landing identity](#t36-show-the-profile-appearance-and-delete-account-dialog-in-the-landing-identity) | R21, R22, R25, R26 (`Profile`, `Appearance` specs) for `settings/{Profile,Appearance}`, `DeleteUser`; S25 | T34 |
 | T37 | <a id="t37"></a>[Show security, two-factor setup and passkeys in the landing identity](#t37-show-security-two-factor-setup-and-passkeys-in-the-landing-identity) | R21, R22, R25, R26 (`Security` spec) for `settings/Security`, `TwoFactorSetupModal`, `ManagePasskeys`, `PasskeyRegister`; S24 two-factor; S25 | T34 |
@@ -1036,6 +1037,24 @@ PHP guards for C3: `tests/Feature/Wallet/WalletPagesTest.php`, `tests/Feature/St
 - **Acceptance record.** C3 record; verdict "pending approval".
 - **Status.** Awaiting approval; C3 stays open. The authoritative record state is the Q&A named as current state in the C3 status line at the top, as amended by the Q&A named there. R20 pending (C3 open); R21, R22, R24, R25 partly met; R23 reported under S26; R26 met; R27 partly met (demo data met at demo level, measured text incomplete); R28, R29 have no C3 allocation; R30 met; S23 met (journey at 375 px light only); S26, S27 partly met; S30 pending approval. Per-page R5–R9 text, manifest counts 106 + 187 + 118 + 260 + 144 + 74 (`dashboard`), Vitest 560, Pest guards 31 and `DemoSeederTest` 20 green are in the measurements entry cited there; demo seeder: no change. Verdict pending approval. Remainder: the visual approval (user); for the unmeasured R5–R9 items, a new C3 task or the user's acceptance of the gap; the other open items stay with the user, except the C4 pages' own measurement (T39) and the full PHP suite (CI); then T34.
 
+### T46 Measure the unmeasured C3 conditions
+
+- **Outcome.** The R5 to R9 conditions on `Wallet/Statement` (member, Manager, Finance), `Member/Baskets/Index` (with pending collections), `Member/Baskets/Show`, `Stock/Index` and their overlays (statement select popup, account menu, mobile sheet, tooltips, toasts) are listed and measured.
+- **Requirements/scenarios.** R5–R9, R22; R20 (C3 condition), R27; S27 for C3.
+- **Plan sections.** R22; Visual evidence plan (C3 row).
+- **Files/surfaces reserved.** `skills/agent-workflow/scripts/visual/*.mjs`, `skills/agent-workflow/tests/visual/*.mjs`, `skills/agent-workflow/references/visual.md`, `resources/js/fixtures/rest-c3-landing*`, new files in `specs/005-landing-identity-rollout/history/`, `specs/005-landing-identity-rollout/tasks.md`.
+- **Dependencies.** T33 integrated: its record defines the parts (Q&A `history/2026-11-25T06-34-04.046Z-DRA-309-9c2b2c1e-8bc7-46c4-b6ca-051389aade5c.md`, amended by `history/2026-11-25T09-04-59.519Z-DRA-309-2d9accad-6d1c-47bd-9179-5901233e58a7.md`).
+- **Done when.**
+  - A history entry, written before measuring, lists every R5 to R9 item per page and overlay with its part (1a, 1b, 2a, 2b, 3, 4, 5, 6a, 7a, H, N1 to N4); the task closes against that list.
+  - A new runner assertion for non-text contrast (field borders, meaningful dividers, focus indicator) fails first, below 3:1, and passes at 3:1 or more.
+  - The manifests run at 375 and 1280 px in light and dark, and at 1024 px with 200% text in both; every listed item ends as measured and met, or measured and failed.
+  - Targets are checked at 44 x 44 px, tab order against reading order and Escape returning focus to the opener; the cancelled basket state and the danger, success and warning colour roles are asserted.
+  - The existing C3 manifests stay green and `settings/Profile` keeps the old theme.
+- **First checkpoint.** Failing runner test, then the statement field border measured at 375 px light.
+- **Size.** Large: likely well over 400 lines, mostly manifest cases; kept whole because it closes against one inventory.
+- **Limits.** No change under `resources/js/pages`, `resources/js/components`, `resources/css`, `app` or `src`; a failed measurement is recorded and reported, and the user decides its rework task (OQ5). Parts 6b, 7b, 8, 9, 10 and O stay with the user. No C4 work and no visual approval.
+- **Acceptance record.** One result per listed item; remainder: failed items (rework task) and the visual approval (user).
+
 ## Checkpoint C4 — Sign-in and settings (T34–T39)
 
 PHP guards for C4: `tests/Feature/Auth/*`, `tests/Feature/Settings/SecurityTest.php`, `tests/Feature/Settings/ProfileUpdateTest.php`,
@@ -1048,7 +1067,7 @@ name is *to confirm in T35*). Run unchanged; no test change to sign-in, two-fact
 - **Requirements/scenarios.** R21–R23, R25, R26 (`Login.spec.ts`, `ForgotPassword.spec.ts`, `ResetPassword.spec.ts`, `AuthSimpleLayout.spec.ts`); S24 start; S26 start. Remainder: T35–T37; closure T39.
 - **Plan sections.** Architecture overview (auth shell gap); D15; R22 (sign-in cards); R23; Test plan; Visual evidence plan incl. first checkpoint C4.
 - **Files/surfaces reserved.** `layouts/AuthLayout.vue` and `layouts/auth/AuthSimpleLayout.vue` (variant prop, provide, class on the `.material-auth` root, `usePilotVariantClass` for portalled overlays; empty string when absent), `lib/pilotTheme.ts` (three rows), `app.css` `/* 005 T34 … */`, admission specs, new `layouts/auth/AuthSimpleLayout.spec.ts`, three page specs, `rest-c4-landing.html`, `rest-c4-landing-visual.ts`, `rest-c4-landing-shared.visual.json`, `rest-c4-landing-signin.visual.json`.
-- **Dependencies.** C3 approved (T33 approval entry).
+- **Dependencies.** C3 approved (T33 approval entry) and complete (R20, OQ5); T46 integrated.
 - **Done when.**
   - OQ8 inventory re-run recorded. First checkpoint: `auth/Login` at 375 px light measures the card background and primary at the global look (record), then landing after the shell variant, with `settings/Profile` unchanged.
   - `AuthSimpleLayout.spec.ts` fails first: the carrier is present only when the variant is provided, unchanged otherwise.
@@ -1281,7 +1300,7 @@ Published 2026-11-16 ([record](linear-publication.md#slices-3-7-checkpoint-c1-fi
 
 ## Linear mapping — slices 3-7, checkpoints C2 to C5
 
-Published 2026-11-17 ([record](linear-publication.md#slices-3-7-checkpoints-c2-to-c5)). Parents: DRA-296 (C2), DRA-297 (C3), DRA-298 (C4), DRA-299 (C5); none has a task ID or label.
+Published 2026-11-17 ([record](linear-publication.md#slices-3-7-checkpoints-c2-to-c5)). Parents: DRA-296 (C2), DRA-297 (C3), DRA-298 (C4), DRA-299 (C5); none has a task ID or label. T46 (DRA-333, parent DRA-297) was published 2026-11-25 ([record](linear-publication.md#t46-c3-measurement-task)).
 
 | Task | Issue   | Task | Issue   |
 | ---- | ------- | ---- | ------- |
@@ -1296,3 +1315,4 @@ Published 2026-11-17 ([record](linear-publication.md#slices-3-7-checkpoints-c2-t
 | T32  | DRA-308 | T43  | DRA-319 |
 | T33  | DRA-309 | T44  | DRA-320 |
 | T34  | DRA-311 | T45  | DRA-321 |
+| T46  | DRA-333 |      |         |
