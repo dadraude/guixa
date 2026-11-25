@@ -1190,6 +1190,481 @@
                     }
                 },
                 {
+                    "id": "expanded",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes i moneder",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Les meves cistelles",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg d’estoc",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Moneder",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cooperativa",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cicles",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Recepcions",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Unitats de convivència",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cistelles",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Productors",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Estoc",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Envasos retornables",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Administració",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comptes",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Rols",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Configuració",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] :is(a,button) svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "escape-on-entry",
                     "query": {
                         "state": "default"
@@ -1907,7 +2382,27 @@
                             "text": 100
                         },
                         {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
                             "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
                             "mode": "dark",
                             "text": 100
                         }
@@ -2005,7 +2500,27 @@
                             "text": 100
                         },
                         {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
                             "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
                             "mode": "dark",
                             "text": 100
                         }
@@ -2103,7 +2618,27 @@
                             "text": 100
                         },
                         {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
                             "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
                             "mode": "dark",
                             "text": 100
                         }

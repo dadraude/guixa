@@ -822,6 +822,14 @@ const runSelectKeyboard = async () => {
 };
 
 initializeFlashToast();
+// `sections=open` expands every collapsed navigation section, so the walk reaches all sublinks.
+const openSections = async () => {
+    for (const trigger of document.querySelectorAll<HTMLElement>(
+        '[data-test="section-trigger"][aria-expanded="false"]',
+    ))
+        trigger.click();
+    await sleep(300);
+};
 void createInertiaApp({
     resolve: (name) => components[`../pages/${name}.vue`].default,
     layout: () => AppLayout,
@@ -843,6 +851,7 @@ void createInertiaApp({
         if (state === 'select') recordPopup((await openSelect()).popup);
         if (state === 'select-keyboard') await runSelectKeyboard();
         if (toastType) await raiseToast();
+        if (query.get('sections') === 'open') await openSections();
     } catch (error) {
         set('error', String(error));
     }
