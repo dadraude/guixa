@@ -102,3 +102,13 @@ Every child has its checkpoint parent as native parent. No task is admitted or m
 ### Verification
 
 The duplicate search from the C1 publication (no slices 3-7 issues) covered this batch. Parents were created first, then the children in dependency order, serially per level. One mistake was corrected during publication: a `relatedTo` for the C2 parent was first set on T31 (DRA-307) instead of on the C3 parent; it was removed and set on DRA-297. Read-back of the children lists and of the relations on DRA-296, DRA-299 and DRA-307 matched the approved graph. No pending operation.
+
+## T46 (C3 measurement task)
+
+**Published 2026-11-25 after the user approved the proposed task (Q&A `history/2026-11-25T15-21-22.908Z-DRA-333-77966f54-61f2-48d1-876c-5b4d190be88a.md`).** Same workspace, team and project. Backlog, unassigned, with no labels, cycle, milestone, due date or priority. Publication does not authorize implementation.
+
+| Task | Published issue | Parent | Blocks |
+| --- | --- | --- | --- |
+| T46 | [DRA-333](https://linear.app/draude/issue/DRA-333) | DRA-297 (C3) | DRA-311 (T34) |
+
+A search found no matching issue before creation. Read-back of title, parent, status, labels and relations matched: it blocks DRA-311 and has no blocker or contextual link. No pending operation.
