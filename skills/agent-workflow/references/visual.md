@@ -54,6 +54,14 @@ appearance, text enlargement and motion preference.
 - `focus` lists controls to reach with real Tab presses, including below the viewport. An empty list
   needs `noFocusReason`. Verify arrow-key menus with their actual interaction model in a focused probe.
 - State `checks` can override view selectors/assertions for its owning state.
+- Optional `tabOrder` walks the whole page with real Tab presses: `regions` lists selectors in reading order, and every
+  visible tabbable control must be reached, show a focus indicator, sit in a region and keep row-then-column reading
+  order inside it; the regions themselves must be laid out in the declared order. `focusContrast` and `minTarget` apply
+  to every stop.
+- Optional `keys` operates a page or overlay with real keys, after the assertions: each step is `tabTo` (a selector to
+  reach by Tab) or `press` (`Tab`, `ShiftTab`, `Enter`, `Escape`, `Space`, `ArrowDown`, `ArrowUp`), with optional
+  `assertions` and a `layout` (`root`, `panels`, `content`) measured after it. Use it to open an overlay, follow its
+  order and require focus back on its opener.
 - Optional `assertions` is an array of rules, each with a CSS `selector` and one or more expectations:
   `count` (including zero), `text` (exact trimmed text), `attributes` (exact values; null means absent),
   `styles` (CSS property/value pairs), `fontSizeRem`, `gapRem` (both axes; distinct gaps use `rowGapRem`/`columnGapRem`), `minWidth`/`minHeight` (CSS pixels), or
@@ -61,6 +69,10 @@ appearance, text enlargement and motion preference.
   scale with enlarged text. Use selectors covering every instance of a repeated acceptance pattern.
   `borderContrast` (minimum ratio, 3 for WCAG 1.4.11) measures each border side of a field, or the sides listed in
   `borderSides` for a divider, against the colour behind the element; a listed side without a visible border fails.
+  `focusContrast` (minimum ratio) requires the matched element to hold focus and measures its solid outlines and
+  zero-blur shadow rings against what is painted next to them; the strongest indicator counts, at its weakest point.
+  `filter` narrows the matched nodes to the `visible` ones, or to the `text` ones (visible, enabled elements that render
+  their own text), so one rule covers every width.
 
 For example:
 
@@ -82,8 +94,10 @@ For example:
 
 Contrast handles solid RGB/RGBA foregrounds and ancestor backgrounds, including alpha composition.
 Images, gradients, opacity, filters, blending or an unknown background are explicitly unverified.
-Border contrast follows the same rule and reads RGB/RGBA and `color(srgb …)` colours; border images, styles other than
-solid and other colour formats are unverified. It does not measure focus indicators drawn with outlines or shadows.
+Border and focus indicator contrast follow the same rule and read RGB/RGBA, `color(srgb …)` and `oklab()` colours.
+Border images, styles other than solid, browser-default (`auto`) outlines, other colour formats and, when no ring
+passes, offset or blurred shadows are unverified, never passed. A focus indicator drawn only by a background or border
+colour change is not measured.
 Unsupported assertions/properties also remain unverified and block the gate. Resolve them with a
 focused check or the justified preview path; do not remove the requirement or claim a full
 accessibility audit. Cover relevant DOM state and interaction semantics alongside geometry.

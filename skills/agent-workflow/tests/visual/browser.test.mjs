@@ -304,8 +304,8 @@ void test('non-text contrast never passes a border whose colours it cannot resol
         ],
         ['dimmed ancestor', '.panel{opacity:.5}'],
         ['border image', 'input{border-image:linear-gradient(red,blue) 1}'],
-        ['unparsed background', '.panel{background:oklab(0.5 0 0)}'],
-        ['unparsed border', 'input{border-color:oklab(0.2 0 0)}'],
+        ['unparsed background', '.panel{background:lab(50 0 0)}'],
+        ['unparsed border', 'input{border-color:lab(20 0 0)}'],
         ['no opaque background', 'html{background:transparent}'],
         ['three-dimensional edge', 'input{border-style:inset}'],
         ['hidden field', 'input{visibility:hidden}'],
@@ -338,4 +338,152 @@ void test('non-text contrast never passes a border whose colours it cannot resol
             JSON.stringify(rule),
         );
     }
+});
+
+async function measureFocused(css, markup, rule = { focusContrast: 3 }) {
+    await render(
+        'html{background:white}#target:focus,#target:focus-visible{outline:none}' +
+            css,
+        markup,
+    );
+    await browser.evaluate("document.querySelector('#target').focus()");
+    return measureRules([{ selector: '#target', ...rule }]);
+}
+const button = '<button id="target">Save</button>';
+
+void test('focus indicator contrast reads outlines and rings against what is painted next to them', async () => {
+    const passing = [
+        [
+            'outline',
+            '#target:focus{outline:2px solid #949494;outline-offset:2px}',
+            button,
+        ],
+        [
+            'inset ring against own fill',
+            '#target{background:black}#target:focus{box-shadow:inset 0 0 0 1px white}',
+            button,
+        ],
+        [
+            'outer oklab ring',
+            '#target:focus{box-shadow:0 0 0 3px oklab(0.558165 0.0633351 0.107746)}',
+            button,
+        ],
+        [
+            'strong outline beside a faint ring',
+            '#target:focus{outline:2px solid black;box-shadow:0 0 0 3px oklab(0.558165 0.0633351 0.107746 / 0.2)}',
+            button,
+        ],
+    ];
+    for (const [name, css, markup] of passing) {
+        const result = await measureFocused(css, markup);
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(result.failures, [], name);
+    }
+    // The oklab ring above is the computed form of #a85f12, 4.9:1 on white.
+    const ring = await measureFocused(passing[2][1], button);
+    assert.ok(
+        Math.abs(ring.results[0].observed[0].focusContrast - 4.9) < 0.1,
+        String(ring.results[0].observed[0].focusContrast),
+    );
+    const failing = [
+        [
+            'faint outline',
+            '#target:focus{outline:2px solid #959595}',
+            button,
+            /^#target: Insufficient focus indicator contrast: 2\.99$/,
+        ],
+        [
+            'ring lost on own fill',
+            '#target{background:black}#target:focus{box-shadow:inset 0 0 0 1px #222}',
+            button,
+            /Insufficient focus indicator contrast: 1\./,
+        ],
+        [
+            'painted backdrop, not the DOM ancestor',
+            '.panel{position:relative;height:200px}#cover{position:absolute;inset:0;background:black}#target{position:absolute;top:60px;left:60px}#target:focus{outline:2px solid #222}',
+            '<div id="cover"></div>' + button,
+            /Insufficient focus indicator contrast: 1\./,
+        ],
+        ['no indicator', '', button, /No visible focus indicator/],
+        [
+            'clipped away',
+            '.clip{overflow:hidden;width:max-content}.clip button{display:block}#target:focus{outline:2px solid black;outline-offset:4px}',
+            '<div class="clip">' + button + '</div>',
+            /No visible focus indicator/,
+        ],
+    ];
+    for (const [name, css, markup, expected] of failing) {
+        const result = await measureFocused(css, markup);
+        assert.deepEqual(result.unverified, [], name);
+        assert.equal(result.failures.length, 1, name);
+        assert.match(result.failures[0], expected, name);
+    }
+    await browser.evaluate("document.querySelector('#target').blur()");
+    assert.deepEqual(
+        (await measureRules([{ selector: '#target', focusContrast: 3 }]))
+            .failures,
+        ['#target: Element is not focused'],
+    );
+});
+
+void test('focus indicator contrast never passes an indicator it cannot resolve', async () => {
+    const outline = '#target:focus{outline:2px solid black}';
+    const unresolved = [
+        ['unparsed outline', '#target:focus{outline:2px solid lab(10 0 0)}'],
+        [
+            'unparsed ring beside a good outline',
+            '#target:focus{outline:2px solid black;box-shadow:0 0 0 3px lab(50 0 0)}',
+        ],
+        ['browser default ring', '#target:focus{outline:auto}'],
+        ['dashed outline', '#target:focus{outline:2px dashed black}'],
+        ['only a blurred shadow', '#target:focus{box-shadow:0 0 8px black}'],
+        [
+            'gradient behind',
+            outline + '.panel{background-image:linear-gradient(red,blue)}',
+        ],
+        ['dimmed ancestor', outline + '.panel{opacity:.5}'],
+        ['no opaque backdrop', outline + 'html{background:transparent}'],
+    ];
+    for (const [name, css] of unresolved) {
+        const result = await measureFocused(css, button);
+        assert.deepEqual(
+            result.unverified,
+            ['#target: Focus indicator colours or compositing are unsupported'],
+            name,
+        );
+        assert.deepEqual(result.failures, [], name);
+        assert.equal(result.results[0].passed, false, name);
+    }
+    const invalid = await measureFocused(outline, button, {
+        focusContrast: 0,
+    });
+    assert.deepEqual(invalid.unverified, [
+        '#target: Invalid focus contrast rule',
+    ]);
+});
+
+void test('a text or visible filter measures what is on screen and cannot pass on nothing', async () => {
+    await render(
+        'html{background:white}.off{display:none}.sr{position:absolute;width:1px;height:1px;overflow:hidden;color:white}',
+        '<div id="group"><p id="read">Read</p><p class="off">Hidden</p><span class="sr">Spoken</span><button disabled style="color:#ddd;background:white">Off</button><div><span>Nested</span></div></div>',
+    );
+    const rule = { selector: '#group, #group *', contrast: 4.5 };
+    const text = await measureRules([{ ...rule, filter: 'text' }]);
+    assert.deepEqual(text.failures, []);
+    assert.deepEqual(text.unverified, []);
+    assert.equal(text.results[0].observed.length, 2);
+    // `visible` drops only what is not rendered, so the unreadable disabled and screen-reader text still fail it.
+    const visible = await measureRules([{ ...rule, filter: 'visible' }]);
+    assert.ok(visible.failures.length > 0);
+    assert.ok(visible.results[0].observed.length > 2);
+    for (const filter of ['text', 'visible']) {
+        const none = await measureRules([
+            { selector: '.off', contrast: 4.5, filter },
+        ]);
+        assert.deepEqual(none.failures, ['.off: Missing element'], filter);
+    }
+    assert.deepEqual(
+        (await measureRules([{ ...rule, filter: 'shown' }])).unverified,
+        ['#group, #group *: Unsupported element filter'],
+    );
 });

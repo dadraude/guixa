@@ -24,6 +24,7 @@ import { expandMatrix, checkCoverage } from './coverage.mjs';
 import { openChrome, waitFor } from './chrome.mjs';
 import { measureLayout, measureFocus } from './measure.mjs';
 import { measureAssertions } from './assertions.mjs';
+import { walkTabOrder, runSteps } from './keyboard.mjs';
 import { renderingInputs, digest } from './evidence.mjs';
 
 const hash = (data) => createHash('sha256').update(data).digest('hex');
@@ -351,6 +352,24 @@ async function runCase(browser, manifest, item, output, captureIds) {
     for (const selector of view.focus)
         if (!focused.has(selector))
             failures.push(`Keyboard did not reach ${selector}`);
+    const keyboard = {};
+    if (view.tabOrder) {
+        keyboard.tabOrder = await walkTabOrder(
+            browser,
+            view.tabOrder,
+            manifest.maxTabs ?? 100,
+        );
+        failures.push(...keyboard.tabOrder.failures);
+    }
+    if (view.keys) {
+        const operated = await runSteps(
+            browser,
+            view.keys,
+            manifest.maxTabs ?? 100,
+        );
+        keyboard.interactions = operated.steps;
+        failures.push(...operated.failures);
+    }
     return {
         id,
         url,
@@ -365,6 +384,7 @@ async function runCase(browser, manifest, item, output, captureIds) {
         },
         focused: [...focused],
         focusMeasurements,
+        ...keyboard,
         failures: [...new Set(failures)],
     };
 }

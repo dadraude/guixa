@@ -22,11 +22,29 @@ export function measureAssertions(assertions = []) {
         'contrast',
         'borderContrast',
         'borderSides',
+        'focusContrast',
+        'filter',
     ];
     const sides = ['top', 'right', 'bottom', 'left'];
     const shown = (node) =>
         node.getClientRects().length > 0 &&
         getComputedStyle(node).visibility !== 'hidden';
+    // Enabled elements on screen that render their own text; screen-reader text is a pixel and does not count.
+    const rendersText = (node) => {
+        const box = node.getBoundingClientRect();
+        return (
+            shown(node) &&
+            (box.width > 1 || box.height > 1) &&
+            !node.closest(':disabled,[aria-disabled="true"],[data-disabled]') &&
+            (node.matches('input:not([type="hidden"]),textarea') ||
+                [...node.childNodes].some(
+                    (child) =>
+                        child.nodeType === Node.TEXT_NODE &&
+                        child.textContent.trim(),
+                ))
+        );
+    };
+    const filters = { visible: shown, text: rendersText };
     const color = (value) => {
         const m = value.match(
             /^rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\)$/,
@@ -63,14 +81,41 @@ export function measureAssertions(assertions = []) {
         );
         return (values[1] + 0.05) / (values[0] + 0.05);
     };
-    // Borders also arrive as color(srgb ...), the computed form of a color-mix() divider.
+    // Truncated so that a failing 2.996 never reads as 3.00.
+    const truncated = (value) => (Math.floor(value * 100) / 100).toFixed(2);
+    const fromOklab = (lightness, a, b) => {
+        const [l, m, s] = [
+            lightness + 0.3963377774 * a + 0.2158037573 * b,
+            lightness - 0.1055613458 * a - 0.0638541728 * b,
+            lightness - 0.0894841775 * a - 1.291485548 * b,
+        ].map((v) => v ** 3);
+        return [
+            4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+            -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+            -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+        ].map((v) => {
+            const linear = Math.min(1, Math.max(0, v));
+            return (
+                255 *
+                (linear <= 0.0031308
+                    ? linear * 12.92
+                    : 1.055 * linear ** (1 / 2.4) - 0.055)
+            );
+        });
+    };
+    // Edges also arrive as color(srgb ...) from color-mix() and as oklab(...) from opacity utilities.
     const edgeColor = (value) => {
         const m = value.match(
-            /^color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)$/,
+            /^(color\(srgb|oklab\() ?(-?[\d.e-]+) (-?[\d.e-]+) (-?[\d.e-]+)(?: \/ ([\d.]+))?\)$/,
         );
-        return m
-            ? [...m.slice(1, 4).map((v) => v * 255), Number(m[4] ?? 1)]
-            : color(value);
+        if (!m) return color(value);
+        const channels = m.slice(2, 5).map(Number);
+        return [
+            ...(m[1] === 'oklab('
+                ? fromOklab(...channels)
+                : channels.map((v) => v * 255)),
+            Number(m[5] ?? 1),
+        ];
     };
     const composited = (computed) =>
         computed.backgroundImage === 'none' &&
@@ -129,15 +174,148 @@ export function measureAssertions(assertions = []) {
             }
             const measured = ratio(over(edge.color, under), outside);
             observed.borderSides[edge.side] = measured;
-            // Truncated so that a failing 2.996 never reads as 3.00.
-            const shownRatio = (Math.floor(measured * 100) / 100).toFixed(2);
             if (measured < rule.borderContrast)
                 record.failures.push(
-                    `Insufficient border contrast: ${edge.side} ${shownRatio}`,
+                    `Insufficient border contrast: ${edge.side} ${truncated(measured)}`,
                 );
         }
         const measured = Object.values(observed.borderSides);
         if (measured.length) observed.borderContrast = Math.min(...measured);
+    };
+    const clippedAway = (node, x, y) => {
+        for (
+            let current = node.parentElement;
+            current && current !== document.body;
+            current = current.parentElement
+        ) {
+            const style = getComputedStyle(current);
+            const box = current.getBoundingClientRect();
+            if (
+                (style.overflowX !== 'visible' &&
+                    (x < box.left || x > box.right)) ||
+                (style.overflowY !== 'visible' &&
+                    (y < box.top || y > box.bottom))
+            )
+                return true;
+        }
+        return false;
+    };
+    // What is painted under one point of an indicator, which for a positioned control is not its DOM ancestors.
+    const paintedAt = (node, x, y, inward) => {
+        let background = [0, 0, 0, 0];
+        for (const element of document.elementsFromPoint(x, y)) {
+            if (node.contains(element) && !(inward && element === node))
+                continue;
+            const computed = getComputedStyle(element);
+            const parsed = edgeColor(computed.backgroundColor);
+            if (
+                !composited(computed) ||
+                !parsed ||
+                element.matches('img,video,canvas')
+            )
+                return null;
+            background = over(background, parsed);
+            if (background[3] >= 1) return background;
+        }
+        return null;
+    };
+    // The points along an indicator: `distance` runs outward from the border box, negative inward.
+    const indicatorPoints = (node, distance) => {
+        const box = node.getBoundingClientRect();
+        const x = box.left + box.width / 2,
+            y = box.top + box.height / 2;
+        return [
+            [x, box.top - distance],
+            [x, box.bottom + distance],
+            [box.left - distance, y],
+            [box.right + distance, y],
+        ].filter(
+            ([px, py]) =>
+                px >= 0 &&
+                px < innerWidth &&
+                py >= 0 &&
+                py < innerHeight &&
+                (distance < 0 || !clippedAway(node, px, py)),
+        );
+    };
+    // Outlines and solid rings; anything else that could draw the indicator is reported, never guessed.
+    const indicators = (style) => {
+        const found = { rings: [], unresolved: false, other: false };
+        const width = pixels(style.outlineWidth),
+            offset = pixels(style.outlineOffset);
+        if (style.outlineStyle !== 'none' && width !== 0) {
+            const parsed = edgeColor(style.outlineColor);
+            if (style.outlineStyle !== 'solid' || !parsed)
+                found.unresolved = true;
+            else if (parsed[3] > 0)
+                found.rings.push({
+                    color: parsed,
+                    distance: offset + width / 2,
+                });
+        }
+        const shadows =
+            style.boxShadow === 'none'
+                ? []
+                : style.boxShadow.split(/,(?![^(]*\))/);
+        for (const shadow of shadows) {
+            const m = shadow
+                .trim()
+                .match(
+                    /^(.+\)) (-?[\d.]+)px (-?[\d.]+)px ([\d.]+)px (-?[\d.]+)px( inset)?$/,
+                );
+            const parsed = m && edgeColor(m[1]);
+            if (!parsed) {
+                found.unresolved = true;
+                continue;
+            }
+            const [x, y, blur, spread] = m.slice(2, 6).map(Number);
+            if (parsed[3] === 0 || (!x && !y && !blur && !spread)) continue;
+            if (x || y || blur || spread < 0) found.other = true;
+            else
+                found.rings.push({
+                    color: parsed,
+                    distance: m[6]
+                        ? -(pixels(style.borderTopWidth) + spread / 2)
+                        : spread / 2,
+                });
+        }
+        return found;
+    };
+    // WCAG 1.4.11: the strongest indicator of the focused element, at its weakest visible point.
+    const measureFocusContrast = (node, rule, record, observed) => {
+        if (node !== document.activeElement) {
+            record.failures.push('Element is not focused');
+            return;
+        }
+        const found = indicators(getComputedStyle(node));
+        let unresolved = found.unresolved;
+        for (let current = node; current; current = current.parentElement)
+            if (!composited(getComputedStyle(current))) unresolved = true;
+        const ratios = [];
+        for (const ring of found.rings) {
+            const measured = indicatorPoints(node, ring.distance).map(
+                ([x, y]) => {
+                    const under = paintedAt(node, x, y, ring.distance < 0);
+                    return under && ratio(over(ring.color, under), under);
+                },
+            );
+            if (measured.includes(null)) unresolved = true;
+            else if (measured.length) ratios.push(Math.min(...measured));
+        }
+        const best = ratios.length ? Math.max(...ratios) : null;
+        const passes = best !== null && best >= rule.focusContrast;
+        if (unresolved || (!passes && found.other)) {
+            record.unverified.push(
+                'Focus indicator colours or compositing are unsupported',
+            );
+            return;
+        }
+        observed.focusContrast = best;
+        if (best === null) record.failures.push('No visible focus indicator');
+        else if (!passes)
+            record.failures.push(
+                'Insufficient focus indicator contrast: ' + truncated(best),
+            );
     };
     const validBorderRule = (rule) =>
         Number.isFinite(rule.borderContrast) &&
@@ -159,6 +337,8 @@ export function measureAssertions(assertions = []) {
             Object.keys(rule).some((key) => !known.includes(key))
         )
             record.unverified.push('Unsupported assertion or missing selector');
+        else if (rule.filter !== undefined && !filters[rule.filter])
+            record.unverified.push('Unsupported element filter');
         else {
             let nodes = [];
             try {
@@ -166,6 +346,7 @@ export function measureAssertions(assertions = []) {
             } catch {
                 record.unverified.push('Invalid selector');
             }
+            if (rule.filter) nodes = nodes.filter(filters[rule.filter]);
             record.matched = nodes.length;
             if (rule.count !== undefined && nodes.length !== rule.count)
                 record.failures.push('Wrong element count');
@@ -299,6 +480,14 @@ export function measureAssertions(assertions = []) {
                     if (validBorderRule(rule))
                         measureBorder(node, rule, record, observed);
                     else record.unverified.push('Invalid border contrast rule');
+                }
+                if (rule.focusContrast !== undefined) {
+                    if (
+                        Number.isFinite(rule.focusContrast) &&
+                        rule.focusContrast >= 1
+                    )
+                        measureFocusContrast(node, rule, record, observed);
+                    else record.unverified.push('Invalid focus contrast rule');
                 }
                 record.observed.push(observed);
             }
