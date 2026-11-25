@@ -64,8 +64,10 @@ function recordStop() {
     return element.tagName.toLowerCase() + name;
 }
 
-// Geometry is read after the walk, from one scroll position.
+// Geometry is read after the walk, with the page and every scroll container back at its start.
 function describeWalk(regions) {
+    for (const element of document.querySelectorAll('*'))
+        if (element.scrollTop || element.scrollLeft) element.scrollTo(0, 0);
     window.scrollTo(0, 0);
     const box = (element) => {
         const { top, bottom, left, right, width, height } =

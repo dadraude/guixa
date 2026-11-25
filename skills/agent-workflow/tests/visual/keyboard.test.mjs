@@ -174,3 +174,19 @@ void test('keyboard steps fail unreachable targets, clipped overlays and unknown
             result.failures.join('; '),
         );
 });
+
+void test('tab order is read with every scroll container back at its start', async () => {
+    const buttons = Array.from(
+        { length: 12 },
+        (_, index) => `<button id="item-${index}">Item ${index}</button><br>`,
+    ).join('');
+    await render(
+        `<header><button id="menu">Menu</button></header><main><button id="top">Top</button><div id="scroller">${buttons}</div></main>`,
+        '#scroller{height:150px;overflow:auto;padding:8px}',
+    );
+    const result = await walkTabOrder(browser, {
+        regions: ['header', 'main'],
+    });
+    assert.deepEqual(result.failures, []);
+    assert.equal(result.stops.length, 14);
+});
