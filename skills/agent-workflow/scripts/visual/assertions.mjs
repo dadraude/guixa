@@ -23,18 +23,33 @@ export function measureAssertions(assertions = []) {
         'borderContrast',
         'borderSides',
         'focusContrast',
+        'fillContrast',
         'filter',
     ];
     const sides = ['top', 'right', 'bottom', 'left'];
     const shown = (node) =>
         node.getClientRects().length > 0 &&
         getComputedStyle(node).visibility !== 'hidden';
-    // Enabled elements on screen that render their own text; screen-reader text is a pixel and does not count.
+    // Screen-reader text lives in a box clipped away or down to a pixel.
+    const clippedToPixel = (node) => {
+        for (let current = node; current; current = current.parentElement) {
+            const box = current.getBoundingClientRect();
+            const style = getComputedStyle(current);
+            if (
+                style.clipPath === 'inset(50%)' ||
+                (box.width <= 1 &&
+                    box.height <= 1 &&
+                    style.overflow === 'hidden')
+            )
+                return true;
+        }
+        return false;
+    };
+    // Enabled elements on screen that render their own text.
     const rendersText = (node) => {
-        const box = node.getBoundingClientRect();
         return (
             shown(node) &&
-            (box.width > 1 || box.height > 1) &&
+            !clippedToPixel(node) &&
             !node.closest(':disabled,[aria-disabled="true"],[data-disabled]') &&
             (node.matches('input:not([type="hidden"]),textarea') ||
                 [...node.childNodes].some(
@@ -292,6 +307,10 @@ export function measureAssertions(assertions = []) {
         for (let current = node; current; current = current.parentElement)
             if (!composited(getComputedStyle(current))) unresolved = true;
         const ratios = [];
+        // A modal stops the page behind it from being hit-tested; sampling needs every painted element.
+        const hitTestAll = document.createElement('style');
+        hitTestAll.textContent = '*{pointer-events:auto!important}';
+        document.head.append(hitTestAll);
         for (const ring of found.rings) {
             const measured = indicatorPoints(node, ring.distance).map(
                 ([x, y]) => {
@@ -302,6 +321,7 @@ export function measureAssertions(assertions = []) {
             if (measured.includes(null)) unresolved = true;
             else if (measured.length) ratios.push(Math.min(...measured));
         }
+        hitTestAll.remove();
         const best = ratios.length ? Math.max(...ratios) : null;
         const passes = best !== null && best >= rule.focusContrast;
         if (unresolved || (!passes && found.other)) {
@@ -315,6 +335,28 @@ export function measureAssertions(assertions = []) {
         else if (!passes)
             record.failures.push(
                 'Insufficient focus indicator contrast: ' + truncated(best),
+            );
+    };
+    // A divider drawn as a thin filled element rather than as a border.
+    const measureFill = (node, rule, record, observed) => {
+        const style = getComputedStyle(node);
+        const outside = backdrop(node.parentElement);
+        const fill = edgeColor(style.backgroundColor);
+        if (!shown(node) || !outside || !fill || !composited(style)) {
+            record.unverified.push(
+                'Fill contrast colours or compositing are unsupported',
+            );
+            return;
+        }
+        if (fill[3] === 0) {
+            record.failures.push('No visible fill');
+            return;
+        }
+        observed.fillContrast = ratio(over(fill, outside), outside);
+        if (observed.fillContrast < rule.fillContrast)
+            record.failures.push(
+                'Insufficient fill contrast: ' +
+                    truncated(observed.fillContrast),
             );
     };
     const validBorderRule = (rule) =>
@@ -488,6 +530,14 @@ export function measureAssertions(assertions = []) {
                     )
                         measureFocusContrast(node, rule, record, observed);
                     else record.unverified.push('Invalid focus contrast rule');
+                }
+                if (rule.fillContrast !== undefined) {
+                    if (
+                        Number.isFinite(rule.fillContrast) &&
+                        rule.fillContrast >= 1
+                    )
+                        measureFill(node, rule, record, observed);
+                    else record.unverified.push('Invalid fill contrast rule');
                 }
                 record.observed.push(observed);
             }

@@ -464,8 +464,8 @@ void test('focus indicator contrast never passes an indicator it cannot resolve'
 
 void test('a text or visible filter measures what is on screen and cannot pass on nothing', async () => {
     await render(
-        'html{background:white}.off{display:none}.sr{position:absolute;width:1px;height:1px;overflow:hidden;color:white}',
-        '<div id="group"><p id="read">Read</p><p class="off">Hidden</p><span class="sr">Spoken</span><button disabled style="color:#ddd;background:white">Off</button><div><span>Nested</span></div></div>',
+        'html{background:white}.off{display:none}.sr{position:absolute;width:1px;height:1px;overflow:hidden;color:white}.clipped{position:absolute;width:1px;height:1px;padding:16px;overflow:hidden;clip-path:inset(50%);color:white}',
+        '<div id="group"><p id="read">Read</p><p class="off">Hidden</p><span class="sr">Spoken</span><div class="sr"><h2>Announced</h2></div><div class="clipped"><h2>Padded</h2></div><button disabled style="color:#ddd;background:white">Off</button><div><span>Nested</span></div></div>',
     );
     const rule = { selector: '#group, #group *', contrast: 4.5 };
     const text = await measureRules([{ ...rule, filter: 'text' }]);
@@ -485,5 +485,46 @@ void test('a text or visible filter measures what is on screen and cannot pass o
     assert.deepEqual(
         (await measureRules([{ ...rule, filter: 'shown' }])).unverified,
         ['#group, #group *: Unsupported element filter'],
+    );
+});
+
+void test('a divider painted as a filled line meets the same ratio against what is behind it', async () => {
+    const css =
+        'html{background:white}hr{border:0;height:1px;background:#949494}#faint{background:#959595}#none{background:transparent}#unparsed{background:lab(50 0 0)}#striped{background-image:linear-gradient(red,blue)}';
+    await render(
+        css,
+        '<hr id="line"><hr id="faint"><hr id="none"><hr id="unparsed"><hr id="striped">',
+    );
+    const rule = (selector) => ({ selector, fillContrast: 3 });
+    const passing = await measureRules([rule('#line')]);
+    assert.deepEqual(passing.failures, []);
+    assert.deepEqual(passing.unverified, []);
+    assert.deepEqual(
+        (await measureRules([rule('#faint'), rule('#none')])).failures,
+        ['#faint: Insufficient fill contrast: 2.99', '#none: No visible fill'],
+    );
+    const unresolved = await measureRules([
+        rule('#unparsed'),
+        rule('#striped'),
+        { selector: '#line', fillContrast: 0 },
+    ]);
+    assert.deepEqual(unresolved.failures, []);
+    assert.deepEqual(unresolved.unverified, [
+        '#unparsed: Fill contrast colours or compositing are unsupported',
+        '#striped: Fill contrast colours or compositing are unsupported',
+        '#line: Invalid fill contrast rule',
+    ]);
+});
+
+void test('a focus indicator behind a modal is read through the page that stopped taking the pointer', async () => {
+    const result = await measureFocused(
+        'html{background:transparent}body{background:white;min-height:100vh;pointer-events:none}#shade,#dialog{position:fixed;pointer-events:auto;top:0;bottom:0}#shade{left:0;right:0;background:rgb(0 0 0 / 0.8)}#dialog{left:0;width:200px;background:black}#target{position:absolute;top:40px;left:0;width:199px}#target:focus{outline:2px solid white;outline-offset:2px}',
+        '<div id="shade"></div><div id="dialog">' + button + '</div>',
+    );
+    assert.deepEqual(result.unverified, []);
+    assert.deepEqual(result.failures, []);
+    assert.equal(
+        await browser.evaluate('document.querySelectorAll("style").length'),
+        1,
     );
 });

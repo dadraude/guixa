@@ -71,6 +71,7 @@ appearance, text enlargement and motion preference.
   `borderSides` for a divider, against the colour behind the element; a listed side without a visible border fails.
   `focusContrast` (minimum ratio) requires the matched element to hold focus and measures its solid outlines and
   zero-blur shadow rings against what is painted next to them; the strongest indicator counts, at its weakest point.
+  `fillContrast` (minimum ratio) does the same for a divider drawn as a thin filled element.
   `filter` narrows the matched nodes to the `visible` ones, or to the `text` ones (visible, enabled elements that render
   their own text), so one rule covers every width.
 
