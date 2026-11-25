@@ -4,7 +4,9 @@ import { createInertiaApp, http, router } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { initializeTheme } from '@/composables/useAppearance';
+import { initializeFlashToast } from '@/lib/flashToast';
 import { installTranslations } from '@/lib/i18n';
+import { recordConditions } from './rest-c3-landing-conditions';
 
 /*
  * Deterministic review fixture for checkpoint C3 (spec 005, slices 3-7): the wallet statement, the member baskets and the stock list in the landing identity.
@@ -16,6 +18,9 @@ const fixtureUrl = window.location.href;
 const pageName = query.get('page') ?? 'Wallet/Statement';
 const state = query.get('state') ?? 'default';
 const roles = (query.get('role') ?? 'manager').split(',');
+const longUser = query.get('user') === 'long';
+// `toast` picks the type a visit flashes, as a controller would; `message=long` gives it a long message.
+const toastType = query.get('toast');
 const components = import.meta.glob('../pages/**/*.vue', {
     eager: true,
 }) as Record<string, { default: DefineComponent }>;
@@ -182,6 +187,16 @@ const basketListProps = () => {
             pending: true,
         };
     if (state === 'empty') return { baskets: [], pending: false };
+    // The member list returns every state of the household's baskets, so these three rows can all appear.
+    if (state === 'cancelled')
+        return {
+            baskets: [
+                basketSummary('basket-5', 'cancelled', 0),
+                basketSummary('basket-6', 'reversed', 0),
+                basketSummary('basket-7', 'nothing_to_collect', 0),
+            ],
+            pending: false,
+        };
     if (state === 'long-content')
         return {
             baskets: [
@@ -225,6 +240,15 @@ const stockLine = (
     effectiveQuantity: quantity,
     effectiveAmountCents: amountCents,
 });
+const basketStatuses: Record<string, string> = {
+    collected: 'collected',
+    corrected: 'collected',
+    cancelled: 'cancelled',
+    reversed: 'reversed',
+    nothing: 'nothing_to_collect',
+};
+// The states that hold no goods, so their line lists are empty.
+const emptyBasketStates = ['cancelled', 'reversed', 'nothing'];
 const weeklyLine = (name: string, ordered: string, allocated: string) => ({
     productId: `weekly-${name}`,
     name,
@@ -243,12 +267,10 @@ const weeklyLine = (name: string, ordered: string, allocated: string) => ({
 // (`BasketState::isSettled`), the member may mark it collected (`markCollected` is `isPendingCollection`) and no collected event
 // exists yet; `collected` has the one `collected` event that collecting appends; `weekly` is a weekly draft; `long-content` has a long
 // household and product name and a seven-digit total. Quantities have three decimals, dates are ATOM strings, kind is `stock` or `weekly`.
-const basketProps = () => {
+const plainBasketProps = () => {
     const status = state.startsWith('validated')
         ? 'validated'
-        : state === 'collected'
-          ? 'collected'
-          : 'draft';
+        : (basketStatuses[state] ?? 'draft');
     const long = state === 'long-content';
     const weekly = state === 'weekly';
     const total = long ? 123456789 : weekly ? 1920 : 1350;
@@ -302,7 +324,7 @@ const basketProps = () => {
                 correctCollection: false,
             },
             status,
-            settled: status !== 'draft',
+            settled: ['validated', 'collected', 'reversed'].includes(status),
             collected: status === 'collected',
             weekly,
             weeklyLines: weekly
@@ -315,6 +337,78 @@ const basketProps = () => {
             late: false,
         },
     };
+};
+// A collected weekly basket after corrections: amount and returned goods, the collection mark, and two rows in every
+// list (weekly, stock and return lines with effective quantities that differ, and amount corrections).
+const correctedBasket = (
+    basket: ReturnType<typeof plainBasketProps>['basket'],
+) => {
+    const correctedWeekly = (name: string) => ({
+        ...weeklyLine(name, '3.000', '2.000'),
+        differsFromAllocation: true,
+        effectiveQuantity: '1.000',
+    });
+    const correctedStock = (name: string) => ({
+        ...stockLine(name, '3.000', 450, 1350),
+        effectiveQuantity: '2.000',
+        effectiveAmountCents: 900,
+    });
+    const returned = (returnItemId: string, name: string) => ({
+        returnItemId,
+        name,
+        quantity: 2,
+        amountCents: 50,
+        creditCents: 100,
+    });
+    const adjustment = (id: string, reason: string) => ({
+        id,
+        amountCents: -450,
+        reason,
+        authorName: 'Marta Soler',
+        occurredAt: '2026-11-08T10:00:00+01:00',
+        lines: [{ stockProductId: 'stock-Mongetes', quantityDelta: '-1.000' }],
+    });
+    return {
+        ...basket,
+        weekly: true,
+        kind: 'weekly',
+        weeklyLines: [correctedWeekly('Cols'), correctedWeekly('Porros')],
+        stockLines: [correctedStock('Mongetes'), correctedStock('Llenties')],
+        returnLines: [
+            returned('return-1', 'Ampolla de vidre'),
+            returned('return-2', 'Caixa de fusta'),
+        ],
+        effectiveTotalCents: 900,
+        adjustments: [
+            adjustment('adjustment-1', 'Un quilo retornat'),
+            adjustment('adjustment-2', 'Un altre quilo retornat'),
+        ],
+        collectionEvents: [
+            ...basket.collectionEvents,
+            {
+                id: 'event-2',
+                type: 'corrected',
+                authorName: 'Marta Soler',
+                occurredAt: '2026-11-08T11:00:00+01:00',
+                reason: 'Marcada per error',
+            },
+        ],
+    };
+};
+const basketProps = () => {
+    const { basket } = plainBasketProps();
+    if (state === 'corrected') return { basket: correctedBasket(basket) };
+    if (emptyBasketStates.includes(state))
+        return {
+            basket: {
+                ...basket,
+                stockLines: [],
+                totalCents: 0,
+                effectiveTotalCents: 0,
+                projectedBalanceCents: null,
+            },
+        };
+    return { basket };
 };
 const stockOffer = (
     id: string,
@@ -383,8 +477,10 @@ const shared = {
     auth: {
         user: {
             id: 'account-1',
-            name: 'Maria Soler',
-            email: 'maria@example.test',
+            name: longUser ? longName : 'Maria Soler',
+            email: longUser
+                ? 'maria.soler.de.la.cooperativa.agricola.de.la.plana@example.test'
+                : 'maria@example.test',
             avatar: '',
             email_verified_at: '2026-10-01T12:00:00Z',
             created_at: '2026-10-01T12:00:00Z',
@@ -393,7 +489,7 @@ const shared = {
         roles,
     },
     roleAreas,
-    sidebarOpen: true,
+    sidebarOpen: query.get('sidebar') !== 'collapsed',
 };
 const buildPage = (name: string) => ({
     component: name,
@@ -413,6 +509,19 @@ const invalidErrors = {
     amount: 'El camp import és obligatori.',
     note: 'El camp nota és obligatori.',
     source_movement_id: 'El camp ingrés original és obligatori.',
+};
+const flashedToast = (type: string) => ({
+    type,
+    message:
+        query.get('message') === 'long'
+            ? longNote
+            : 'La cistella s’ha actualitzat.',
+});
+// The visit the user is on, reloaded: the app's flash listener raises the toast the response carries.
+const raiseToast = async () => {
+    router.reload();
+    await waitFor(() => document.querySelector('[data-sonner-toast]'));
+    await sleep(600);
 };
 http.setClient({
     request: async (config: { url: string; method?: string }) => {
@@ -445,8 +554,13 @@ http.setClient({
         }
         navigation.push(`get ${url.pathname}`);
         const target = pagesByPath[url.pathname];
+        const body = target
+            ? buildPage(target)
+            : { ...page, url: url.pathname };
         return reply(
-            target ? buildPage(target) : { ...page, url: url.pathname },
+            toastType
+                ? { ...body, flash: { toast: flashedToast(toastType) } }
+                : body,
         );
     },
 });
@@ -707,6 +821,7 @@ const runSelectKeyboard = async () => {
     );
 };
 
+initializeFlashToast();
 void createInertiaApp({
     resolve: (name) => components[`../pages/${name}.vue`].default,
     layout: () => AppLayout,
@@ -727,10 +842,12 @@ void createInertiaApp({
             await runFormRequest();
         if (state === 'select') recordPopup((await openSelect()).popup);
         if (state === 'select-keyboard') await runSelectKeyboard();
+        if (toastType) await raiseToast();
     } catch (error) {
         set('error', String(error));
     }
     recordIdentity();
+    recordConditions();
     document.body.dataset.visualReady = state;
     const restore = () =>
         window.history.replaceState(window.history.state, '', fixtureUrl);
