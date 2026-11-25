@@ -250,3 +250,92 @@ void test('gap assertions check both axes and leave unresolved percentages unver
             .length,
     );
 });
+
+const measureRules = (rules) =>
+    browser.evaluate(
+        '(' + measureAssertions.toString() + ')(' + JSON.stringify(rules) + ')',
+    );
+
+void test('non-text contrast fails a field border or divider below 3:1 and passes at 3:1', async () => {
+    // On white, #949494 is 3.03:1 and #959595 is 2.99:1.
+    await render(
+        'html{background:white}input{border:1px solid #949494}#faint{border-color:#959595}#underline{border-width:0 0 1px}li+li{border-top:1px solid color-mix(in srgb, black 60%, transparent)}ul.faint li+li{border-top-color:color-mix(in srgb, black 12%, transparent)}',
+        '<input id="field"><input id="faint"><input id="underline"><ul><li>a</li><li id="divider">b</li></ul><ul class="faint"><li>a</li><li id="faint-divider">b</li></ul>',
+    );
+    const passing = await measureRules([
+        { selector: '#field', borderContrast: 3 },
+        { selector: '#underline', borderContrast: 3, borderSides: ['bottom'] },
+        { selector: '#divider', borderContrast: 3, borderSides: ['top'] },
+    ]);
+    assert.deepEqual(passing.unverified, []);
+    assert.deepEqual(passing.failures, []);
+    assert.equal(
+        passing.results[0].observed[0].borderContrast.toFixed(2),
+        '3.03',
+    );
+    const failing = await measureRules([
+        { selector: '#faint', borderContrast: 3 },
+        { selector: '#faint-divider', borderContrast: 3, borderSides: ['top'] },
+        { selector: '#underline', borderContrast: 3 },
+    ]);
+    assert.deepEqual(failing.unverified, []);
+    assert.deepEqual(failing.results[0].failures, [
+        'Insufficient border contrast: top 2.99',
+        'Insufficient border contrast: right 2.99',
+        'Insufficient border contrast: bottom 2.99',
+        'Insufficient border contrast: left 2.99',
+    ]);
+    assert.match(
+        failing.results[1].failures[0],
+        /^Insufficient border contrast: top 1\./,
+    );
+    assert.ok(failing.results[2].failures.includes('No visible border: top'));
+});
+
+void test('non-text contrast never passes a border whose colours it cannot resolve', async () => {
+    const unresolved = [
+        [
+            'gradient behind',
+            '.panel{background-image:linear-gradient(red,blue)}',
+        ],
+        [
+            'gradient on field',
+            'input{background-image:linear-gradient(red,blue)}',
+        ],
+        ['dimmed ancestor', '.panel{opacity:.5}'],
+        ['border image', 'input{border-image:linear-gradient(red,blue) 1}'],
+        ['unparsed background', '.panel{background:oklab(0.5 0 0)}'],
+        ['unparsed border', 'input{border-color:oklab(0.2 0 0)}'],
+        ['no opaque background', 'html{background:transparent}'],
+        ['three-dimensional edge', 'input{border-style:inset}'],
+        ['hidden field', 'input{visibility:hidden}'],
+    ];
+    for (const [name, css] of unresolved) {
+        await render(
+            'html{background:white}input{border:1px solid black}' + css,
+            '<input id="field">',
+        );
+        const result = await measureRules([
+            { selector: '#field', borderContrast: 3 },
+        ]);
+        assert.deepEqual(
+            result.unverified,
+            ['#field: Border contrast colours or compositing are unsupported'],
+            name,
+        );
+        assert.equal(result.results[0].passed, false, name);
+    }
+    for (const rule of [
+        { borderContrast: 0.5 },
+        { borderContrast: 3, borderSides: [] },
+        { borderContrast: 3, borderSides: ['middle'] },
+        { borderSides: ['top'] },
+    ]) {
+        const result = await measureRules([{ selector: '#field', ...rule }]);
+        assert.deepEqual(
+            result.unverified,
+            ['#field: Invalid border contrast rule'],
+            JSON.stringify(rule),
+        );
+    }
+});

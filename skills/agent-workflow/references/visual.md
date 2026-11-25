@@ -59,6 +59,8 @@ appearance, text enlargement and motion preference.
   `styles` (CSS property/value pairs), `fontSizeRem`, `gapRem` (both axes; distinct gaps use `rowGapRem`/`columnGapRem`), `minWidth`/`minHeight` (CSS pixels), or
   `contrast` (minimum ratio). All matching nodes must satisfy the expectations. Rem expectations
   scale with enlarged text. Use selectors covering every instance of a repeated acceptance pattern.
+  `borderContrast` (minimum ratio, 3 for WCAG 1.4.11) measures each border side of a field, or the sides listed in
+  `borderSides` for a divider, against the colour behind the element; a listed side without a visible border fails.
 
 For example:
 
@@ -80,6 +82,8 @@ For example:
 
 Contrast handles solid RGB/RGBA foregrounds and ancestor backgrounds, including alpha composition.
 Images, gradients, opacity, filters, blending or an unknown background are explicitly unverified.
+Border contrast follows the same rule and reads RGB/RGBA and `color(srgb …)` colours; border images, styles other than
+solid and other colour formats are unverified. It does not measure focus indicators drawn with outlines or shadows.
 Unsupported assertions/properties also remain unverified and block the gate. Resolve them with a
 focused check or the justified preview path; do not remove the requirement or claim a full
 accessibility audit. Cover relevant DOM state and interaction semantics alongside geometry.

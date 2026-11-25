@@ -20,7 +20,10 @@ export function measureAssertions(assertions = []) {
         'text',
         'attributes',
         'contrast',
+        'borderContrast',
+        'borderSides',
     ];
+    const sides = ['top', 'right', 'bottom', 'left'];
     const shown = (node) =>
         node.getClientRects().length > 0 &&
         getComputedStyle(node).visibility !== 'hidden';
@@ -54,6 +57,95 @@ export function measureAssertions(assertions = []) {
                 v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4,
             )
             .reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0);
+    const ratio = (first, second) => {
+        const values = [luminance(first), luminance(second)].sort(
+            (a, b) => a - b,
+        );
+        return (values[1] + 0.05) / (values[0] + 0.05);
+    };
+    // Borders also arrive as color(srgb ...), the computed form of a color-mix() divider.
+    const edgeColor = (value) => {
+        const m = value.match(
+            /^color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)$/,
+        );
+        return m
+            ? [...m.slice(1, 4).map((v) => v * 255), Number(m[4] ?? 1)]
+            : color(value);
+    };
+    const composited = (computed) =>
+        computed.backgroundImage === 'none' &&
+        Number(computed.opacity) === 1 &&
+        computed.filter === 'none' &&
+        computed.mixBlendMode === 'normal';
+    // The opaque colour painted by the node and its ancestors, or null when it cannot be resolved.
+    const backdrop = (node) => {
+        let background = [0, 0, 0, 0];
+        for (let current = node; current; current = current.parentElement) {
+            const computed = getComputedStyle(current);
+            const parsed = edgeColor(computed.backgroundColor);
+            if (!composited(computed) || !parsed) return null;
+            if (background[3] < 1) background = over(background, parsed);
+        }
+        return background[3] < 1 ? null : background;
+    };
+    // WCAG 1.4.11: each border side against the colour adjacent to it outside the element.
+    const measureBorder = (node, rule, record, observed) => {
+        const style = getComputedStyle(node);
+        const outside = backdrop(node.parentElement);
+        const own = edgeColor(style.backgroundColor);
+        const edges = (rule.borderSides ?? sides).map((side) => ({
+            side,
+            style: style.getPropertyValue(`border-${side}-style`),
+            width: pixels(style.getPropertyValue(`border-${side}-width`)),
+            color: edgeColor(style.getPropertyValue(`border-${side}-color`)),
+        }));
+        const supported =
+            shown(node) &&
+            outside &&
+            own &&
+            composited(style) &&
+            style.borderImageSource === 'none' &&
+            edges.every(
+                (edge) =>
+                    ['none', 'hidden', 'solid'].includes(edge.style) &&
+                    edge.color,
+            );
+        if (!supported) {
+            record.unverified.push(
+                'Border contrast colours or compositing are unsupported',
+            );
+            return;
+        }
+        // A translucent border shows the element's own background only when that background reaches under it.
+        const under =
+            style.backgroundClip === 'border-box'
+                ? over(own, outside)
+                : outside;
+        observed.borderSides = {};
+        for (const edge of edges) {
+            if (edge.style !== 'solid' || !(edge.width > 0)) {
+                record.failures.push('No visible border: ' + edge.side);
+                continue;
+            }
+            const measured = ratio(over(edge.color, under), outside);
+            observed.borderSides[edge.side] = measured;
+            // Truncated so that a failing 2.996 never reads as 3.00.
+            const shownRatio = (Math.floor(measured * 100) / 100).toFixed(2);
+            if (measured < rule.borderContrast)
+                record.failures.push(
+                    `Insufficient border contrast: ${edge.side} ${shownRatio}`,
+                );
+        }
+        const measured = Object.values(observed.borderSides);
+        if (measured.length) observed.borderContrast = Math.min(...measured);
+    };
+    const validBorderRule = (rule) =>
+        Number.isFinite(rule.borderContrast) &&
+        rule.borderContrast >= 1 &&
+        (rule.borderSides === undefined ||
+            (Array.isArray(rule.borderSides) &&
+                rule.borderSides.length > 0 &&
+                rule.borderSides.every((side) => sides.includes(side))));
     for (const [index, rule] of assertions.entries()) {
         const record = {
             index,
@@ -189,18 +281,24 @@ export function measureAssertions(assertions = []) {
                             'Contrast background/compositing is unsupported',
                         );
                     else {
-                        const values = [
-                            luminance(over(foreground, background)),
-                            luminance(background),
-                        ].sort((a, b) => a - b);
-                        observed.contrast =
-                            (values[1] + 0.05) / (values[0] + 0.05);
+                        observed.contrast = ratio(
+                            over(foreground, background),
+                            background,
+                        );
                         if (observed.contrast < rule.contrast)
                             record.failures.push(
                                 'Insufficient contrast: ' +
                                     observed.contrast.toFixed(2),
                             );
                     }
+                }
+                if (
+                    rule.borderContrast !== undefined ||
+                    rule.borderSides !== undefined
+                ) {
+                    if (validBorderRule(rule))
+                        measureBorder(node, rule, record, observed);
+                    else record.unverified.push('Invalid border contrast rule');
                 }
                 record.observed.push(observed);
             }
