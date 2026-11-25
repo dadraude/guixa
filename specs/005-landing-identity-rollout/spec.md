@@ -313,7 +313,9 @@ them outside the landing page set keep their current look until their checkpoint
 - **R20 — Checkpoints, order and gate.** The checkpoints run in the order C1, C2, C3, C4, C5. A checkpoint is complete only when its acceptance
   record shows R5 to R9 for its pages as measured text (R12) and the user records visual approval of those pages in light and dark; the next
   checkpoint does not start before that approval. Each approval is a Q&A that names the evidence it covered. The approval of one checkpoint is
-  never inferred from another's.
+  never inferred from another's. For C3 only (user decision, 2026-11-25): visual approval alone does not complete the checkpoint while these
+  are unmeasured: 3:1 contrast on field borders and focus ring (R5), some target sizes and tab order (R6) and the danger, success and
+  warning colour roles (R9). C3 stays open and C4 does not start until a new C3 task measures them or the user accepts that gap.
 - **R21 — Every page of a checkpoint in the landing page set.** Each page in the checkpoint's table meets R1 to R4 for its audience: shell and
   content, the dialogs, sheets, dropdowns, tooltips and toasts it opens, in light and dark. A page enters `landingPages` only in its checkpoint; no role, prefix
   or area is migrated by implication. After the checkpoint no page of that checkpoint keeps the previous green look.
@@ -416,7 +418,7 @@ templates (Laravel defaults, decided 2026-11-13); new copy beyond what a visual 
 
 None open. Answered 2026-11-16 (see history):
 
-- **OQ5 — A checkpoint is rejected or the approval does not come (R20, S30).** The checkpoint stays open; its rework is tasks in the same checkpoint with the same evidence rules; later checkpoints stay blocked; a new approval Q&A names the new evidence.
+- **OQ5 — A checkpoint is rejected or the approval does not come (R20, S30).** The checkpoint stays open; its rework is tasks in the same checkpoint with the same evidence rules; later checkpoints stay blocked; a new approval Q&A names the new evidence. For C3 (2026-11-25), the unmeasured items R20 names are closed by a new C3 task that measures them or by the user's acceptance of that gap.
 - **OQ6 — A later change touches an approved checkpoint's page (R20, R23, R30, S30).** The fix goes in the current checkpoint's PR with a Deviation and R30 re-measures the affected pages. The earlier approval stands unless a computed colour, font or size of the approved page changes; then the user re-approves that page only.
 - **OQ7 — Flash on first paint before C5 (R28, S24).** Accepted until C5, as in slices 1 and 2; S24 is measured at C4 for navigation after hydration and fully at C5.
 - **OQ8 — Source of the "no old-theme page" inventory (R29, S29).** `resources/js/pages/**`, `resources/views/**` and the overlay components listed in Scope; a page added during the slice joins the checkpoint of its audience, and the plan re-verifies the list at each checkpoint start.
