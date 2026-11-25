@@ -1,0 +1,67 @@
+{
+    "baseUrl": "http://127.0.0.1:5307",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "statement-manager-conditions",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content label,#main-content input,#main-content button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Field boundaries at rest are measured from computed styles; this view reaches no control.",
+            "states": [
+                {
+                    "id": "default-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"hidden\"])",
+                                "count": 4,
+                                "borderContrast": 3
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "borderContrast": 3
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
