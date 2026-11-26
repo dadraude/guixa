@@ -485,16 +485,66 @@ export function measureAssertions(assertions = []) {
                 holds(element.getBoundingClientRect(), x, y)
             );
         });
-    // Whether an element's own text runs across a point: glyphs there would be the adjacent colour, or part of it.
-    const textAt = (element, x, y) =>
-        getComputedStyle(element).visibility === 'visible' &&
-        [...element.childNodes].some((child) => {
+    // Underlines, shadows and changed letter shapes can paint where the font's own glyphs do not.
+    const plainText = (element) => {
+        const style = getComputedStyle(element);
+        if (
+            style.textTransform !== 'none' ||
+            style.textShadow !== 'none' ||
+            style.fontVariantCaps !== 'normal'
+        )
+            return false;
+        for (let current = element; current; current = current.parentElement)
+            if (getComputedStyle(current).textDecorationLine !== 'none')
+                return false;
+        return true;
+    };
+    const meter = document.createElement('canvas').getContext('2d');
+    // Whether the ink of one character may reach a point: its box across, its glyph's height down. A character
+    // box that does not match the font's own metrics counts in full.
+    const inkAt = (range, character, x, y) => {
+        const metrics = meter.measureText(character);
+        const ascent = metrics.fontBoundingBoxAscent,
+            height = ascent + metrics.fontBoundingBoxDescent;
+        return [...range.getClientRects()].some((box) => {
+            if (x < box.left - 2 || x > box.right + 2) return false;
+            if (Math.abs(box.height - height) > 1.5) return holds(box, x, y);
+            const baseline = box.top + ascent;
+            return (
+                y >= baseline - metrics.actualBoundingBoxAscent - 1 &&
+                y <= baseline + metrics.actualBoundingBoxDescent + 1
+            );
+        });
+    };
+    // Whether glyphs of an element's own text may paint at a point, where they would be the adjacent colour.
+    const textAt = (element, x, y) => {
+        const style = getComputedStyle(element);
+        if (style.visibility !== 'visible') return false;
+        meter.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        const plain = plainText(element);
+        return [...element.childNodes].some((child) => {
             if (child.nodeType !== Node.TEXT_NODE || !child.textContent.trim())
                 return false;
             const range = document.createRange();
             range.selectNodeContents(child);
-            return [...range.getClientRects()].some((box) => holds(box, x, y));
+            const near = [...range.getClientRects()].some(
+                (box) =>
+                    y >= box.top - box.height && y <= box.bottom + box.height,
+            );
+            if (!near) return false;
+            if (!plain)
+                return [...range.getClientRects()].some((box) =>
+                    holds(box, x, y),
+                );
+            let offset = 0;
+            return [...child.data].some((character) => {
+                range.setStart(child, offset);
+                offset += character.length;
+                range.setEnd(child, offset);
+                return !!character.trim() && inkAt(range, character, x, y);
+            });
         });
+    };
     // What is painted next to one point of an indicator: the adjacent colour and the tint shadows may add to it,
     // `unpainted` when the indicator is provably not painted there, or null when neither is proven.
     const paintedAt = (node, x, y, kind) => {
@@ -659,6 +709,28 @@ export function measureAssertions(assertions = []) {
         }
         return Math.min(...values);
     };
+    // A ring that reaches past the viewport is measured with the page scrolled to centre the control.
+    const inView = (node, reach, measure) => {
+        const box = node.getBoundingClientRect();
+        if (
+            box.left >= reach &&
+            box.top >= reach &&
+            box.right + reach < innerWidth &&
+            box.bottom + reach < innerHeight
+        )
+            return measure();
+        const start = { left: scrollX, top: scrollY, behavior: 'instant' };
+        scrollBy({
+            left: (box.left + box.right - innerWidth) / 2,
+            top: (box.top + box.bottom - innerHeight) / 2,
+            behavior: 'instant',
+        });
+        try {
+            return measure();
+        } finally {
+            scrollTo(start);
+        }
+    };
     // WCAG 1.4.11: the strongest indicator of the focused element, at its weakest painted point.
     const measureFocusContrast = (node, rule, record, observed) => {
         if (node !== document.activeElement) {
@@ -675,9 +747,9 @@ export function measureAssertions(assertions = []) {
         hitTestAll.textContent =
             '*,*::before,*::after{pointer-events:auto!important}';
         document.head.append(hitTestAll);
-        for (const ring of found.rings) {
+        const gradePoints = (ring) => {
             const own = underOwnLayer(found, ring);
-            const painted = indicatorPoints(node, ring.distance)
+            return indicatorPoints(node, ring.distance)
                 .map(([x, y]) => {
                     const under = sampleAt(node, x, y, ring.kind);
                     // A point already hidden by the page stays hidden whatever the control paints over it.
@@ -689,10 +761,12 @@ export function measureAssertions(assertions = []) {
                         shade: joinTints(own.tint, under.shade),
                     };
                 })
-                .filter((under) => under !== 'unpainted');
-            const measured = painted.map(
-                (under) => under && lowestRatio(ring.color, under),
-            );
+                .filter((under) => under !== 'unpainted')
+                .map((under) => under && lowestRatio(ring.color, under));
+        };
+        const reach = Math.max(0, ...found.rings.map((ring) => ring.distance));
+        const graded = inView(node, reach, () => found.rings.map(gradePoints));
+        for (const measured of graded) {
             if (measured.includes(null)) unresolved = true;
             else if (measured.length) ratios.push(Math.min(...measured));
         }

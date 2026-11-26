@@ -114,7 +114,8 @@ accessibility audit. Cover relevant DOM state and interaction semantics alongsid
 
 ### Focus indicator contrast
 
-The indicators are the element's solid outline and its zero-offset, zero-blur shadow rings with a positive spread. The
+A ring that reaches past the viewport is measured with the page scrolled to centre the control, and the scroll is
+restored. The indicators are the element's solid outline and its zero-offset, zero-blur shadow rings with a positive spread. The
 strongest one counts, graded at its weakest sample point: the middle of the ring on each of the four sides. A background
 or border colour change alone is not measured.
 
@@ -137,12 +138,13 @@ The rule is unverified, never passed, when any ring has a point it cannot prove,
 - a non-solid or browser-default (`auto`) outline, or an unreadable colour or shadow;
 - the control or an ancestor with opacity, a filter, blending, a clip-path, mask, `clip`, paint containment,
   `content-visibility`, rotation, scale, a transform other than a translation, a negative `z-index`, or in the top layer;
-- a point outside the viewport, or with no opaque background beneath it; clipping by an ancestor outside the
+- a point still outside the viewport after that scroll, or with no opaque background beneath it; clipping by an ancestor outside the
   containing block chain, or with a clip margin;
 - inert content, a painting `::before`/`::after`, an image, drawing or replaced element, a border, a background image, a
   background clipped to text, or a table row or column background that hit testing leaves out;
 - a translucent cover, or a cover painted through opacity, a filter, blending, a clip-path or a mask;
-- a line of text running across the point, above the first opaque background found there;
+- a glyph that may paint at the point, above the first opaque background found there: a character box across, the
+  glyph's own height down; the whole line box under decorated, shadowed, case-changed or rescaled text;
 - an unproven stacking order: two boxes in the flow of one layer, positioned content under an outline, content under an
   outset shadow, content with a negative `z-index` under an inset shadow, `order`, `will-change`, containment, a
   backdrop filter, a 3D transform context, the top layer, or a size container where trapping or not trapping `z-index`

@@ -776,8 +776,8 @@ void test('a control whose indicator cannot be located or may be clipped is neve
             '#wrap{width:10px;height:10px;overflow:hidden}#target{position:absolute;top:60px;left:60px;margin:0}',
             wrapped,
         ],
-        'side below the viewport': [
-            '#target{margin-top:540px}.panel{height:900px}',
+        'side below a viewport that cannot scroll to it': [
+            '#target{position:fixed;top:560px;left:0}',
             plain,
         ],
     };
@@ -1023,4 +1023,46 @@ void test('text lying under a sample point leaves the adjacent colour unproven',
     );
     assert.deepEqual(hidden.unverified, []);
     assert.deepEqual(hidden.failures, []);
+});
+
+void test('only the ink of a text under a sample point leaves it unproven', async () => {
+    // The left midpoint, at (36, 62), lies below the baseline of this line: its descenders reach it, other letters do not.
+    const over = (words, css = '') =>
+        measureFocused(
+            control +
+                outside +
+                '#target{position:absolute;top:40px;left:40px;margin:0;z-index:5}#words{position:absolute;left:0;top:23px;margin:0;font:40px/40px Arial;white-space:nowrap}' +
+                css,
+            `<p id="words">${words.slice(0, 2)}</p><div tabindex="0" id="target"></div>`,
+        );
+    const clear = await over('aaaa');
+    assert.deepEqual(clear.unverified, []);
+    assert.deepEqual(clear.failures, []);
+    for (const [name, words, css] of [
+        ['descender', 'gggg', ''],
+        ['underline', 'aaaa', '#words{text-decoration:underline}'],
+        ['underline of an ancestor', 'aaaa', 'body{text-decoration:underline}'],
+        ['transformed case', 'aaaa', '#words{text-transform:uppercase}'],
+        ['text shadow', 'aaaa', '#words{text-shadow:0 8px black}'],
+        ['scaled line', 'aaaa', '#words{scale:1 1.2}'],
+    ]) {
+        const result = await over(words, css);
+        assert.deepEqual(result.unverified, [unsupportedFocus], name);
+    }
+});
+
+void test('a ring that reaches past the viewport is graded with the page scrolled to it', async () => {
+    const below = (outline) =>
+        measureFocused(
+            control +
+                `#target:focus{outline:4px solid ${outline};outline-offset:2px}#target{position:absolute;top:556px;left:40px;margin:0}.panel{height:900px}`,
+            plain,
+        );
+    await browser.evaluate('0');
+    const seen = await below('black');
+    assert.deepEqual(seen.unverified, []);
+    assert.deepEqual(seen.failures, []);
+    const faint = await below('#eee');
+    assert.match(faint.failures[0], /Insufficient focus indicator contrast/);
+    assert.equal(await browser.evaluate('scrollY'), 0);
 });
