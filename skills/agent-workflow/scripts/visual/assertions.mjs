@@ -485,6 +485,16 @@ export function measureAssertions(assertions = []) {
                 holds(element.getBoundingClientRect(), x, y)
             );
         });
+    // Whether an element's own text runs across a point: glyphs there would be the adjacent colour, or part of it.
+    const textAt = (element, x, y) =>
+        getComputedStyle(element).visibility === 'visible' &&
+        [...element.childNodes].some((child) => {
+            if (child.nodeType !== Node.TEXT_NODE || !child.textContent.trim())
+                return false;
+            const range = document.createRange();
+            range.selectNodeContents(child);
+            return [...range.getClientRects()].some((box) => holds(box, x, y));
+        });
     // What is painted next to one point of an indicator: the adjacent colour and the tint shadows may add to it,
     // `unpainted` when the indicator is provably not painted there, or null when neither is proven.
     const paintedAt = (node, x, y, kind) => {
@@ -496,7 +506,7 @@ export function measureAssertions(assertions = []) {
         let background = [0, 0, 0, 0];
         for (const element of stack) {
             const painted = paintOf(element, x, y);
-            if (!painted) return null;
+            if (!painted || textAt(element, x, y)) return null;
             if (!painted[3]) continue;
             const stacked = stackedAt(element, node, kind);
             if (!stacked) return null;

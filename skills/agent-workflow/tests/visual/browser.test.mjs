@@ -1005,3 +1005,22 @@ void test('the worst case of a tint decides the ratio, and a tint that cannot be
         assert.deepEqual(result.unverified, [unsupportedFocus], name);
     }
 });
+
+void test('text lying under a sample point leaves the adjacent colour unproven', async () => {
+    // A control over a line of text, as a skip link over the app bar: the ring crosses the glyphs.
+    const over = (css) =>
+        measureFocused(
+            control +
+                outside +
+                '#target{position:relative;z-index:5}#words{position:absolute;left:0;top:62px;margin:0;font:14px/14px Arial;white-space:nowrap}' +
+                css,
+            '<p id="words">MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM</p><div tabindex="0" id="target"></div>',
+        );
+    assert.deepEqual((await over('')).unverified, [unsupportedFocus]);
+    // Hidden under an opaque box that lies over the text and under the control, it paints nothing there.
+    const hidden = await over(
+        '#words{z-index:1}.panel::after{content:none}#target{box-shadow:none}#words{visibility:hidden}',
+    );
+    assert.deepEqual(hidden.unverified, []);
+    assert.deepEqual(hidden.failures, []);
+});
