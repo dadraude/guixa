@@ -56,8 +56,9 @@ appearance, text enlargement and motion preference.
 - State `checks` can override view selectors/assertions for its owning state.
 - Optional `tabOrder` walks the whole page with real Tab presses: `regions` lists selectors in reading order, and every
   visible tabbable control must be reached, show a focus indicator, sit in a region and keep row-then-column reading
-  order inside it; the regions themselves must be laid out in the declared order. `focusContrast` and `minTarget` apply
-  to every stop. `regions` is required; unknown keys, empty selectors and minimums below 1 fail the case.
+  order inside it; the regions themselves must be laid out in the declared order. Order is judged with the page and
+  every scroll container back at its start. `focusContrast` and `minTarget` apply to every stop. `regions` is required;
+  unknown keys, empty selectors and minimums below 1 fail the case.
 - Optional `keys` operates a page or overlay with real keys, after the assertions: each step is `tabTo` (a selector to
   reach by Tab) or `press` (`Tab`, `ShiftTab`, `Enter`, `Escape`, `Space`, `ArrowDown`, `ArrowUp`), with optional
   `assertions` and a `layout` (`root` and `panels`, optional `content`) measured after it. Use it to open an overlay,
@@ -69,15 +70,13 @@ appearance, text enlargement and motion preference.
   `contrast` (minimum ratio). All matching nodes must satisfy the expectations. Rem expectations
   scale with enlarged text. Use selectors covering every instance of a repeated acceptance pattern.
   `borderContrast` (minimum ratio, 3 for WCAG 1.4.11) measures each border side of a field, or the sides listed in
-  `borderSides` for a divider, against the colour behind the element; a listed side without a visible border fails.
-  `focusContrast` (minimum ratio) requires the matched element to hold focus and measures its solid outlines and
-  zero-blur shadow rings against what is painted next to them; the strongest indicator counts, at its weakest
-  visible point. Each ring is sampled at the middle of its four sides; a point outside the viewport, clipped by an
-  ancestor or covered by something painted over it is not visible and is left out, and a ring with no visible point
-  does not count.
+  `borderSides` for a divider, against the colour behind the element (painted by its parent and ancestors); a listed
+  side without a visible border fails.
+  `focusContrast` (minimum ratio) requires the matched element to hold focus; see
+  [focus indicator contrast](#focus-indicator-contrast).
   `fillContrast` (minimum ratio) compares the matched element's own background fill, such as a divider drawn as a thin
-  element or a highlighted option, with the colour behind its parent. It needs no focus and measures no outline or
-  shadow; a transparent fill fails.
+  element or a highlighted option, with the colour behind the element (painted by its parent and ancestors). It needs
+  no focus and measures no outline or shadow; a transparent fill fails.
   `filter` narrows the matched nodes to the `visible` ones, or to the `text` ones (visible, enabled elements that render
   their own text), so one rule covers every width.
 
@@ -99,17 +98,60 @@ For example:
 }
 ```
 
-Contrast handles solid RGB/RGBA foregrounds and ancestor backgrounds, including alpha composition.
-Images, gradients, opacity, filters, blending or an unknown background are explicitly unverified.
-Border, fill and focus indicator contrast follow the same rule and read RGB/RGBA, `color(srgb …)` and `oklab()`
-colours. For `borderContrast`, border images and styles other than solid are unverified. For `fillContrast`, an unparsed
-colour, a background image, opacity, a filter, blending, an unknown colour behind the element or a hidden element is
-unverified. For `focusContrast`, browser-default (`auto`) and non-solid outlines, a point under a translucent cover or
-an image and, when no ring passes, offset or blurred shadows are unverified. None of these passes. A focus indicator
-drawn only by a background or border colour change is not measured by `focusContrast`.
+`contrast` handles solid RGB/RGBA foregrounds and ancestor backgrounds, including alpha composition. Any other colour
+format, images, gradients, opacity, filters, blending, an unknown background or a hidden element are explicitly
+unverified.
+
+`borderContrast`, `fillContrast` and `focusContrast` read RGB/RGBA, `color(srgb …)` and `oklab()` colours; any other
+colour format is unverified for all three. `borderContrast` and `fillContrast` compare with the backgrounds of the
+element's ancestors, not with what hit testing finds on screen; they leave unverified a hidden element, an unknown colour
+behind it, and a background image, opacity, filter or blending on it or an ancestor. `borderContrast` also leaves
+unverified a border image and a listed side whose style is not solid, none or hidden.
+
 Unsupported assertions/properties also remain unverified and block the gate. Resolve them with a
 focused check or the justified preview path; do not remove the requirement or claim a full
 accessibility audit. Cover relevant DOM state and interaction semantics alongside geometry.
+
+### Focus indicator contrast
+
+The indicators are the element's solid outline and its zero-offset, zero-blur shadow rings with a positive spread. The
+strongest one counts, graded at its weakest sample point: the middle of the ring on each of the four sides. A background
+or border colour change alone is not measured.
+
+A point is left out only when the ring is proven not to be painted there:
+
+- it lies before the document's origin, where nothing can be scrolled into view;
+- an ancestor in the control's containing block chain clips it away with `overflow` and no clip margin;
+- an opaque ring of the control painted over it covers it;
+- an opaque background, of an element and ancestors without opacity, filter, blending, clip-path or mask, covers it, and
+  the CSS stacking order puts that element above that kind of indicator.
+
+A ring with no point left does not count; with no ring left the rule fails. Every other point is graded against the
+backgrounds proven to lie beneath it. A box shadow of another element that reaches the point, and a translucent blurred
+or offset shadow of the control over the ring, only lower the result: the ratio is the worst of the untinted one, the
+tint beneath the ring and the tint over both, with mixed tint colours bounded by black and white. A shadow is therefore
+graded as if it could lie over the ring, even where it lies beneath.
+
+The rule is unverified, never passed, when any ring has a point it cannot prove, for example:
+
+- a non-solid or browser-default (`auto`) outline, or an unreadable colour or shadow;
+- the control or an ancestor with opacity, a filter, blending, a clip-path, mask, `clip`, paint containment,
+  `content-visibility`, rotation, scale, a transform other than a translation, a negative `z-index`, or in the top layer;
+- a point outside the viewport, or with no opaque background beneath it; clipping by an ancestor outside the
+  containing block chain, or with a clip margin;
+- inert content, a painting `::before`/`::after`, an image, drawing or replaced element, a border, a background image, a
+  background clipped to text, or a table row or column background that hit testing leaves out;
+- a translucent cover, or a cover painted through opacity, a filter, blending, a clip-path or a mask;
+- an unproven stacking order: two boxes in the flow of one layer, positioned content under an outline, content under an
+  outset shadow, content with a negative `z-index` under an inset shadow, `order`, `will-change`, containment, a
+  backdrop filter, a 3D transform context, the top layer, or a size container where trapping or not trapping `z-index`
+  would change the answer;
+- a layer of the control covering a ring only partly or translucently, or with an opaque blurred or offset shadow;
+- a tint strong enough to bring the ring and its backdrop to the same lightness;
+- no ring passes while an offset or blurred shadow might be the visible indicator.
+
+Limits: four points per ring; text and other elements' outlines under a point, scrollbars and rounded corners are not
+detected; the stacking order is the part of CSS modelled here, checked against Chrome pixels.
 
 ## Pre-review gate
 
