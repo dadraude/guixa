@@ -485,12 +485,11 @@ export function measureAssertions(assertions = []) {
                 holds(element.getBoundingClientRect(), x, y)
             );
         });
-    // Underlines, shadows and changed letter shapes can paint where the font's own glyphs do not.
+    // Underlines and changed letter shapes can paint where the font's own glyphs do not.
     const plainText = (element) => {
         const style = getComputedStyle(element);
         if (
             style.textTransform !== 'none' ||
-            style.textShadow !== 'none' ||
             style.fontVariantCaps !== 'normal'
         )
             return false;

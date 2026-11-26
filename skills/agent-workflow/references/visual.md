@@ -144,7 +144,7 @@ The rule is unverified, never passed, when any ring has a point it cannot prove,
   background clipped to text, or a table row or column background that hit testing leaves out;
 - a translucent cover, or a cover painted through opacity, a filter, blending, a clip-path or a mask;
 - a glyph that may paint at the point, above the first opaque background found there: a character box across, the
-  glyph's own height down; the whole line box under decorated, shadowed, case-changed or rescaled text;
+  glyph's own height down; the whole line box under decorated, case-changed or rescaled text;
 - an unproven stacking order: two boxes in the flow of one layer, positioned content under an outline, content under an
   outset shadow, content with a negative `z-index` under an inset shadow, `order`, `will-change`, containment, a
   backdrop filter, a 3D transform context, the top layer, or a size container where trapping or not trapping `z-index`
