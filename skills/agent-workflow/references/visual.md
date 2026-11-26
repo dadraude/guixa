@@ -114,10 +114,10 @@ accessibility audit. Cover relevant DOM state and interaction semantics alongsid
 
 ### Focus indicator contrast
 
-A ring that reaches past the viewport is measured with the page scrolled to centre the control, and the scroll is
-restored. The indicators are the element's solid outline and its zero-offset, zero-blur shadow rings with a positive spread. The
-strongest one counts, graded at its weakest sample point: the middle of the ring on each of the four sides. A background
-or border colour change alone is not measured.
+The indicators are the element's solid outline and its zero-offset, zero-blur shadow rings with a positive spread.
+The strongest one counts, graded at its weakest sample point: the middle of the ring on each of the four sides. A ring
+that reaches past the viewport is measured with the page scrolled to centre the control, and the scroll is restored. A
+background or border colour change alone is not measured.
 
 A point is left out only when the ring is proven not to be painted there:
 
@@ -150,11 +150,16 @@ The rule is unverified, never passed, when any ring has a point it cannot prove,
   backdrop filter, a 3D transform context, the top layer, or a size container where trapping or not trapping `z-index`
   would change the answer;
 - a layer of the control covering a ring only partly or translucently, or with an opaque blurred or offset shadow;
-- a tint strong enough to bring the ring and its backdrop to the same lightness;
+- another element's outline at the point; or, anywhere on the page, a filter, text shadow or border image, or a
+  `::before`/`::after` with a box shadow, outline or one of those, since what they paint outside a box is not located;
+- a tint that, beneath the ring, could stop the ring being lighter (or darker) than its backdrop as it is without the
+  tint, or one over both that could reverse them (one that only brings them together lowers the ratio, down to 1);
 - no ring passes while an offset or blurred shadow might be the visible indicator.
 
-Limits: four points per ring; other elements' outlines under a point, scrollbars and rounded corners are not
-detected; the stacking order is the part of CSS modelled here, checked against Chrome pixels.
+Limits: four points per ring. Not detected: other paint outside a box, such as column rules, list markers, reflections
+and selection highlights, scrollbars and rounded corners. Glyphs are bounded by their character box across and their
+own height down, not by their shape. The stacking order is the part of CSS modelled here, checked against Chrome
+pixels.
 
 ## Pre-review gate
 

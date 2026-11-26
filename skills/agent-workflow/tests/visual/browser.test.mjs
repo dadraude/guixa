@@ -1070,3 +1070,46 @@ void test('a ring that reaches past the viewport is graded with the page scrolle
     assert.match(faint.failures[0], /Insufficient focus indicator contrast/);
     assert.equal(await browser.evaluate('scrollY'), 0);
 });
+
+void test('paint that reaches a point from outside its box keeps the point unverified', async () => {
+    // Each caster lies above the control and paints over its top side only, or may, from outside its own box.
+    const caster =
+        '#target{position:absolute;top:40px;left:40px;margin:0}#caster{position:absolute;left:0;width:375px;top:20px;height:10px;z-index:5}';
+    const pseudo =
+        '#caster::after{content:"";position:absolute;left:0;top:0;width:375px;height:4px;';
+    const cases = {};
+    for (const [name, css] of [
+        [
+            'outline of another box',
+            '#caster{outline:10px solid white;height:4px;top:24px}',
+        ],
+        ['pseudo-element shadow', `${pseudo}box-shadow:0 14px 0 0 white}`],
+        [
+            'pseudo-element outline',
+            `${pseudo}top:4px;outline:10px solid white}`,
+        ],
+        [
+            'filter shadow',
+            '#caster{background:white;filter:drop-shadow(0 14px 0 white)}',
+        ],
+        ['text shadow', '#caster{color:white;text-shadow:0 14px white}'],
+        [
+            'border image',
+            '#caster{border:1px solid transparent;border-image:linear-gradient(white,white) 1 / 1px / 12px}',
+        ],
+    ])
+        cases[name] = [
+            caster + css,
+            '<div tabindex="0" id="target"></div><div id="caster">MMMMMMMMMMMM</div>',
+        ];
+    assert.deepEqual(await resolved(cases), []);
+    // An outline that does not reach any point changes nothing.
+    const away = await measureFocused(
+        control +
+            outside +
+            '#other{height:10px;margin-top:200px;outline:2px solid red}',
+        plain + '<div id="other"></div>',
+    );
+    assert.deepEqual(away.unverified, []);
+    assert.deepEqual(away.failures, []);
+});

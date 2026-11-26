@@ -544,10 +544,58 @@ export function measureAssertions(assertions = []) {
             });
         });
     };
+    // The span of distances from its box that an outline paints, or null when it paints none.
+    const outlineBand = (style) => {
+        const width = pixels(style.outlineWidth),
+            offset = pixels(style.outlineOffset);
+        return style.outlineStyle === 'none' ||
+            !(width > 0) ||
+            edgeColor(style.outlineColor)?.[3] === 0
+            ? null
+            : [offset, offset + width];
+    };
+    // Effects painted outside a box by an amount that is not modelled here.
+    const spills = (style) =>
+        style.filter !== 'none' ||
+        style.textShadow !== 'none' ||
+        style.borderImageSource !== 'none';
+    const spillingPseudo = (element) =>
+        ['::before', '::after'].some((pseudo) => {
+            const style = getComputedStyle(element, pseudo);
+            return (
+                !['none', 'normal'].includes(style.content) &&
+                style.display !== 'none' &&
+                (style.boxShadow !== 'none' ||
+                    !!outlineBand(style) ||
+                    spills(style))
+            );
+        });
+    // Hit testing never reports what is painted outside a box: another box's outline at the point or, anywhere on
+    // the page, an effect or a pseudo-element whose reach is unknown.
+    const strayPaintAt = (node, x, y) =>
+        [...document.querySelectorAll('*')].some((element) => {
+            const style = getComputedStyle(element);
+            const boxes = [...element.getClientRects()];
+            if (!boxes.length && style.display !== 'contents') return false;
+            if (spills(style) || spillingPseudo(element)) return true;
+            const band =
+                element !== node &&
+                style.visibility === 'visible' &&
+                outlineBand(style);
+            if (!band) return false;
+            const [from, to] = band;
+            const grown = (box, by) =>
+                shrink(box, { top: -by, right: -by, bottom: -by, left: -by });
+            return boxes.some(
+                (box) =>
+                    holds(grown(box, to), x, y) &&
+                    !holds(grown(box, from - 0.5), x, y),
+            );
+        });
     // What is painted next to one point of an indicator: the adjacent colour and the tint shadows may add to it,
     // `unpainted` when the indicator is provably not painted there, or null when neither is proven.
     const paintedAt = (node, x, y, kind) => {
-        if (inertAt(x, y)) return null;
+        if (inertAt(x, y) || strayPaintAt(node, x, y)) return null;
         const shade = shadeAt(node, x, y);
         if (!shade) return null;
         const stack = document.elementsFromPoint(x, y);
