@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { paintedColours, paintsToken } from './rest-c3-landing-conditions';
 
 // #a05a10, the light landing ochre, as `token()` reports it.
