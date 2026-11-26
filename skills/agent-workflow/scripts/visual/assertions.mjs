@@ -744,6 +744,8 @@ export function measureAssertions(assertions = []) {
         }
         return found;
     };
+    const reaches = (from, to, distance) =>
+        distance > from - 0.5 && distance < to + 0.5;
     // What the control's own layers painted over a ring do at its sample distance: `hidden` by an opaque ring, a
     // `tint` from translucent blurred or offset shadows, or null when neither is proven.
     const underOwnLayer = (found, ring) => {
@@ -751,8 +753,7 @@ export function measureAssertions(assertions = []) {
         for (const layer of found.layers.slice(0, found.layers.indexOf(ring))) {
             const [from, to] = layer.reach;
             // Within half a pixel of either edge the covering is partial; further out the layer does not reach.
-            if (ring.distance <= from - 0.5 || ring.distance >= to + 0.5)
-                continue;
+            if (!reaches(from, to, ring.distance)) continue;
             const within =
                 ring.distance >= from + 0.5 && ring.distance <= to - 0.5;
             if (layer.solid)
@@ -762,6 +763,17 @@ export function measureAssertions(assertions = []) {
         }
         return { tint };
     };
+    // The joint tint, were each painted at full strength, of the control's own layers beneath a ring that reach its
+    // sample distance.
+    const beneathOwnRing = (found, ring) =>
+        found.layers
+            .slice(found.layers.indexOf(ring) + 1)
+            .filter(({ reach: [from, to] }) => reaches(from, to, ring.distance))
+            .reduce(
+                (tint, layer) =>
+                    layer.color ? joinTints(layer.color, tint) : tint,
+                [0, 0, 0, 0],
+            );
     // The lowest ratio a ring can show at a point: bare, or with a tint beneath it or over it and its surroundings.
     // Null when a tint could bring one colour to the other, which hides the ring.
     const lowestRatio = (ring, { colour, shade }) => {
@@ -829,6 +841,19 @@ export function measureAssertions(assertions = []) {
         document.head.append(hitTestAll);
         const gradePoints = (ring) => {
             const own = underOwnLayer(found, ring);
+            const beneath = beneathOwnRing(found, ring);
+            // The reading leaves out the layers beneath; a passing one stands only if they cannot take it below the
+            // minimum.
+            const grade = (under) => {
+                const reading = lowestRatio(ring.color, under);
+                if (!beneath[3] || reading === null) return reading;
+                const worst = lowestRatio(ring.color, {
+                    colour: under.colour,
+                    shade: joinTints(beneath, under.shade),
+                });
+                const safe = worst !== null && worst >= rule.focusContrast;
+                return safe || reading < rule.focusContrast ? reading : null;
+            };
             return indicatorPoints(node, ring.distance)
                 .map(([x, y]) => {
                     const under = sampleAt(node, x, y, ring.kind);
@@ -842,7 +867,7 @@ export function measureAssertions(assertions = []) {
                     };
                 })
                 .filter((under) => under !== 'unpainted')
-                .map((under) => under && lowestRatio(ring.color, under));
+                .map((under) => under && grade(under));
         };
         const reach = Math.max(0, ...found.rings.map((ring) => ring.distance));
         const graded = inView(node, reach, () => found.rings.map(gradePoints));

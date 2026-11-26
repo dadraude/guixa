@@ -1186,3 +1186,41 @@ void test('overflow on a wrapper it does not apply to clips nothing', async () =
         assert.deepEqual(result.failures, [], name);
     }
 });
+
+void test("the control's own layers beneath a ring never let it pass below the minimum", async () => {
+    const focused = (focus) =>
+        measureFocused(control + `#target:focus{${focus}}`, plain);
+    for (const [name, focus] of [
+        [
+            'blurred shadow under an outline',
+            'outline:2px solid black;box-shadow:0 0 12px 8px #111',
+        ],
+        [
+            'solid ring under an outline',
+            'outline:2px solid black;box-shadow:0 0 0 8px #111',
+        ],
+        [
+            'translucent ring under an outline',
+            'outline:2px solid #777;box-shadow:0 0 0 8px rgb(0 0 0 / 0.5)',
+        ],
+        [
+            'ring under another ring',
+            'outline:none;box-shadow:0 0 0 3px black,0 0 0 10px #111',
+        ],
+        [
+            'inset shadow under an inward outline',
+            'outline:2px solid black;outline-offset:-4px;box-shadow:inset 0 0 0 10px #111',
+        ],
+    ]) {
+        const result = await focused(focus);
+        assert.deepEqual(result.unverified, [unsupportedFocus], name);
+        assert.deepEqual(result.failures, [], name);
+    }
+    // A faint shadow beneath that cannot take the ring below the minimum leaves the reading as it was.
+    const faint = await focused(
+        'outline:2px solid black;outline-offset:2px;box-shadow:0 4px 12px rgb(0 0 0 / 0.1)',
+    );
+    assert.deepEqual(faint.unverified, []);
+    assert.deepEqual(faint.failures, []);
+    assert.equal(faint.results[0].observed[0].focusContrast, 21);
+});
