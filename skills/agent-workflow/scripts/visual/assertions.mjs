@@ -330,7 +330,7 @@ export function measureAssertions(assertions = []) {
         bottom: box.bottom - by.bottom,
         left: box.left + by.left,
     });
-    // The zero-size or listed box shadows of a computed value; null when one cannot be read.
+    // The box shadows of a computed value that paint something; null when one cannot be read.
     const parseShadows = (value) => {
         if (value === 'none') return [];
         const shadows = value.split(/,(?![^(]*\))/).map((shadow) => {
@@ -763,17 +763,19 @@ export function measureAssertions(assertions = []) {
         }
         return { tint };
     };
-    // The joint tint, were each painted at full strength, of the control's own layers beneath a ring that reach its
-    // sample distance.
-    const beneathOwnRing = (found, ring) =>
-        found.layers
+    // The joint tint, were each painted at full strength, of the control's own layers beneath a ring that show just
+    // past its outer edge. The outer side decides: what lies only under the ring or towards the control is not graded.
+    const beneathOwnRing = (found, ring) => {
+        const outside = ring.reach[1] + 0.5;
+        return found.layers
             .slice(found.layers.indexOf(ring) + 1)
-            .filter(({ reach: [from, to] }) => reaches(from, to, ring.distance))
+            .filter(({ reach: [from, to] }) => from < outside && to > outside)
             .reduce(
                 (tint, layer) =>
                     layer.color ? joinTints(layer.color, tint) : tint,
                 [0, 0, 0, 0],
             );
+    };
     // The lowest ratio a ring can show at a point: bare, or with a tint beneath it or over it and its surroundings.
     // Null when a tint could bring one colour to the other, which hides the ring.
     const lowestRatio = (ring, { colour, shade }) => {
@@ -842,8 +844,8 @@ export function measureAssertions(assertions = []) {
         const gradePoints = (ring) => {
             const own = underOwnLayer(found, ring);
             const beneath = beneathOwnRing(found, ring);
-            // The reading leaves out the layers beneath; a passing one stands only if they cannot take it below the
-            // minimum.
+            // The reading leaves out the layers beneath; a passing one stands only if those past the outer edge cannot
+            // take it below the minimum.
             const grade = (under) => {
                 const reading = lowestRatio(ring.color, under);
                 if (!beneath[3] || reading === null) return reading;

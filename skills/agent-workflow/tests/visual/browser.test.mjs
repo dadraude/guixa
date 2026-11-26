@@ -1224,3 +1224,35 @@ void test("the control's own layers beneath a ring never let it pass below the m
     assert.deepEqual(faint.failures, []);
     assert.equal(faint.results[0].observed[0].focusContrast, 21);
 });
+
+void test('a layer beneath a ring counts only where it reaches past the outer edge of the ring', async () => {
+    const focused = (focus) =>
+        measureFocused(control + `#target:focus{${focus}}`, plain);
+    // The outline spans 2 to 4 px outside the control; the dark layer beneath it ends at or before that edge, or past it.
+    const ringed = (shadow) =>
+        focused(
+            `outline:2px solid black;outline-offset:2px;box-shadow:${shadow} #111`,
+        );
+    for (const shadow of ['0 0 0 3px', '0 0 1px 3px']) {
+        const inside = await ringed(shadow);
+        assert.deepEqual(inside.unverified, [], shadow);
+        assert.deepEqual(inside.failures, [], shadow);
+        assert.equal(inside.results[0].observed[0].focusContrast, 21);
+    }
+    for (const shadow of ['0 0 1px 4px', '0 0 0 5px'])
+        assert.deepEqual(
+            (await ringed(shadow)).unverified,
+            [unsupportedFocus],
+            shadow,
+        );
+});
+
+void test('a layer just outside an inward outline counts although it lies beneath none of it', async () => {
+    // The layer lies only between the outer edge of the outline and the border edge.
+    const result = await measureFocused(
+        control +
+            '#target:focus{outline:2px solid black;outline-offset:-4px;box-shadow:inset 0 0 0 2px #111}',
+        plain,
+    );
+    assert.deepEqual(result.unverified, [unsupportedFocus]);
+});
