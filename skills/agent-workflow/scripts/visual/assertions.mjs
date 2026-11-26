@@ -519,7 +519,6 @@ export function measureAssertions(assertions = []) {
     // Whether glyphs of an element's own text may paint at a point, where they would be the adjacent colour.
     const textAt = (element, x, y) => {
         const style = getComputedStyle(element);
-        if (style.visibility !== 'visible') return false;
         meter.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
         const plain = plainText(element);
         return [...element.childNodes].some((child) => {

@@ -1038,7 +1038,11 @@ void test('only the ink of a text under a sample point leaves it unproven', asyn
     const clear = await over('aaaa');
     assert.deepEqual(clear.unverified, []);
     assert.deepEqual(clear.failures, []);
+    // With the point above the x-height, small letters stay clear and capitals reach it.
+    const above = await over('aaaa', '#words{top:54px}');
+    assert.deepEqual(above.unverified, []);
     for (const [name, words, css] of [
+        ['capital', 'AAAA', '#words{top:54px}'],
         ['descender', 'gggg', ''],
         ['underline', 'aaaa', '#words{text-decoration:underline}'],
         ['underline of an ancestor', 'aaaa', 'body{text-decoration:underline}'],
