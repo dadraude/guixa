@@ -661,10 +661,19 @@ export function measureAssertions(assertions = []) {
         }
         return false;
     };
+    // Only a left-to-right, top-to-bottom page is known to have nothing to scroll to before its origin.
+    const startsAtOrigin = () =>
+        [document.documentElement, document.body].every((element) => {
+            const style = getComputedStyle(element);
+            return (
+                style.direction === 'ltr' &&
+                style.writingMode === 'horizontal-tb'
+            );
+        });
     // A point outside the viewport hits nothing, so unless it is clipped away it stays unknown.
     const sampleAt = (node, x, y, kind) => {
-        // Nothing before the document's origin can ever be scrolled into view.
-        if (x + scrollX < 0 || y + scrollY < 0) return 'unpainted';
+        if ((x + scrollX < 0 || y + scrollY < 0) && startsAtOrigin())
+            return 'unpainted';
         const clipped = clippedAt(node, x, y);
         if (clipped !== false) return clipped ? 'unpainted' : null;
         return paintedAt(node, x, y, kind);

@@ -1146,3 +1146,21 @@ void test('a box that ignores the pointer despite the runner keeps the point unv
     };
     assert.deepEqual(await resolved(cases), []);
 });
+
+void test('a point before the origin is left out only in a page that scrolls from there', async () => {
+    // The control straddles x = 0 of a page that scrolls leftwards, beside a dark band painted there.
+    for (const flow of ['direction:rtl', 'writing-mode:vertical-rl']) {
+        const result = await measureFocused(
+            control +
+                outside +
+                `html{${flow}}#wide{width:1200px;height:10px}#target{position:absolute;top:100px;left:-50px;margin:0}#band{position:absolute;top:0;height:400px;left:-70px;width:19px;background:#111}`,
+            '<div id="wide"></div><div id="band"></div>' + plain,
+        );
+        assert.deepEqual(result.unverified, [], flow);
+        assert.match(
+            result.failures[0],
+            /Insufficient focus indicator contrast: 1\.1/,
+            flow,
+        );
+    }
+});
