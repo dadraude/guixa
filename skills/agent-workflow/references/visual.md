@@ -170,11 +170,12 @@ The rule is unverified, never passed, when any ring has a point it cannot prove,
   tint, or one over both that could reverse them (one that only brings them together lowers the ratio, down to 1);
 - no ring passes while an offset or blurred shadow might be the visible indicator.
 
-Limits: four points per ring. A ring is graded against what lies under it at those points, with the shadows above and the
-control's own layers past its outer edge; other colours beside it, on either side, are not graded. Not detected: other paint outside a box, such as column rules, list markers, reflections and
-selection highlights; what a box that ignores the pointer paints outside its own boxes, such as overflowing text; the
-content of shadow trees; scrollbars and rounded corners. Glyphs are bounded by their character box across and their own
-height down, not by their shape. The stacking order is the part of CSS modelled here, checked against Chrome pixels.
+Limits: four points per ring. A ring is graded against what lies under it at those points, with the shadows above and
+the control's own layers past its outer edge; other colours beside it, on either side, are not graded. Not detected:
+other paint outside a box, such as column rules, list markers, reflections and selection highlights; what a box that
+ignores the pointer paints outside its own boxes, such as overflowing text; the content of shadow trees; scrollbars
+and rounded corners. Glyphs are bounded by their character box across and their own height down, not by their shape.
+The stacking order is the part of CSS modelled here, checked against Chrome pixels.
 
 ## Pre-review gate
 
