@@ -121,8 +121,9 @@ background or border colour change alone is not measured.
 
 A point is left out only when the ring is proven not to be painted there:
 
-- it lies before the document's origin, where nothing can be scrolled into view;
-- an ancestor in the control's containing block chain clips it away with `overflow` and no clip margin;
+- it lies before the origin of a left-to-right, top-to-bottom page, where nothing can be scrolled into view;
+- an ancestor in the control's containing block chain, other than a `display: contents` or inline box (where `overflow`
+  does not apply), clips it away with `overflow` and no clip margin;
 - an opaque ring of the control painted over it covers it;
 - an opaque background, of an element and ancestors without opacity, filter, blending, clip-path or mask, covers it, and
   the CSS stacking order puts that element above that kind of indicator.
@@ -132,6 +133,15 @@ backgrounds proven to lie beneath it. A box shadow of another element that reach
 or offset shadow of the control over the ring, only lower the result: the ratio is the worst of the untinted one, the
 tint beneath the ring and the tint over both, with mixed tint colours bounded by black and white. A shadow is therefore
 graded as if it could lie over the ring, even where it lies beneath.
+
+For the control's own layers painted beneath a ring, **the outer side decides**. Such a layer counts only when it shows
+just past the ring's outer edge, the edge away from the control's centre (for an inward outline, the one towards the
+border edge): it starts less than half a pixel beyond that edge, or nearer the centre, and ends more than half a pixel
+beyond it. A blurred or offset shadow reaches as far as its offset, blur and spread together. A passing reading then has
+to stay passing with every such layer at full strength over the graded colour, bounded like any other tint; otherwise the
+point is unverified, and a passing one under an opaque layer always is. The reported ratio leaves these layers out. A layer that ends at
+the outer edge or nearer the centre is not counted: **the contrast between a ring and what lies on its inner side, such as
+the control's own halo, is not graded**.
 
 The rule is unverified, never passed, when any ring has a point it cannot prove, for example:
 
@@ -149,17 +159,22 @@ The rule is unverified, never passed, when any ring has a point it cannot prove,
   outset shadow, content with a negative `z-index` under an inset shadow, `order`, `will-change`, containment, a
   backdrop filter, a 3D transform context, the top layer, or a size container where trapping or not trapping `z-index`
   would change the answer;
-- a layer of the control covering a ring only partly or translucently, or with an opaque blurred or offset shadow;
+- a solid outline or ring of the control covering another ring only partly or translucently, or an opaque blurred or
+  offset shadow of the control over it;
+- a layer of the control beneath a ring that shows past its outer edge and could take a passing ring below the minimum;
+- an element that still computes `pointer-events: none` under the runner's override (a layered or inline `!important`)
+  with a box at the point, or any `::before`/`::after` with content that still does;
 - another element's outline at the point; or, anywhere on the page, a filter, text shadow or border image, or a
   `::before`/`::after` with a box shadow, outline or one of those, since what they paint outside a box is not located;
 - a tint that, beneath the ring, could stop the ring being lighter (or darker) than its backdrop as it is without the
   tint, or one over both that could reverse them (one that only brings them together lowers the ratio, down to 1);
 - no ring passes while an offset or blurred shadow might be the visible indicator.
 
-Limits: four points per ring. Not detected: other paint outside a box, such as column rules, list markers, reflections
-and selection highlights, scrollbars and rounded corners. Glyphs are bounded by their character box across and their
-own height down, not by their shape. The stacking order is the part of CSS modelled here, checked against Chrome
-pixels.
+Limits: four points per ring. A ring is graded against what lies under it at those points, with the shadows above and the
+control's own layers past its outer edge; other colours beside it, on either side, are not graded. Not detected: other paint outside a box, such as column rules, list markers, reflections and
+selection highlights; what a box that ignores the pointer paints outside its own boxes, such as overflowing text; the
+content of shadow trees; scrollbars and rounded corners. Glyphs are bounded by their character box across and their own
+height down, not by their shape. The stacking order is the part of CSS modelled here, checked against Chrome pixels.
 
 ## Pre-review gate
 
