@@ -965,3 +965,43 @@ void test('a soft shadow of the control over its own ring is bounded like any ot
     );
     assert.deepEqual(opaque.unverified, [unsupportedFocus]);
 });
+
+void test('the worst case of a tint decides the ratio, and a tint that cannot be bounded decides nothing', async () => {
+    const shaded = (ring, shadow, extra = '') =>
+        measureFocused(
+            control +
+                `#target:focus{${ring}}#caster{position:absolute;left:0;width:375px;height:1px;top:20px;box-shadow:${shadow}}${extra}`,
+            '<div tabindex="0" id="target"></div><div id="dim"><div id="caster"></div></div>',
+        );
+    const outline = (colour) =>
+        `outline:4px solid ${colour};outline-offset:2px`;
+    const fails = async (ring, shadow, ratio) => {
+        const result = await shaded(ring, shadow);
+        assert.deepEqual(result.unverified, [], shadow);
+        assert.match(result.failures[0], ratio, shadow);
+    };
+    // A grey ring is closest to its backdrop when the tint lies beneath it.
+    await fails(outline('#777'), '0 49px 0 5px rgb(0 0 0 / 0.3)', /: 2\.1/);
+    // Black and white at the joint strength of two tints: the white one is the worst for a black ring.
+    await fails(
+        outline('black'),
+        '0 49px 0 5px rgb(0 0 0 / 0.5), 0 49px 0 5px rgb(255 255 255 / 0.5)',
+        /: 1\.8/,
+    );
+    const own = await shaded(
+        'outline:none;box-shadow:0 0 1px 10px rgb(0 0 0 / 0.3),0 0 0 6px #777',
+        'none',
+    );
+    assert.deepEqual(own.unverified, [unsupportedFocus]);
+    for (const [name, shadow, extra] of [
+        ['unparsed shadow colour', '0 49px 0 5px lab(100 0 0)', ''],
+        [
+            'shadow of a dimmed box',
+            '0 49px 0 5px rgb(0 0 0 / 0.1)',
+            '#dim{opacity:.5}',
+        ],
+    ]) {
+        const result = await shaded(outline('black'), shadow, extra);
+        assert.deepEqual(result.unverified, [unsupportedFocus], name);
+    }
+});
