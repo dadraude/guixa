@@ -1145,9 +1145,12 @@ void test('a box that ignores the pointer despite the runner keeps the point unv
         ],
     };
     assert.deepEqual(await resolved(cases), []);
-    // Away from every point, such a box changes nothing.
+    // Away from every point, such a box changes nothing, and an ordinary declaration on a pseudo-element is
+    // overridden by the runner.
     const away = await measureFocused(
-        control + outside + '#cover{height:20px;margin-top:200px}',
+        control +
+            outside +
+            '#cover{height:20px;margin-top:200px}#cover::after{content:"x";pointer-events:none}',
         plain + `<div id="cover" style="${inert}"></div>`,
     );
     assert.deepEqual(away.unverified, []);
