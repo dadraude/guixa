@@ -197,125 +197,302 @@ export function measureAssertions(assertions = []) {
         const measured = Object.values(observed.borderSides);
         if (measured.length) observed.borderContrast = Math.min(...measured);
     };
-    const clippedAway = (node, x, y) => {
-        for (
-            let current = node.parentElement;
-            current && current !== document.body;
-            current = current.parentElement
-        ) {
-            const style = getComputedStyle(current);
-            const box = current.getBoundingClientRect();
-            if (
-                (style.overflowX !== 'visible' &&
-                    (x < box.left || x > box.right)) ||
-                (style.overflowY !== 'visible' &&
-                    (y < box.top || y > box.bottom))
-            )
-                return true;
-        }
-        return false;
-    };
-    // The CSS that gives an element its own stacking context.
-    const createsContext = (element) => {
+    // Properties that change how, or whether, a box is painted.
+    const plainPaint = (style) =>
+        Number(style.opacity) === 1 &&
+        style.filter === 'none' &&
+        style.mixBlendMode === 'normal' &&
+        style.clipPath === 'none' &&
+        style.maskImage === 'none';
+    const inTopLayer = (element) => element.matches(':modal, :popover-open');
+    // A control painted with any of these, itself or through an ancestor, cannot have its indicator located.
+    const unlocatable = (element) => {
         const style = getComputedStyle(element);
-        const parent = element.parentElement;
-        const layered =
-            style.position !== 'static' ||
-            (parent && /flex|grid/.test(getComputedStyle(parent).display));
         return (
-            (layered && style.zIndex !== 'auto') ||
-            ['fixed', 'sticky'].includes(style.position) ||
-            style.isolation === 'isolate' ||
-            /paint|layout|strict|content/.test(style.contain) ||
-            [
+            !composited(style) ||
+            !plainPaint(style) ||
+            style.clip !== 'auto' ||
+            /paint|strict|content/.test(style.contain) ||
+            style.contentVisibility !== 'visible' ||
+            !/^(none|matrix\(1, 0, 0, 1, [-\d.e]+, [-\d.e]+\))$/.test(
                 style.transform,
-                style.translate,
-                style.rotate,
-                style.scale,
-                style.perspective,
-                style.clipPath,
-            ].some((value) => value !== 'none')
+            ) ||
+            style.rotate !== 'none' ||
+            style.scale !== 'none' ||
+            Number(style.zIndex) < 0 ||
+            inTopLayer(element)
         );
     };
-    const lineage = (element) => {
+    const isPositioned = (style) => style.position !== 'static';
+    // Where a branch below the common ancestor is painted: its z-level and whether anything in it is positioned.
+    // Null when the branch uses CSS whose painting order is not modelled here.
+    const layerOf = (branch) => {
+        let positioned = false;
+        for (const element of branch) {
+            const style = getComputedStyle(element);
+            if (
+                inTopLayer(element) ||
+                style.order !== '0' ||
+                style.willChange !== 'auto' ||
+                style.contain !== 'none' ||
+                style.containerType !== 'normal' ||
+                style.backdropFilter !== 'none' ||
+                style.transformStyle !== 'flat'
+            )
+                return null;
+            const flexItem = /flex|grid/.test(
+                getComputedStyle(element.parentElement).display,
+            );
+            if (style.zIndex !== 'auto' && (isPositioned(style) || flexItem))
+                return { positioned: true, level: Number(style.zIndex) };
+            // These keep the z-index of everything inside them at level zero.
+            if (
+                ['fixed', 'sticky'].includes(style.position) ||
+                !plainPaint(style) ||
+                style.isolation !== 'auto' ||
+                [
+                    style.transform,
+                    style.translate,
+                    style.rotate,
+                    style.scale,
+                    style.perspective,
+                ].some((value) => value !== 'none')
+            )
+                return { positioned: true, level: 0 };
+            positioned ||= isPositioned(style);
+        }
+        return { positioned, level: 0 };
+    };
+    const pathUp = (element, end) => {
         const path = [];
-        for (let current = element; current; current = current.parentElement)
+        for (
+            let current = element;
+            current !== end;
+            current = current.parentElement
+        )
             path.unshift(current);
         return path;
     };
-    // Whether `element`, outside the node's own subtree and ancestors, is painted over the node's outline.
-    const paintsAbove = (element, node) => {
-        const paths = [lineage(element), lineage(node)];
-        let shared = 0;
-        for (let depth = 0; paths[0][depth] === paths[1][depth]; depth++)
-            if (createsContext(paths[0][depth])) shared = depth;
-        const [other, own] = paths.map((path) => {
-            const below = path.slice(shared + 1);
-            const context = below.find(createsContext);
-            if (context)
-                return {
-                    at: context,
-                    level: Number(getComputedStyle(context).zIndex) || 0,
-                };
-            const positioned = below.findLast(
-                (item) => getComputedStyle(item).position !== 'static',
+    // Whether a painted box is `above` or `beneath` an indicator of the node, or null when CSS leaves it unproven.
+    // `kind` is the indicator: an `outline`, or an `inset` or `outset` shadow.
+    const stackedAt = (element, node, kind) => {
+        if (element.contains(node)) return 'beneath';
+        if (node.contains(element)) {
+            const path = pathUp(element, node);
+            const layer = layerOf(path);
+            if (!layer || layer.level < 0) return null;
+            // Content is painted over an inset shadow; an outline is painted over content that forms no layer.
+            if (kind === 'inset') return 'above';
+            return kind === 'outline' && !layer.positioned && layer.level === 0
+                ? 'beneath'
+                : null;
+        }
+        let common = element.parentElement;
+        while (!common.contains(node)) common = common.parentElement;
+        const [other, own] = [element, node].map((end) => {
+            const layer = layerOf(pathUp(end, common));
+            return (
+                layer && {
+                    ...layer,
+                    rank: layer.positioned ? layer.level : -0.5,
+                }
             );
-            return positioned
-                ? { at: positioned, level: 0 }
-                : { at: below.at(-1), level: -0.5 };
         });
-        if (other.level !== own.level) return other.level > own.level;
-        // An outline is painted over in-flow content of its own layer; positioned boxes follow the tree order.
-        return (
-            other.level !== -0.5 &&
-            Boolean(
-                own.at.compareDocumentPosition(other.at) &
-                Node.DOCUMENT_POSITION_FOLLOWING,
-            )
+        if (!other || !own) return null;
+        if (other.rank !== own.rank)
+            return other.rank > own.rank ? 'above' : 'beneath';
+        // Two boxes in the flow of one layer: which paints over an indicator depends on their kinds of box.
+        if (!other.positioned) return null;
+        return element.compareDocumentPosition(node) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+            ? 'beneath'
+            : 'above';
+    };
+    const holds = (box, x, y) =>
+        x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
+    const edgeWidths = (style, property) =>
+        Object.fromEntries(
+            sides.map((side) => [
+                side,
+                pixels(style.getPropertyValue(property.replace('*', side))) ||
+                    0,
+            ]),
+        );
+    const shrink = (box, by) => ({
+        top: box.top + by.top,
+        right: box.right - by.right,
+        bottom: box.bottom - by.bottom,
+        left: box.left + by.left,
+    });
+    // The zero-size or listed box shadows of a computed value; null when one cannot be read.
+    const parseShadows = (value) => {
+        if (value === 'none') return [];
+        const shadows = value.split(/,(?![^(]*\))/).map((shadow) => {
+            const m = shadow
+                .trim()
+                .match(
+                    /^(.+\)) (-?[\d.]+)px (-?[\d.]+)px ([\d.]+)px (-?[\d.]+)px( inset)?$/,
+                );
+            const parsed = m && edgeColor(m[1]);
+            if (!parsed) return null;
+            const [x, y, blur, spread] = m.slice(2, 6).map(Number);
+            return { color: parsed, x, y, blur, spread, inset: !!m[6] };
+        });
+        if (shadows.includes(null)) return null;
+        return shadows.filter(
+            ({ color: parsed, x, y, blur, spread }) =>
+                parsed[3] > 0 && (x || y || blur || spread),
         );
     };
-    // Content of the node covers an inset ring; outside the box only its positioned content covers an outline.
-    const contentCovers = (element, node, inward) => {
-        if (inward) return true;
-        for (let current = element; current !== node;) {
-            if (getComputedStyle(current).position !== 'static') return true;
-            current = current.parentElement;
-        }
-        return false;
+    const pseudoPaints = (element) =>
+        ['::before', '::after'].some((pseudo) => {
+            const style = getComputedStyle(element, pseudo);
+            if (
+                ['none', 'normal'].includes(style.content) ||
+                style.display === 'none'
+            )
+                return false;
+            const background = edgeColor(style.backgroundColor);
+            const widths = edgeWidths(style, 'border-*-width');
+            return (
+                !background ||
+                background[3] > 0 ||
+                style.backgroundImage !== 'none' ||
+                style.boxShadow !== 'none' ||
+                style.outlineStyle !== 'none' ||
+                sides.some(
+                    (side) =>
+                        widths[side] > 0 &&
+                        style.getPropertyValue(`border-${side}-style`) !==
+                            'none',
+                )
+            );
+        });
+    // The colour an element's box paints at a point: transparent when it paints nothing there, null when unknown.
+    const paintOf = (element, x, y) => {
+        const nothing = [0, 0, 0, 0];
+        if (pseudoPaints(element)) return null;
+        const root =
+            element === document.documentElement || element === document.body;
+        const boxes = [...element.getClientRects()];
+        const box = boxes.find((rect) => holds(rect, x, y));
+        if (!box && !root) return nothing;
+        const style = getComputedStyle(element);
+        const background = edgeColor(style.backgroundColor);
+        if (!background) return null;
+        const borders = edgeWidths(style, 'border-*-width');
+        const inBorder =
+            !!box &&
+            !holds(shrink(box, borders), x, y) &&
+            sides.some((side) => {
+                const parsed = edgeColor(
+                    style.getPropertyValue(`border-${side}-color`),
+                );
+                return borders[side] > 0 && (!parsed || parsed[3] > 0);
+            });
+        const replaced =
+            element instanceof SVGElement ||
+            element.matches('img,video,canvas,iframe,object,embed');
+        if (
+            !background[3] &&
+            style.backgroundImage === 'none' &&
+            !inBorder &&
+            !replaced
+        )
+            return nothing;
+        for (let current = element; current; current = current.parentElement)
+            if (!plainPaint(getComputedStyle(current))) return null;
+        if (style.backgroundImage !== 'none' || inBorder || replaced)
+            return null;
+        if (style.backgroundClip === 'border-box' || root) return background;
+        if (style.backgroundClip === 'text') return null;
+        const inner = shrink(box, borders);
+        const painted =
+            style.backgroundClip === 'content-box'
+                ? shrink(inner, edgeWidths(style, 'padding-*'))
+                : inner;
+        return holds(painted, x, y) ? background : nothing;
     };
-    // What is painted under one point of an indicator, which for a positioned control is not its DOM ancestors:
-    // the adjacent colour, `covered` when something paints over the point, or null when neither can be told.
-    const paintedAt = (node, x, y, inward) => {
+    // Whether another element's box shadow reaches a point; hit testing never reports shadows.
+    const shadowedAt = (node, x, y) =>
+        [...document.querySelectorAll('*')].some((element) => {
+            if (element === node) return false;
+            const style = getComputedStyle(element);
+            if (style.boxShadow === 'none' || style.visibility !== 'visible')
+                return false;
+            const box = element.getBoundingClientRect();
+            if (!box.width && !box.height) return false;
+            const shadows = parseShadows(style.boxShadow);
+            if (!shadows) return holds(box, x, y);
+            return shadows.some((shadow) => {
+                const reach =
+                    Math.max(Math.abs(shadow.x), Math.abs(shadow.y)) +
+                    shadow.blur +
+                    shadow.spread;
+                const around = (by) =>
+                    shrink(box, { top: by, right: by, bottom: by, left: by });
+                return shadow.inset
+                    ? holds(box, x, y) && !holds(around(reach), x, y)
+                    : !holds(box, x, y) && holds(around(-reach), x, y);
+            });
+        });
+    // An inert subtree is painted but never hit, so nothing under it can be told apart from it.
+    const inertAt = (x, y) =>
+        [...document.querySelectorAll('[inert], [inert] *')].some((element) =>
+            [...element.getClientRects()].some((box) => holds(box, x, y)),
+        );
+    // What is painted next to one point of an indicator: the adjacent colour, `unpainted` when the indicator is
+    // provably not painted there, or null when neither is proven.
+    const paintedAt = (node, x, y, kind) => {
+        if (inertAt(x, y) || shadowedAt(node, x, y)) return null;
         let background = [0, 0, 0, 0];
         for (const element of document.elementsFromPoint(x, y)) {
-            const own = element === node;
-            if (own && !inward) continue;
-            const content = !own && node.contains(element);
-            const above =
-                !own &&
-                !element.contains(node) &&
-                (content
-                    ? contentCovers(element, node, inward)
-                    : paintsAbove(element, node));
-            if (content && !above) continue;
-            const computed = getComputedStyle(element);
-            const parsed = edgeColor(computed.backgroundColor);
-            if (
-                !composited(computed) ||
-                !parsed ||
-                element.matches('img,video,canvas')
-            )
-                return null;
-            if (above) {
-                if (parsed[3] === 0) continue;
-                return parsed[3] < 1 ? null : 'covered';
-            }
-            background = over(background, parsed);
+            const painted = paintOf(element, x, y);
+            if (!painted) return null;
+            if (!painted[3]) continue;
+            const stacked = stackedAt(element, node, kind);
+            if (!stacked) return null;
+            if (stacked === 'above')
+                return painted[3] >= 1 && !background[3] ? 'unpainted' : null;
+            background = over(background, painted);
             if (background[3] >= 1) return background;
         }
         return null;
     };
-    // The points along an indicator: `distance` runs outward from the border box, negative inward.
+    // Whether an ancestor's overflow removes the point: only an ancestor in the containing block chain provably does.
+    const clippedAt = (node, x, y) => {
+        let escapes = false;
+        for (
+            let child = node, current = node.parentElement;
+            current && current !== document.body;
+            child = current, current = current.parentElement
+        ) {
+            escapes ||= ['absolute', 'fixed'].includes(
+                getComputedStyle(child).position,
+            );
+            const style = getComputedStyle(current);
+            const box = current.getBoundingClientRect();
+            const outside =
+                (style.overflowX !== 'visible' &&
+                    (x < box.left || x > box.right)) ||
+                (style.overflowY !== 'visible' &&
+                    (y < box.top || y > box.bottom));
+            if (outside)
+                return escapes || style.overflowClipMargin !== '0px'
+                    ? null
+                    : true;
+        }
+        return false;
+    };
+    const sampleAt = (node, x, y, kind) => {
+        // Nothing before the document's origin can ever be scrolled into view.
+        if (x + scrollX < 0 || y + scrollY < 0) return 'unpainted';
+        if (x < 0 || x >= innerWidth || y < 0 || y >= innerHeight) return null;
+        const clipped = clippedAt(node, x, y);
+        if (clipped !== false) return clipped ? 'unpainted' : null;
+        return paintedAt(node, x, y, kind);
+    };
+    // The four side midpoints of an indicator: `distance` runs outward from the border box, negative inward.
     const indicatorPoints = (node, distance) => {
         const box = node.getBoundingClientRect();
         const x = box.left + box.width / 2,
@@ -325,59 +502,76 @@ export function measureAssertions(assertions = []) {
             [x, box.bottom + distance],
             [box.left - distance, y],
             [box.right + distance, y],
-        ].filter(
-            ([px, py]) =>
-                px >= 0 &&
-                px < innerWidth &&
-                py >= 0 &&
-                py < innerHeight &&
-                !clippedAway(node, px, py),
-        );
+        ];
     };
-    // Outlines and solid rings; anything else that could draw the indicator is reported, never guessed.
+    // Outlines and solid rings, in painting order from the top; anything else that could draw the indicator is
+    // reported, never guessed. `reach` is the span of distances each layer paints.
     const indicators = (style) => {
-        const found = { rings: [], unresolved: false, other: false };
+        const found = {
+            rings: [],
+            layers: [],
+            unresolved: false,
+            other: false,
+        };
         const width = pixels(style.outlineWidth),
             offset = pixels(style.outlineOffset);
         if (style.outlineStyle !== 'none' && width !== 0) {
             const parsed = edgeColor(style.outlineColor);
-            if (style.outlineStyle !== 'solid' || !parsed)
-                found.unresolved = true;
-            else if (parsed[3] > 0)
-                found.rings.push({
-                    color: parsed,
-                    distance: offset + width / 2,
-                });
+            const solid = style.outlineStyle === 'solid' && !!parsed;
+            const layer = {
+                color: parsed,
+                solid,
+                kind: 'outline',
+                reach: [offset, offset + width],
+                distance: offset + width / 2,
+            };
+            if (!solid) found.unresolved = true;
+            if (!solid || parsed[3] > 0) found.layers.push(layer);
+            if (solid && parsed[3] > 0) found.rings.push(layer);
         }
-        const shadows =
-            style.boxShadow === 'none'
-                ? []
-                : style.boxShadow.split(/,(?![^(]*\))/);
-        for (const shadow of shadows) {
-            const m = shadow
-                .trim()
-                .match(
-                    /^(.+\)) (-?[\d.]+)px (-?[\d.]+)px ([\d.]+)px (-?[\d.]+)px( inset)?$/,
-                );
-            const parsed = m && edgeColor(m[1]);
-            if (!parsed) {
-                found.unresolved = true;
-                continue;
-            }
-            const [x, y, blur, spread] = m.slice(2, 6).map(Number);
-            if (parsed[3] === 0 || (!x && !y && !blur && !spread)) continue;
-            if (x || y || blur || spread < 0) found.other = true;
-            else
-                found.rings.push({
-                    color: parsed,
-                    distance: m[6]
-                        ? -(pixels(style.borderTopWidth) + spread / 2)
-                        : spread / 2,
-                });
+        const shadows = parseShadows(style.boxShadow);
+        if (!shadows) found.unresolved = true;
+        const border = pixels(style.borderTopWidth);
+        for (const shadow of shadows ?? []) {
+            const solid =
+                !shadow.x && !shadow.y && !shadow.blur && shadow.spread > 0;
+            const spread =
+                Math.max(Math.abs(shadow.x), Math.abs(shadow.y)) +
+                shadow.blur +
+                shadow.spread;
+            const layer = {
+                color: shadow.color,
+                solid,
+                kind: shadow.inset ? 'inset' : 'outset',
+                reach: shadow.inset
+                    ? [-(border + spread), -border]
+                    : [0, spread],
+                distance: shadow.inset
+                    ? -(border + shadow.spread / 2)
+                    : shadow.spread / 2,
+            };
+            found.layers.push(layer);
+            if (solid) found.rings.push(layer);
+            else found.other = true;
         }
         return found;
     };
-    // WCAG 1.4.11: the strongest indicator of the focused element, at its weakest visible point.
+    // Whether a layer of the same control painted over this one hides it at its sample distance.
+    const underOwnLayer = (found, ring) => {
+        for (const layer of found.layers.slice(0, found.layers.indexOf(ring))) {
+            const [from, to] = layer.reach;
+            // Within half a pixel of either edge the covering is partial; further out the layer does not reach.
+            if (ring.distance <= from - 0.5 || ring.distance >= to + 0.5)
+                continue;
+            const within =
+                ring.distance >= from + 0.5 && ring.distance <= to - 0.5;
+            return within && layer.solid && layer.color[3] >= 1
+                ? 'unpainted'
+                : null;
+        }
+        return false;
+    };
+    // WCAG 1.4.11: the strongest indicator of the focused element, at its weakest painted point.
     const measureFocusContrast = (node, rule, record, observed) => {
         if (node !== document.activeElement) {
             record.failures.push('Element is not focused');
@@ -386,23 +580,29 @@ export function measureAssertions(assertions = []) {
         const found = indicators(getComputedStyle(node));
         let unresolved = found.unresolved;
         for (let current = node; current; current = current.parentElement)
-            if (!composited(getComputedStyle(current))) unresolved = true;
+            if (unlocatable(current)) unresolved = true;
         const ratios = [];
-        // A modal stops the page behind it from being hit-tested; sampling needs every painted element.
+        // A modal stops the page behind it from being hit-tested; sampling needs every painted box.
         const hitTestAll = document.createElement('style');
-        hitTestAll.textContent = '*{pointer-events:auto!important}';
+        hitTestAll.textContent =
+            '*,*::before,*::after{pointer-events:auto!important}';
         document.head.append(hitTestAll);
         for (const ring of found.rings) {
-            const visible = indicatorPoints(node, ring.distance)
-                .map(([x, y]) => ({
-                    under: paintedAt(node, x, y, ring.distance < 0),
-                }))
-                .filter(({ under }) => under !== 'covered');
-            if (visible.some(({ under }) => !under)) unresolved = true;
-            else if (visible.length)
+            const covered = underOwnLayer(found, ring);
+            const painted = indicatorPoints(node, ring.distance)
+                .map(([x, y]) => {
+                    const under = sampleAt(node, x, y, ring.kind);
+                    // A point already hidden by the page stays hidden whatever the control paints over it.
+                    return under === 'unpainted' || covered === false
+                        ? under
+                        : covered;
+                })
+                .filter((under) => under !== 'unpainted');
+            if (painted.includes(null)) unresolved = true;
+            else if (painted.length)
                 ratios.push(
                     Math.min(
-                        ...visible.map(({ under }) =>
+                        ...painted.map((under) =>
                             ratio(over(ring.color, under), under),
                         ),
                     ),

@@ -536,6 +536,9 @@ const layered = (cover, css = '') =>
         '<div id="bar">' + button + '</div><div id="over"></div>',
     );
 
+const unsupportedFocus =
+    '#target: Focus indicator colours or compositing are unsupported';
+
 void test('an indicator point covered by a higher layer is not visible and cannot change the verdict', async () => {
     // The right side lies under a white bar of a higher layer, as the sidebar brand under the app bar: the other
     // sides still show the ring on black.
@@ -572,16 +575,12 @@ void test('what paints beneath an indicator stays its adjacent colour', async ()
     ]);
     const transparent = await layered(beneath[1][1]);
     assert.deepEqual(transparent.unverified, []);
-    // In-flow content that follows the control is painted before its outline.
+    // Whether a following in-flow box paints over an indicator is not proven, so it is neither dropped nor graded.
     const flow = await measureFocused(
         '#target{display:block;height:44px;width:100px}#target:focus{outline:2px solid #222;outline-offset:2px}#after{height:60px;margin-top:-4px;background:black}',
         button + '<div id="after"></div>',
     );
-    assert.deepEqual(flow.unverified, []);
-    assert.match(
-        flow.failures[0],
-        /Insufficient focus indicator contrast: 1\./,
-    );
+    assert.deepEqual(flow.unverified, [unsupportedFocus]);
 });
 
 void test('an inset ring covered by the control content is not visible', async () => {
@@ -608,10 +607,6 @@ void test('positioned boxes and clipping hide indicator points on either side of
             '#target:focus{outline:2px solid #222;outline-offset:2px}#after{position:relative;margin:-60px -10px 0;height:90px;background:white}',
             button + '<div id="after"></div>',
         ],
-        'positioned content outside the box': [
-            '#target:focus{outline:2px solid #222;outline-offset:2px}#fill{position:absolute;inset:-8px;background:white}',
-            '<div tabindex="0" id="target"><div id="fill"></div></div>',
-        ],
         'inset ring clipped by an ancestor': [
             '#clip{width:40px;height:20px;overflow:hidden;margin:10px}#target{margin:-10px 0 0 -30px}#target:focus{box-shadow:inset 0 0 0 4px white}',
             '<div id="clip">' + button + '</div>',
@@ -626,4 +621,170 @@ void test('positioned boxes and clipping hide indicator points on either side of
             name,
         );
     }
+});
+
+// A 100 by 44 white control, 40 px into the panel, and a white outline 2 px outside it unless the case says otherwise.
+const control =
+    '#target{display:block;margin:40px;width:100px;height:44px;border:0;padding:0;background:white}';
+const outside = '#target:focus{outline:4px solid black;outline-offset:2px}';
+const plain = '<div tabindex="0" id="target"></div>';
+// A dark strip painted behind the top side, and a white box reaching over the same place.
+const strip =
+    '#strip,#cover{position:absolute;left:0;width:375px;height:14px;top:var(--top)}#strip{background:#111;z-index:-1}:root{--top:62px}';
+
+// The cases that were graded or dropped although they cannot be proven: each one has to stay unverified.
+async function resolved(cases) {
+    const wrong = [];
+    for (const [name, [css, markup]] of Object.entries(cases)) {
+        const result = await measureFocused(control + outside + css, markup);
+        if (result.unverified[0] !== unsupportedFocus || result.failures.length)
+            wrong.push(name);
+    }
+    return wrong;
+}
+
+void test('a point is left out or graded only when the page proves what is painted there', async () => {
+    const unverified = {
+        'cover made invisible by an ancestor': [
+            strip + '#ghost{opacity:0}#cover{background:white;z-index:5}',
+            '<div id="strip"></div>' +
+                plain +
+                '<div id="ghost"><div id="cover"></div></div>',
+        ],
+        'cover inside a filtered ancestor': [
+            strip +
+                '#ghost{position:absolute;left:0;top:0;width:375px;height:80px;filter:opacity(0)}#cover{background:white;z-index:5}',
+            '<div id="strip"></div>' +
+                plain +
+                '<div id="ghost"><div id="cover"></div></div>',
+        ],
+        'masked cover': [
+            strip +
+                '#cover{background:white;z-index:5;mask-image:linear-gradient(transparent,transparent)}',
+            '<div id="strip"></div>' + plain + '<div id="cover"></div>',
+        ],
+        'z-index kept inside a will-change ancestor': [
+            strip +
+                '#trap{will-change:transform}#cover{background:white;z-index:5}#target{position:relative;z-index:1}',
+            '<div id="trap"><div id="cover"></div></div>' + plain,
+        ],
+        'z-index kept inside a containing ancestor': [
+            strip +
+                '#trap{contain:layout}#cover{background:white;z-index:5}#target{position:relative;z-index:1}',
+            '<div id="trap"><div id="cover"></div></div>' + plain,
+        ],
+        'inert cover': [
+            strip + '#cover{background:white;z-index:5}',
+            '<div id="strip"></div>' + plain + '<div id="cover" inert></div>',
+        ],
+        'pseudo-element cover': [
+            strip +
+                '#host::after{content:"";position:absolute;left:0;width:375px;height:14px;top:62px;background:white;z-index:5}',
+            '<div id="strip"></div>' + plain + '<div id="host"></div>',
+        ],
+        'another box shadow over the point': [
+            strip +
+                '#cover{height:1px;top:20px;box-shadow:0 49px 0 5px white;z-index:5}',
+            '<div id="strip"></div>' + plain + '<div id="cover"></div>',
+        ],
+        'border painted over the point': [
+            strip + '#cover{height:0;border-top:14px solid white;z-index:5}',
+            '<div id="strip"></div>' + plain + '<div id="cover"></div>',
+        ],
+        'drawing painted over the point': [
+            strip + '#cover{z-index:5}',
+            '<div id="strip"></div>' +
+                plain +
+                '<svg id="cover" width="375" height="14"><rect width="375" height="14" fill="white"/></svg>',
+        ],
+    };
+    assert.deepEqual(await resolved(unverified), []);
+    // Clipped to its content box, the cover paints nothing there: the ring is graded on the strip behind it.
+    const clipped = await measureFocused(
+        control +
+            outside +
+            strip +
+            '#cover{height:0;padding-bottom:14px;background:white;background-clip:content-box;z-index:5}',
+        '<div id="strip"></div>' + plain + '<div id="cover"></div>',
+    );
+    assert.deepEqual(clipped.unverified, []);
+    assert.deepEqual(clipped.failures, [
+        '#target: Insufficient focus indicator contrast: 1.11',
+    ]);
+});
+
+void test('an outline drawn inside the box is graded against the content beneath it', async () => {
+    const result = await measureFocused(
+        control +
+            '#fill{height:30px;background:#111}#target:focus{outline:2px solid black;outline-offset:-4px}',
+        '<div tabindex="0" id="target"><div id="fill"></div></div>',
+    );
+    assert.deepEqual(result.unverified, []);
+    assert.deepEqual(result.failures, [
+        '#target: Insufficient focus indicator contrast: 1.11',
+    ]);
+});
+
+void test('a shadow ring is not graded where a following box or its own layers may hide it', async () => {
+    const ring = '#target:focus{box-shadow:0 0 0 8px black}';
+    const following = await measureFocused(
+        control +
+            ring +
+            '#after{height:20px;margin-top:-46px;background:white}',
+        plain + '<div id="after"></div>',
+    );
+    assert.deepEqual(following.unverified, [unsupportedFocus]);
+    for (const [name, css] of Object.entries({
+        'under an earlier shadow': 'box-shadow:0 0 0 8px white,0 0 0 6px black',
+        'under an inset earlier shadow':
+            'box-shadow:inset 0 0 0 8px white,inset 0 0 0 6px black',
+        'under the outline':
+            'outline:8px solid white;outline-offset:0;box-shadow:0 0 0 8px black',
+    })) {
+        const result = await measureFocused(
+            control + `#target:focus{${css}}`,
+            plain,
+        );
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(
+            result.failures,
+            ['#target: Insufficient focus indicator contrast: 1.00'],
+            name,
+        );
+    }
+    const blurred = await measureFocused(
+        control +
+            '#target:focus{box-shadow:0 0 1px 10px white,0 0 0 6px black}',
+        plain,
+    );
+    assert.deepEqual(blurred.unverified, [unsupportedFocus]);
+});
+
+void test('a control whose indicator cannot be located or may be clipped is never passed', async () => {
+    const wrapped = '<div id="wrap">' + plain + '</div>';
+    const cases = {
+        'masked ancestor': [
+            '#wrap{mask-image:linear-gradient(transparent,transparent)}',
+            wrapped,
+        ],
+        'clip-path ancestor': ['#wrap{clip-path:inset(40px)}', wrapped],
+        'paint containment': [
+            '#wrap{contain:paint;margin:40px;width:100px}#target{margin:0}',
+            wrapped,
+        ],
+        'rotated control': ['#target{rotate:20deg}', plain],
+        'control below its layer': [
+            '#target{position:relative;z-index:-1}.panel{background:white}',
+            plain,
+        ],
+        'absolute control past a clipping ancestor': [
+            '#wrap{width:10px;height:10px;overflow:hidden}#target{position:absolute;top:60px;left:60px;margin:0}',
+            wrapped,
+        ],
+        'side below the viewport': [
+            '#target{margin-top:540px}.panel{height:900px}',
+            plain,
+        ],
+    };
+    assert.deepEqual(await resolved(cases), []);
 });
