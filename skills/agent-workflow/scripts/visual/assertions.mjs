@@ -224,8 +224,9 @@ export function measureAssertions(assertions = []) {
     };
     const isPositioned = (style) => style.position !== 'static';
     // Where a branch below the common ancestor is painted: its z-level and whether anything in it is positioned.
-    // Null when the branch uses CSS whose painting order is not modelled here.
-    const layerOf = (branch) => {
+    // Null when the branch uses CSS whose painting order is not modelled here. Chrome versions differ on whether a
+    // size container keeps its descendants' z-index inside it, so the caller states which reading it asks for.
+    const layerOf = (branch, containersTrap) => {
         let positioned = false;
         for (const element of branch) {
             const style = getComputedStyle(element);
@@ -234,7 +235,6 @@ export function measureAssertions(assertions = []) {
                 style.order !== '0' ||
                 style.willChange !== 'auto' ||
                 style.contain !== 'none' ||
-                style.containerType !== 'normal' ||
                 style.backdropFilter !== 'none' ||
                 style.transformStyle !== 'flat'
             )
@@ -246,6 +246,7 @@ export function measureAssertions(assertions = []) {
                 return { positioned: true, level: Number(style.zIndex) };
             // These keep the z-index of everything inside them at level zero.
             if (
+                (containersTrap && style.containerType !== 'normal') ||
                 ['fixed', 'sticky'].includes(style.position) ||
                 !plainPaint(style) ||
                 style.isolation !== 'auto' ||
@@ -275,10 +276,16 @@ export function measureAssertions(assertions = []) {
     // Whether a painted box is `above` or `beneath` an indicator of the node, or null when CSS leaves it unproven.
     // `kind` is the indicator: an `outline`, or an `inset` or `outset` shadow.
     const stackedAt = (element, node, kind) => {
+        const [passing, trapping] = [false, true].map((containersTrap) =>
+            stackedWith(element, node, kind, containersTrap),
+        );
+        return passing === trapping ? passing : null;
+    };
+    const stackedWith = (element, node, kind, containersTrap) => {
         if (element.contains(node)) return 'beneath';
         if (node.contains(element)) {
             const path = pathUp(element, node);
-            const layer = layerOf(path);
+            const layer = layerOf(path, containersTrap);
             if (!layer || layer.level < 0) return null;
             // Content is painted over an inset shadow; an outline is painted over content that forms no layer.
             if (kind === 'inset') return 'above';
@@ -289,7 +296,7 @@ export function measureAssertions(assertions = []) {
         let common = element.parentElement;
         while (!common.contains(node)) common = common.parentElement;
         const [other, own] = [element, node].map((end) => {
-            const layer = layerOf(pathUp(end, common));
+            const layer = layerOf(pathUp(end, common), containersTrap);
             return (
                 layer && {
                     ...layer,
@@ -412,29 +419,52 @@ export function measureAssertions(assertions = []) {
                 : inner;
         return holds(painted, x, y) ? background : nothing;
     };
-    // Whether another element's box shadow reaches a point; hit testing never reports shadows.
-    const shadowedAt = (node, x, y) =>
-        [...document.querySelectorAll('*')].some((element) => {
-            if (element === node) return false;
+    // Tints of one colour add up. Different colours, in an unknown order, are kept as `mixed`: any mixture of them
+    // lies between black and white at their joint strength.
+    const joinTints = (added, tint) => {
+        if (!added[3]) return tint;
+        if (!tint[3]) return added;
+        const alpha = over(added, tint)[3];
+        const same = added.slice(0, 3).join() === tint.slice(0, 3).join();
+        return same && !added[4] && !tint[4]
+            ? [...tint.slice(0, 3), alpha]
+            : [0, 0, 0, alpha, 'mixed'];
+    };
+    // The strongest tint other boxes' shadows can add at a point, which hit testing never reports: transparent when
+    // none reaches it, null when it cannot be bounded.
+    const shadeAt = (node, x, y) => {
+        let shade = [0, 0, 0, 0];
+        for (const element of document.querySelectorAll('*')) {
+            if (element === node) continue;
             const style = getComputedStyle(element);
             if (style.boxShadow === 'none' || style.visibility !== 'visible')
-                return false;
+                continue;
             const box = element.getBoundingClientRect();
-            if (!box.width && !box.height) return false;
+            if (!box.width && !box.height) continue;
             const shadows = parseShadows(style.boxShadow);
-            if (!shadows) return holds(box, x, y);
-            return shadows.some((shadow) => {
+            if (!shadows) return null;
+            for (const shadow of shadows) {
                 const reach =
                     Math.max(Math.abs(shadow.x), Math.abs(shadow.y)) +
                     shadow.blur +
                     shadow.spread;
                 const around = (by) =>
                     shrink(box, { top: by, right: by, bottom: by, left: by });
-                return shadow.inset
+                const reaches = shadow.inset
                     ? holds(box, x, y) && !holds(around(reach), x, y)
                     : !holds(box, x, y) && holds(around(-reach), x, y);
-            });
-        });
+                if (!reaches) continue;
+                for (
+                    let current = element;
+                    current;
+                    current = current.parentElement
+                )
+                    if (!plainPaint(getComputedStyle(current))) return null;
+                shade = joinTints(shadow.color, shade);
+            }
+        }
+        return shade;
+    };
     // An inert subtree is painted but never hit, so nothing under it can be told apart from it.
     const inertAt = (x, y) =>
         [...document.querySelectorAll('[inert], [inert] *')].some((element) =>
@@ -455,10 +485,12 @@ export function measureAssertions(assertions = []) {
                 holds(element.getBoundingClientRect(), x, y)
             );
         });
-    // What is painted next to one point of an indicator: the adjacent colour, `unpainted` when the indicator is
-    // provably not painted there, or null when neither is proven.
+    // What is painted next to one point of an indicator: the adjacent colour and the tint shadows may add to it,
+    // `unpainted` when the indicator is provably not painted there, or null when neither is proven.
     const paintedAt = (node, x, y, kind) => {
-        if (inertAt(x, y) || shadowedAt(node, x, y)) return null;
+        if (inertAt(x, y)) return null;
+        const shade = shadeAt(node, x, y);
+        if (!shade) return null;
         const stack = document.elementsFromPoint(x, y);
         if (missedTablePaint(stack, x, y)) return null;
         let background = [0, 0, 0, 0];
@@ -471,7 +503,7 @@ export function measureAssertions(assertions = []) {
             if (stacked === 'above')
                 return painted[3] >= 1 && !background[3] ? 'unpainted' : null;
             background = over(background, painted);
-            if (background[3] >= 1) return background;
+            if (background[3] >= 1) return { colour: background, shade };
         }
         return null;
     };
@@ -572,8 +604,10 @@ export function measureAssertions(assertions = []) {
         }
         return found;
     };
-    // Whether a layer of the same control painted over this one hides it at its sample distance.
+    // What the control's own layers painted over a ring do at its sample distance: `hidden` by an opaque ring, a
+    // `tint` from translucent blurred or offset shadows, or null when neither is proven.
     const underOwnLayer = (found, ring) => {
+        let tint = [0, 0, 0, 0];
         for (const layer of found.layers.slice(0, found.layers.indexOf(ring))) {
             const [from, to] = layer.reach;
             // Within half a pixel of either edge the covering is partial; further out the layer does not reach.
@@ -581,11 +615,39 @@ export function measureAssertions(assertions = []) {
                 continue;
             const within =
                 ring.distance >= from + 0.5 && ring.distance <= to - 0.5;
-            return within && layer.solid && layer.color[3] >= 1
-                ? 'unpainted'
-                : null;
+            if (layer.solid)
+                return within && layer.color[3] >= 1 ? { hidden: true } : null;
+            if (!layer.color || layer.color[3] >= 1) return null;
+            tint = joinTints(layer.color, tint);
         }
-        return false;
+        return { tint };
+    };
+    // The lowest ratio a ring can show at a point: bare, or with a tint beneath it or over it and its surroundings.
+    // Null when a tint could bring one colour to the other, which hides the ring.
+    const lowestRatio = (ring, { colour, shade }) => {
+        const bare = over(ring, colour);
+        const values = [ratio(bare, colour)];
+        if (!shade[3]) return values[0];
+        const side = (first, second) =>
+            Math.sign(luminance(first) - luminance(second));
+        const extremes = shade[4]
+            ? [
+                  [0, 0, 0, shade[3]],
+                  [255, 255, 255, shade[3]],
+              ]
+            : [shade];
+        for (const tint of extremes) {
+            const tinted = over(tint, colour);
+            const beneath = over(ring, tinted);
+            const covered = over(tint, bare);
+            if (
+                side(beneath, tinted) !== side(bare, colour) ||
+                side(covered, tinted) * side(bare, colour) < 0
+            )
+                return null;
+            values.push(ratio(beneath, tinted), ratio(covered, tinted));
+        }
+        return Math.min(...values);
     };
     // WCAG 1.4.11: the strongest indicator of the focused element, at its weakest painted point.
     const measureFocusContrast = (node, rule, record, observed) => {
@@ -604,25 +666,25 @@ export function measureAssertions(assertions = []) {
             '*,*::before,*::after{pointer-events:auto!important}';
         document.head.append(hitTestAll);
         for (const ring of found.rings) {
-            const covered = underOwnLayer(found, ring);
+            const own = underOwnLayer(found, ring);
             const painted = indicatorPoints(node, ring.distance)
                 .map(([x, y]) => {
                     const under = sampleAt(node, x, y, ring.kind);
                     // A point already hidden by the page stays hidden whatever the control paints over it.
-                    return under === 'unpainted' || covered === false
-                        ? under
-                        : covered;
+                    if (under === 'unpainted' || own?.hidden)
+                        return 'unpainted';
+                    if (!own || !under) return null;
+                    return {
+                        colour: under.colour,
+                        shade: joinTints(own.tint, under.shade),
+                    };
                 })
                 .filter((under) => under !== 'unpainted');
-            if (painted.includes(null)) unresolved = true;
-            else if (painted.length)
-                ratios.push(
-                    Math.min(
-                        ...painted.map((under) =>
-                            ratio(over(ring.color, under), under),
-                        ),
-                    ),
-                );
+            const measured = painted.map(
+                (under) => under && lowestRatio(ring.color, under),
+            );
+            if (measured.includes(null)) unresolved = true;
+            else if (measured.length) ratios.push(Math.min(...measured));
         }
         hitTestAll.remove();
         const best = ratios.length ? Math.max(...ratios) : null;

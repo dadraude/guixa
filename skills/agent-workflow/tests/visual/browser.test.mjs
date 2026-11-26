@@ -682,11 +682,6 @@ void test('a point is left out or graded only when the page proves what is paint
                 '#host::after{content:"";position:absolute;left:0;width:375px;height:14px;top:62px;background:white;z-index:5}',
             '<div id="strip"></div>' + plain + '<div id="host"></div>',
         ],
-        'another box shadow over the point': [
-            strip +
-                '#cover{height:1px;top:20px;box-shadow:0 49px 0 5px white;z-index:5}',
-            '<div id="strip"></div>' + plain + '<div id="cover"></div>',
-        ],
         'border painted over the point': [
             strip + '#cover{height:0;border-top:14px solid white;z-index:5}',
             '<div id="strip"></div>' + plain + '<div id="cover"></div>',
@@ -828,9 +823,6 @@ void test('each way of painting that the rule does not model keeps the point unv
             '#cover{z-index:5}',
             '<img id="cover" alt="" width="375" height="14" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=">',
         ),
-        'inset shadow of another box over the point': over(
-            '#cover{box-shadow:inset 0 0 0 9px white;z-index:5}',
-        ),
         'pseudo-element cover that ignores the pointer': over(
             '#cover::after{content:"";position:absolute;inset:0;background:white;pointer-events:none}#cover{z-index:5}',
         ),
@@ -901,4 +893,75 @@ void test('what is proven to lie beneath a point is graded and nothing else coun
         assert.deepEqual(result.unverified, [], name);
         assert.deepEqual(result.failures, failures, name);
     }
+});
+
+void test('a shadow of another box lowers a ratio to its worst case and never raises it', async () => {
+    const ringed = (colour, shadow) =>
+        measureFocused(
+            control +
+                `#target:focus{outline:4px solid ${colour};outline-offset:2px}#caster{position:absolute;left:0;width:375px;height:1px;top:20px;box-shadow:${shadow}}`,
+            '<div tabindex="0" id="target"></div><div id="caster"></div>',
+        );
+    // A 10% tint over the top side of a black ring on white: still far above 3:1, and below the untinted 21:1.
+    const light = await ringed('black', '0 49px 0 5px rgb(0 0 0 / 0.1)');
+    assert.deepEqual(light.unverified, []);
+    assert.deepEqual(light.failures, []);
+    assert.ok(light.results[0].observed[0].focusContrast < 17);
+    // An opaque shadow of the page's colour can hide the ring altogether.
+    const hiding = await ringed('black', '0 49px 0 5px white');
+    assert.deepEqual(hiding.failures, [
+        '#target: Insufficient focus indicator contrast: 1.00',
+    ]);
+    // A grey ring between the bare and the tinted backdrop may vanish into it: no ratio can be told.
+    const crossing = await ringed('#777', '0 49px 0 5px rgb(0 0 0 / 0.9)');
+    assert.deepEqual(crossing.unverified, [unsupportedFocus]);
+    const inside = await measureFocused(
+        control +
+            '#target:focus{outline:4px solid black;outline-offset:2px}#caster{position:absolute;left:0;width:375px;height:14px;top:62px;box-shadow:inset 0 0 0 9px white}',
+        '<div tabindex="0" id="target"></div><div id="caster"></div>',
+    );
+    assert.deepEqual(inside.failures, [
+        '#target: Insufficient focus indicator contrast: 1.00',
+    ]);
+    // Tints of two colours are bounded by black and by white at their joint strength.
+    const mixed = await ringed(
+        'black',
+        '0 49px 0 5px rgb(0 0 0 / 0.1), 0 49px 0 5px rgb(255 0 0 / 0.1)',
+    );
+    assert.deepEqual(mixed.unverified, []);
+    assert.deepEqual(mixed.failures, []);
+    assert.ok(
+        mixed.results[0].observed[0].focusContrast <
+            light.results[0].observed[0].focusContrast,
+    );
+    // A grey ring that one of those extremes can bring to its backdrop's colour has no bound.
+    const unbounded = await ringed(
+        '#999',
+        '0 49px 0 5px rgb(0 0 0 / 0.6), 0 49px 0 5px rgb(255 0 0 / 0.6)',
+    );
+    assert.deepEqual(unbounded.unverified, [unsupportedFocus]);
+});
+
+void test('a soft shadow of the control over its own ring is bounded like any other tint', async () => {
+    // A toast: a faint drop shadow listed over a faint ring, beside an outline that shows the focus.
+    const toast = await measureFocused(
+        control +
+            '#target:focus{outline:2px solid black;outline-offset:2px;box-shadow:0 4px 12px rgb(0 0 0 / 0.1),0 0 0 2px rgb(0 0 0 / 0.2)}',
+        '<div tabindex="0" id="target"></div>',
+    );
+    assert.deepEqual(toast.unverified, []);
+    assert.deepEqual(toast.failures, []);
+    // Without the outline no ring passes, and the blurred shadow might be what shows the focus: unverified.
+    const faint = await measureFocused(
+        control +
+            '#target:focus{outline:none;box-shadow:0 4px 12px rgb(0 0 0 / 0.1),0 0 0 2px rgb(0 0 0 / 0.2)}',
+        '<div tabindex="0" id="target"></div>',
+    );
+    assert.deepEqual(faint.unverified, [unsupportedFocus]);
+    const opaque = await measureFocused(
+        control +
+            '#target:focus{outline:none;box-shadow:0 4px 12px black,0 0 0 2px black}',
+        '<div tabindex="0" id="target"></div>',
+    );
+    assert.deepEqual(opaque.unverified, [unsupportedFocus]);
 });
