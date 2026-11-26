@@ -1127,3 +1127,22 @@ void test("another box's inset shadow is measured from inside its border", async
         '#target: Insufficient focus indicator contrast: 1.00',
     ]);
 });
+
+void test('a box that ignores the pointer despite the runner keeps the point unverified', async () => {
+    const cover =
+        '#cover{position:absolute;left:0;top:0;width:375px;height:300px;background:#111;z-index:5}';
+    const inert = 'pointer-events:none!important';
+    const markup = plain + '<div id="cover"></div>';
+    const cases = {
+        'layered declaration': [cover + `@layer u{#cover{${inert}}}`, markup],
+        'inline declaration': [
+            cover,
+            plain + `<div id="cover" style="${inert}"></div>`,
+        ],
+        'layered pseudo-element declaration': [
+            `@layer u{#cover::after{content:"";position:absolute;left:0;top:0;width:375px;height:300px;background:#111;${inert}}}#cover{position:absolute;left:0;top:0;width:375px;height:1px;z-index:5}`,
+            markup,
+        ],
+    };
+    assert.deepEqual(await resolved(cases), []);
+});

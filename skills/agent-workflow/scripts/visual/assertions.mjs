@@ -475,6 +475,23 @@ export function measureAssertions(assertions = []) {
         [...document.querySelectorAll('[inert], [inert] *')].some((element) =>
             [...element.getClientRects()].some((box) => holds(box, x, y)),
         );
+    // A layered or inline `!important` beats the injected rule, so hit testing still misses what it covers. A
+    // pseudo-element's box is unknown, so one such pseudo-element counts anywhere.
+    const unhittableAt = (x, y) =>
+        [...document.querySelectorAll('*')].some(
+            (element) =>
+                ['::before', '::after'].some((pseudo) => {
+                    const style = getComputedStyle(element, pseudo);
+                    return (
+                        !['none', 'normal'].includes(style.content) &&
+                        style.pointerEvents === 'none'
+                    );
+                }) ||
+                (getComputedStyle(element).pointerEvents === 'none' &&
+                    [...element.getClientRects()].some((box) =>
+                        holds(box, x, y),
+                    )),
+        );
     // Hit testing leaves out the row, group and column boxes whose backgrounds show through a table's cells.
     const missedTablePaint = (stack, x, y) =>
         [
@@ -599,7 +616,8 @@ export function measureAssertions(assertions = []) {
     // What is painted next to one point of an indicator: the adjacent colour and the tint shadows may add to it,
     // `unpainted` when the indicator is provably not painted there, or null when neither is proven.
     const paintedAt = (node, x, y, kind) => {
-        if (inertAt(x, y) || strayPaintAt(node, x, y)) return null;
+        if (inertAt(x, y) || unhittableAt(x, y) || strayPaintAt(node, x, y))
+            return null;
         const shade = shadeAt(node, x, y);
         if (!shade) return null;
         const stack = document.elementsFromPoint(x, y);
