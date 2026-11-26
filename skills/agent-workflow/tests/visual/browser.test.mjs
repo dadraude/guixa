@@ -788,3 +788,117 @@ void test('a control whose indicator cannot be located or may be clipped is neve
     };
     assert.deepEqual(await resolved(cases), []);
 });
+
+void test('each way of painting that the rule does not model keeps the point unverified', async () => {
+    // A white cover of a higher layer over the top side, trapped or reordered by the CSS of its ancestor.
+    const trapped = (ancestor) => [
+        strip +
+            `#trap{${ancestor}}#cover{background:white;z-index:5}#target{position:relative;z-index:1}`,
+        '<div id="trap"><div id="cover"></div></div>' + plain,
+    ];
+    const over = (css, markup = '<div id="cover"></div>') => [
+        strip + css,
+        '<div id="strip"></div>' + plain + markup,
+    ];
+    const shown = (id) =>
+        `<script>document.querySelector('${id}').showPopover()</script>`;
+    const cases = {
+        'cover under a size container': trapped('container-type:inline-size'),
+        'cover under a backdrop filter': trapped('backdrop-filter:blur(1px)'),
+        'cover under a 3d context': trapped('transform-style:preserve-3d'),
+        'cover reordered in a flex row': [
+            strip +
+                '#trap{order:1}#cover{background:white;z-index:5}.panel{display:flex}',
+            '<div id="trap"><div id="cover"></div></div>' + plain,
+        ],
+        'cover in the top layer': over(
+            '#cover{margin:0;border:0;padding:0;inset:auto;top:62px;background:white}',
+            '<div id="cover" popover="manual"></div>' + shown('#cover'),
+        ),
+        'unparsed cover colour': over(
+            '#cover{background:lab(100 0 0);z-index:5}',
+        ),
+        'image background cover': over(
+            '#cover{background-image:linear-gradient(white,white);z-index:5}',
+        ),
+        'cover clipped to its text': over(
+            '#cover{background:white;background-clip:text;z-index:5}',
+        ),
+        'image over the point': over(
+            '#cover{z-index:5}',
+            '<img id="cover" alt="" width="375" height="14" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=">',
+        ),
+        'inset shadow of another box over the point': over(
+            '#cover{box-shadow:inset 0 0 0 9px white;z-index:5}',
+        ),
+        'pseudo-element cover that ignores the pointer': over(
+            '#cover::after{content:"";position:absolute;inset:0;background:white;pointer-events:none}#cover{z-index:5}',
+        ),
+        'translucent shadow of the control over its ring': [
+            '#target:focus{outline:none;box-shadow:0 0 0 8px rgb(255 255 255 / 0.5),0 0 0 6px black}',
+            plain,
+        ],
+        'ring at the edge of another layer of the control': [
+            '#target:focus{outline:none;box-shadow:0 0 0 3px white,0 0 0 6px black}',
+            plain,
+        ],
+        'pseudo-element of a box elsewhere that ignores the pointer': over(
+            '#host::after{content:"";position:absolute;left:0;top:62px;width:375px;height:14px;background:white;z-index:5;pointer-events:none}',
+            '<div id="host"></div>',
+        ),
+        'blurred layer of the control over a ring beside a good outline': [
+            '#target:focus{outline:4px solid black;outline-offset:14px;box-shadow:0 0 1px 10px white,0 0 0 6px black}',
+            plain,
+        ],
+        'table row group background that hit testing leaves out': [
+            'table{border-collapse:collapse}tbody{background:#111}td{padding:0}',
+            '<table><tbody><tr><td>' + plain + '</td></tr></tbody></table>',
+        ],
+        'outline over positioned content': [
+            '#target{position:relative}#fill{position:absolute;inset:-8px;background:white}',
+            '<div tabindex="0" id="target"><div id="fill"></div></div>',
+        ],
+        'inset ring over content below its layer': [
+            '#target{position:relative;z-index:0}#target:focus{outline:none;box-shadow:inset 0 0 0 8px black}#fill{position:absolute;z-index:-1;inset:0;background:white}',
+            '<div tabindex="0" id="target"><div id="fill"></div></div>',
+        ],
+        'skipped content ancestor': [
+            '#wrap{content-visibility:auto}',
+            '<div id="wrap">' + plain + '</div>',
+        ],
+        'legacy clip ancestor': [
+            '#wrap{position:absolute;clip:rect(0,300px,300px,0)}',
+            '<div id="wrap">' + plain + '</div>',
+        ],
+        'skewed control': ['#target{transform:skewX(10deg)}', plain],
+        'scaled control': ['#target{scale:1.2}', plain],
+        'control in the top layer': [
+            '#wrap{margin:0;border:0;background:white}',
+            '<div id="wrap" popover="manual">' +
+                plain +
+                '</div>' +
+                shown('#wrap'),
+        ],
+        'ring in a clip margin': [
+            '#wrap{overflow:clip;overflow-clip-margin:1px;margin:40px;width:100px}#target{margin:0}',
+            '<div id="wrap">' + plain + '</div>',
+        ],
+    };
+    assert.deepEqual(await resolved(cases), []);
+});
+
+void test('what is proven to lie beneath a point is graded and nothing else counts', async () => {
+    const graded = {
+        // The fixed box keeps its child's z-index, so the child stays beneath the higher control.
+        'z-index kept inside a fixed box': [
+            '#trap{position:fixed;left:0;top:62px;width:375px;height:14px}#cover{height:14px;background:#111;position:relative;z-index:5}#target{position:relative;z-index:1}',
+            '<div id="trap"><div id="cover"></div></div>' + plain,
+            ['#target: Insufficient focus indicator contrast: 1.11'],
+        ],
+    };
+    for (const [name, [css, markup, failures]] of Object.entries(graded)) {
+        const result = await measureFocused(control + outside + css, markup);
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(result.failures, failures, name);
+    }
+});

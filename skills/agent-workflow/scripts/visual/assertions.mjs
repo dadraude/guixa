@@ -209,7 +209,6 @@ export function measureAssertions(assertions = []) {
     const unlocatable = (element) => {
         const style = getComputedStyle(element);
         return (
-            !composited(style) ||
             !plainPaint(style) ||
             style.clip !== 'auto' ||
             /paint|strict|content/.test(style.contain) ||
@@ -376,7 +375,7 @@ export function measureAssertions(assertions = []) {
             element === document.documentElement || element === document.body;
         const boxes = [...element.getClientRects()];
         const box = boxes.find((rect) => holds(rect, x, y));
-        if (!box && !root) return nothing;
+        if (!box && !root) return null;
         const style = getComputedStyle(element);
         const background = edgeColor(style.backgroundColor);
         if (!background) return null;
@@ -441,12 +440,29 @@ export function measureAssertions(assertions = []) {
         [...document.querySelectorAll('[inert], [inert] *')].some((element) =>
             [...element.getClientRects()].some((box) => holds(box, x, y)),
         );
+    // Hit testing leaves out the row, group and column boxes whose backgrounds show through a table's cells.
+    const missedTablePaint = (stack, x, y) =>
+        [
+            ...document.querySelectorAll('tr,thead,tbody,tfoot,col,colgroup'),
+        ].some((element) => {
+            if (stack.includes(element)) return false;
+            const style = getComputedStyle(element);
+            const background = edgeColor(style.backgroundColor);
+            return (
+                (!background ||
+                    background[3] > 0 ||
+                    style.backgroundImage !== 'none') &&
+                holds(element.getBoundingClientRect(), x, y)
+            );
+        });
     // What is painted next to one point of an indicator: the adjacent colour, `unpainted` when the indicator is
     // provably not painted there, or null when neither is proven.
     const paintedAt = (node, x, y, kind) => {
         if (inertAt(x, y) || shadowedAt(node, x, y)) return null;
+        const stack = document.elementsFromPoint(x, y);
+        if (missedTablePaint(stack, x, y)) return null;
         let background = [0, 0, 0, 0];
-        for (const element of document.elementsFromPoint(x, y)) {
+        for (const element of stack) {
             const painted = paintOf(element, x, y);
             if (!painted) return null;
             if (!painted[3]) continue;
@@ -484,10 +500,10 @@ export function measureAssertions(assertions = []) {
         }
         return false;
     };
+    // A point outside the viewport hits nothing, so unless it is clipped away it stays unknown.
     const sampleAt = (node, x, y, kind) => {
         // Nothing before the document's origin can ever be scrolled into view.
         if (x + scrollX < 0 || y + scrollY < 0) return 'unpainted';
-        if (x < 0 || x >= innerWidth || y < 0 || y >= innerHeight) return null;
         const clipped = clippedAt(node, x, y);
         if (clipped !== false) return clipped ? 'unpainted' : null;
         return paintedAt(node, x, y, kind);
