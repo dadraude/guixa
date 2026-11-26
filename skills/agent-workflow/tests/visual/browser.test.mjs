@@ -1145,6 +1145,13 @@ void test('a box that ignores the pointer despite the runner keeps the point unv
         ],
     };
     assert.deepEqual(await resolved(cases), []);
+    // Away from every point, such a box changes nothing.
+    const away = await measureFocused(
+        control + outside + '#cover{height:20px;margin-top:200px}',
+        plain + `<div id="cover" style="${inert}"></div>`,
+    );
+    assert.deepEqual(away.unverified, []);
+    assert.deepEqual(away.failures, []);
 });
 
 void test('a point before the origin is left out only in a page that scrolls from there', async () => {
@@ -1174,7 +1181,7 @@ void test('overflow on a wrapper it does not apply to clips nothing', async () =
         ],
         [
             'inline box',
-            '#wrap{overflow:hidden}#target{display:inline-block;vertical-align:top}',
+            '#wrap{overflow:hidden}#target{display:inline-block;vertical-align:top;margin:80px}',
             '<span id="wrap">' + plain + '</span>',
         ],
     ]) {
@@ -1248,6 +1255,14 @@ void test('a layer beneath a ring counts only where it reaches past the outer ed
 });
 
 void test('a layer just outside an inward outline counts although it lies beneath none of it', async () => {
+    // An outer shadow lies beyond the border edge, nowhere next to an outline 18 px inside it.
+    const apart = await measureFocused(
+        control +
+            '#target:focus{outline:2px solid black;outline-offset:-20px;box-shadow:0 0 0 5px #111}',
+        plain,
+    );
+    assert.deepEqual(apart.unverified, []);
+    assert.deepEqual(apart.failures, []);
     // The layer lies only between the outer edge of the outline and the border edge.
     const result = await measureFocused(
         control +
