@@ -623,7 +623,7 @@ void test('positioned boxes and clipping hide indicator points on either side of
     }
 });
 
-// A 100 by 44 white control, 40 px into the panel, and a white outline 2 px outside it unless the case says otherwise.
+// A 100 by 44 white control, 40 px into the panel, and a 4 px black outline 2 px outside it.
 const control =
     '#target{display:block;margin:40px;width:100px;height:44px;border:0;padding:0;background:white}';
 const outside = '#target:focus{outline:4px solid black;outline-offset:2px}';
@@ -1112,4 +1112,18 @@ void test('paint that reaches a point from outside its box keeps the point unver
     );
     assert.deepEqual(away.unverified, []);
     assert.deepEqual(away.failures, []);
+});
+
+void test("another box's inset shadow is measured from inside its border", async () => {
+    // The shadow paints 4 to 10 px inside the box, behind its 4 px border; the top midpoint lies 7 px inside.
+    const result = await measureFocused(
+        control +
+            outside +
+            '#box{position:absolute;left:0;top:0;width:360px;height:200px;border:4px solid white;box-shadow:inset 0 0 0 6px #111;background:white}#target{position:absolute;left:40px;top:7px;margin:0}',
+        '<div id="box">' + plain + '</div>',
+    );
+    assert.deepEqual(result.unverified, []);
+    assert.deepEqual(result.failures, [
+        '#target: Insufficient focus indicator contrast: 1.00',
+    ]);
 });

@@ -448,11 +448,16 @@ export function measureAssertions(assertions = []) {
                     Math.max(Math.abs(shadow.x), Math.abs(shadow.y)) +
                     shadow.blur +
                     shadow.spread;
-                const around = (by) =>
-                    shrink(box, { top: by, right: by, bottom: by, left: by });
+                const shrunk = (from, by) =>
+                    shrink(from, { top: by, right: by, bottom: by, left: by });
+                // An inset shadow is painted from the padding edge inward.
+                const padding = shrink(
+                    box,
+                    edgeWidths(style, 'border-*-width'),
+                );
                 const reaches = shadow.inset
-                    ? holds(box, x, y) && !holds(around(reach), x, y)
-                    : !holds(box, x, y) && holds(around(-reach), x, y);
+                    ? holds(box, x, y) && !holds(shrunk(padding, reach), x, y)
+                    : !holds(box, x, y) && holds(shrunk(box, -reach), x, y);
                 if (!reaches) continue;
                 for (
                     let current = element;
