@@ -1164,3 +1164,25 @@ void test('a point before the origin is left out only in a page that scrolls fro
         );
     }
 });
+
+void test('overflow on a wrapper it does not apply to clips nothing', async () => {
+    for (const [name, wrapper, markup] of [
+        [
+            'display contents',
+            '#wrap{display:contents;overflow:hidden}',
+            '<div id="wrap">' + plain + '</div>',
+        ],
+        [
+            'inline box',
+            '#wrap{overflow:hidden}#target{display:inline-block;vertical-align:top}',
+            '<span id="wrap">' + plain + '</span>',
+        ],
+    ]) {
+        const result = await measureFocused(
+            control + outside + wrapper,
+            markup,
+        );
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(result.failures, [], name);
+    }
+});

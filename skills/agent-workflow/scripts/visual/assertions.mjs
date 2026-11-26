@@ -648,6 +648,8 @@ export function measureAssertions(assertions = []) {
                 getComputedStyle(child).position,
             );
             const style = getComputedStyle(current);
+            // Overflow does not apply to these boxes.
+            if (['contents', 'inline'].includes(style.display)) continue;
             const box = current.getBoundingClientRect();
             const outside =
                 (style.overflowX !== 'visible' &&
