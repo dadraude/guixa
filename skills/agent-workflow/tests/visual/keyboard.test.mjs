@@ -190,3 +190,62 @@ void test('tab order is read with every scroll container back at its start', asy
     assert.deepEqual(result.failures, []);
     assert.equal(result.stops.length, 14);
 });
+
+void test('a tab order walk with a missing, misspelled or empty option is rejected', async () => {
+    await render(page);
+    const regions = ['header', 'main'];
+    for (const [name, invalid] of Object.entries({
+        'misspelled target': { regions, minTarge: 44 },
+        'misspelled contrast': { regions, focusContrst: 3 },
+        'zero contrast': { regions, focusContrast: 0 },
+        'null contrast': { regions, focusContrast: null },
+        'zero target': { regions, minTarget: 0 },
+        'text target': { regions, minTarget: '44' },
+        'no regions': { minTarget: 44 },
+        'empty regions': { regions: [] },
+        'blank region': { regions: [''] },
+        'null options': null,
+        'false options': false,
+    })) {
+        const result = await walkTabOrder(browser, invalid);
+        assert.deepEqual(
+            result,
+            { stops: [], failures: ['Unsupported tab order options'] },
+            name,
+        );
+    }
+});
+
+void test('keyboard steps with an empty list or a malformed field are rejected', async () => {
+    await render(page);
+    for (const invalid of [[], null, false, { press: 'Tab' }])
+        assert.deepEqual(
+            await runSteps(browser, invalid),
+            { steps: [], failures: ['Unsupported keyboard steps'] },
+            JSON.stringify(invalid),
+        );
+    const layout = { root: 'body', panels: 'main' };
+    for (const [name, invalid] of Object.entries({
+        'numeric target': { tabTo: 5 },
+        'assertion object': { press: 'Tab', assertions: { selector: '#menu' } },
+        'misspelled layout key': {
+            press: 'Tab',
+            layout: { ...layout, contnet: 'button' },
+        },
+        'layout without root': { press: 'Tab', layout: { panels: 'main' } },
+        'layout without panels': { press: 'Tab', layout: { root: 'body' } },
+        'numeric layout content': {
+            press: 'Tab',
+            layout: { ...layout, content: 1 },
+        },
+        'null layout': { press: 'Tab', layout: null },
+        'null step': null,
+    })) {
+        const result = await runSteps(browser, [invalid]);
+        assert.deepEqual(
+            result.failures,
+            ['step 1: Unsupported keyboard step'],
+            name,
+        );
+    }
+});

@@ -353,7 +353,7 @@ async function runCase(browser, manifest, item, output, captureIds) {
         if (!focused.has(selector))
             failures.push(`Keyboard did not reach ${selector}`);
     const keyboard = {};
-    if (view.tabOrder) {
+    if (view.tabOrder !== undefined) {
         keyboard.tabOrder = await walkTabOrder(
             browser,
             view.tabOrder,
@@ -361,7 +361,7 @@ async function runCase(browser, manifest, item, output, captureIds) {
         );
         failures.push(...keyboard.tabOrder.failures);
     }
-    if (view.keys) {
+    if (view.keys !== undefined) {
         const operated = await runSteps(
             browser,
             view.keys,

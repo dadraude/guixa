@@ -256,3 +256,41 @@ void test('verification requires the declared tab order walk and every keyboard 
         );
     }
 });
+void test('a declared but empty tab order walk or step list still needs its evidence', () => {
+    for (const [name, checks, expected] of [
+        ['null walk', { tabOrder: null }, /tab order/],
+        ['false walk', { tabOrder: false }, /tab order/],
+        ['no steps', { keys: [] }, /keyboard steps/],
+        ['null steps', { keys: null }, /keyboard steps/],
+    ]) {
+        const declared = structuredClone(manifest);
+        declared.views[0].states[0] = {
+            id: 'populated',
+            query: {},
+            cases: [{ width: 375, mode: 'light', text: 100 }],
+            checks,
+        };
+        const [item] = expandMatrix(declared);
+        const report = {
+            ...candidate,
+            schemaVersion: 2,
+            captureIds: [],
+            cases: [
+                {
+                    id: item.id,
+                    status: 'passed',
+                    assertions: { results: [], failures: [], unverified: [] },
+                    failures: [],
+                    measurements: { viewport: 375, text: 100, mode: 'light' },
+                    focused: ['button'],
+                    interactions: [],
+                },
+            ],
+        };
+        assert.match(
+            checkCoverage(declared, report, candidate).join('\n'),
+            expected,
+            name,
+        );
+    }
+});

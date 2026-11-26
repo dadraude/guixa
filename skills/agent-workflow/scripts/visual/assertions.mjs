@@ -215,12 +215,89 @@ export function measureAssertions(assertions = []) {
         }
         return false;
     };
-    // What is painted under one point of an indicator, which for a positioned control is not its DOM ancestors.
+    // The CSS that gives an element its own stacking context.
+    const createsContext = (element) => {
+        const style = getComputedStyle(element);
+        const parent = element.parentElement;
+        const layered =
+            style.position !== 'static' ||
+            (parent && /flex|grid/.test(getComputedStyle(parent).display));
+        return (
+            (layered && style.zIndex !== 'auto') ||
+            ['fixed', 'sticky'].includes(style.position) ||
+            style.isolation === 'isolate' ||
+            /paint|layout|strict|content/.test(style.contain) ||
+            [
+                style.transform,
+                style.translate,
+                style.rotate,
+                style.scale,
+                style.perspective,
+                style.clipPath,
+            ].some((value) => value !== 'none')
+        );
+    };
+    const lineage = (element) => {
+        const path = [];
+        for (let current = element; current; current = current.parentElement)
+            path.unshift(current);
+        return path;
+    };
+    // Whether `element`, outside the node's own subtree and ancestors, is painted over the node's outline.
+    const paintsAbove = (element, node) => {
+        const paths = [lineage(element), lineage(node)];
+        let shared = 0;
+        for (let depth = 0; paths[0][depth] === paths[1][depth]; depth++)
+            if (createsContext(paths[0][depth])) shared = depth;
+        const [other, own] = paths.map((path) => {
+            const below = path.slice(shared + 1);
+            const context = below.find(createsContext);
+            if (context)
+                return {
+                    at: context,
+                    level: Number(getComputedStyle(context).zIndex) || 0,
+                };
+            const positioned = below.findLast(
+                (item) => getComputedStyle(item).position !== 'static',
+            );
+            return positioned
+                ? { at: positioned, level: 0 }
+                : { at: below.at(-1), level: -0.5 };
+        });
+        if (other.level !== own.level) return other.level > own.level;
+        // An outline is painted over in-flow content of its own layer; positioned boxes follow the tree order.
+        return (
+            other.level !== -0.5 &&
+            Boolean(
+                own.at.compareDocumentPosition(other.at) &
+                Node.DOCUMENT_POSITION_FOLLOWING,
+            )
+        );
+    };
+    // Content of the node covers an inset ring; outside the box only its positioned content covers an outline.
+    const contentCovers = (element, node, inward) => {
+        if (inward) return true;
+        for (let current = element; current !== node;) {
+            if (getComputedStyle(current).position !== 'static') return true;
+            current = current.parentElement;
+        }
+        return false;
+    };
+    // What is painted under one point of an indicator, which for a positioned control is not its DOM ancestors:
+    // the adjacent colour, `covered` when something paints over the point, or null when neither can be told.
     const paintedAt = (node, x, y, inward) => {
         let background = [0, 0, 0, 0];
         for (const element of document.elementsFromPoint(x, y)) {
-            if (node.contains(element) && !(inward && element === node))
-                continue;
+            const own = element === node;
+            if (own && !inward) continue;
+            const content = !own && node.contains(element);
+            const above =
+                !own &&
+                !element.contains(node) &&
+                (content
+                    ? contentCovers(element, node, inward)
+                    : paintsAbove(element, node));
+            if (content && !above) continue;
             const computed = getComputedStyle(element);
             const parsed = edgeColor(computed.backgroundColor);
             if (
@@ -229,6 +306,10 @@ export function measureAssertions(assertions = []) {
                 element.matches('img,video,canvas')
             )
                 return null;
+            if (above) {
+                if (parsed[3] === 0) continue;
+                return parsed[3] < 1 ? null : 'covered';
+            }
             background = over(background, parsed);
             if (background[3] >= 1) return background;
         }
@@ -250,7 +331,7 @@ export function measureAssertions(assertions = []) {
                 px < innerWidth &&
                 py >= 0 &&
                 py < innerHeight &&
-                (distance < 0 || !clippedAway(node, px, py)),
+                !clippedAway(node, px, py),
         );
     };
     // Outlines and solid rings; anything else that could draw the indicator is reported, never guessed.
@@ -312,14 +393,20 @@ export function measureAssertions(assertions = []) {
         hitTestAll.textContent = '*{pointer-events:auto!important}';
         document.head.append(hitTestAll);
         for (const ring of found.rings) {
-            const measured = indicatorPoints(node, ring.distance).map(
-                ([x, y]) => {
-                    const under = paintedAt(node, x, y, ring.distance < 0);
-                    return under && ratio(over(ring.color, under), under);
-                },
-            );
-            if (measured.includes(null)) unresolved = true;
-            else if (measured.length) ratios.push(Math.min(...measured));
+            const visible = indicatorPoints(node, ring.distance)
+                .map(([x, y]) => ({
+                    under: paintedAt(node, x, y, ring.distance < 0),
+                }))
+                .filter(({ under }) => under !== 'covered');
+            if (visible.some(({ under }) => !under)) unresolved = true;
+            else if (visible.length)
+                ratios.push(
+                    Math.min(
+                        ...visible.map(({ under }) =>
+                            ratio(over(ring.color, under), under),
+                        ),
+                    ),
+                );
         }
         hitTestAll.remove();
         const best = ratios.length ? Math.max(...ratios) : null;
@@ -379,7 +466,10 @@ export function measureAssertions(assertions = []) {
             Object.keys(rule).some((key) => !known.includes(key))
         )
             record.unverified.push('Unsupported assertion or missing selector');
-        else if (rule.filter !== undefined && !filters[rule.filter])
+        else if (
+            rule.filter !== undefined &&
+            !Object.hasOwn(filters, rule.filter)
+        )
             record.unverified.push('Unsupported element filter');
         else {
             let nodes = [];

@@ -12,6 +12,32 @@ const KEYS = {
     ArrowUp: { code: 'ArrowUp', keyCode: 38 },
 };
 const STEP_KEYS = ['press', 'tabTo', 'assertions', 'layout'];
+const LAYOUT_KEYS = ['root', 'panels', 'content'];
+const WALK_KEYS = ['regions', 'focusContrast', 'minTarget'];
+
+// Unsupported input is reported, never read as "nothing to check".
+const isRecord = (value) =>
+    value !== null && typeof value === 'object' && !Array.isArray(value);
+const onlyKeys = (value, keys) =>
+    isRecord(value) && Object.keys(value).every((key) => keys.includes(key));
+const isSelector = (value) => typeof value === 'string' && value.trim() !== '';
+const optional = (record, key, valid) =>
+    !Object.hasOwn(record, key) || valid(record[key]);
+const isMinimum = (value) => Number.isFinite(value) && value >= 1;
+
+const validWalk = (options) =>
+    onlyKeys(options, WALK_KEYS) &&
+    Array.isArray(options.regions) &&
+    options.regions.length > 0 &&
+    options.regions.every(isSelector) &&
+    optional(options, 'focusContrast', isMinimum) &&
+    optional(options, 'minTarget', isMinimum);
+
+const validLayout = (layout) =>
+    onlyKeys(layout, LAYOUT_KEYS) &&
+    isSelector(layout.root) &&
+    isSelector(layout.panels) &&
+    optional(layout, 'content', isSelector);
 
 const inBrowser = (browser, fn, ...args) =>
     browser.evaluate(
@@ -147,6 +173,8 @@ function orderFailures(stops, regions, names) {
 }
 
 export async function walkTabOrder(browser, options, maxTabs = 100) {
+    if (!validWalk(options))
+        return { stops: [], failures: ['Unsupported tab order options'] };
     const { regions, focusContrast, minTarget } = options;
     await inBrowser(browser, restart);
     await settle(browser);
@@ -219,15 +247,17 @@ async function tabTo(browser, selector, maxTabs) {
     return false;
 }
 
-function validStep(step) {
-    return (
-        Object.keys(step).every((key) => STEP_KEYS.includes(key)) &&
-        (step.press === undefined) !== (step.tabTo === undefined) &&
-        (step.press === undefined || Object.hasOwn(KEYS, step.press))
-    );
-}
+const validStep = (step) =>
+    onlyKeys(step, STEP_KEYS) &&
+    Object.hasOwn(step, 'press') !== Object.hasOwn(step, 'tabTo') &&
+    optional(step, 'press', (key) => Object.hasOwn(KEYS, key)) &&
+    optional(step, 'tabTo', isSelector) &&
+    optional(step, 'assertions', Array.isArray) &&
+    optional(step, 'layout', validLayout);
 
 export async function runSteps(browser, steps, maxTabs = 100) {
+    if (!Array.isArray(steps) || !steps.length)
+        return { steps: [], failures: ['Unsupported keyboard steps'] };
     const records = [],
         failures = [];
     for (const [index, step] of steps.entries()) {

@@ -57,11 +57,12 @@ appearance, text enlargement and motion preference.
 - Optional `tabOrder` walks the whole page with real Tab presses: `regions` lists selectors in reading order, and every
   visible tabbable control must be reached, show a focus indicator, sit in a region and keep row-then-column reading
   order inside it; the regions themselves must be laid out in the declared order. `focusContrast` and `minTarget` apply
-  to every stop.
+  to every stop. `regions` is required; unknown keys, empty selectors and minimums below 1 fail the case.
 - Optional `keys` operates a page or overlay with real keys, after the assertions: each step is `tabTo` (a selector to
   reach by Tab) or `press` (`Tab`, `ShiftTab`, `Enter`, `Escape`, `Space`, `ArrowDown`, `ArrowUp`), with optional
-  `assertions` and a `layout` (`root`, `panels`, `content`) measured after it. Use it to open an overlay, follow its
-  order and require focus back on its opener.
+  `assertions` and a `layout` (`root` and `panels`, optional `content`) measured after it. Use it to open an overlay,
+  follow its order and require focus back on its opener. An empty list, an unknown key or a malformed value fails the
+  case.
 - Optional `assertions` is an array of rules, each with a CSS `selector` and one or more expectations:
   `count` (including zero), `text` (exact trimmed text), `attributes` (exact values; null means absent),
   `styles` (CSS property/value pairs), `fontSizeRem`, `gapRem` (both axes; distinct gaps use `rowGapRem`/`columnGapRem`), `minWidth`/`minHeight` (CSS pixels), or
@@ -70,8 +71,13 @@ appearance, text enlargement and motion preference.
   `borderContrast` (minimum ratio, 3 for WCAG 1.4.11) measures each border side of a field, or the sides listed in
   `borderSides` for a divider, against the colour behind the element; a listed side without a visible border fails.
   `focusContrast` (minimum ratio) requires the matched element to hold focus and measures its solid outlines and
-  zero-blur shadow rings against what is painted next to them; the strongest indicator counts, at its weakest point.
-  `fillContrast` (minimum ratio) does the same for a divider drawn as a thin filled element.
+  zero-blur shadow rings against what is painted next to them; the strongest indicator counts, at its weakest
+  visible point. Each ring is sampled at the middle of its four sides; a point outside the viewport, clipped by an
+  ancestor or covered by something painted over it is not visible and is left out, and a ring with no visible point
+  does not count.
+  `fillContrast` (minimum ratio) compares the matched element's own background fill, such as a divider drawn as a thin
+  element or a highlighted option, with the colour behind its parent. It needs no focus and measures no outline or
+  shadow; a transparent fill fails.
   `filter` narrows the matched nodes to the `visible` ones, or to the `text` ones (visible, enabled elements that render
   their own text), so one rule covers every width.
 
@@ -95,10 +101,12 @@ For example:
 
 Contrast handles solid RGB/RGBA foregrounds and ancestor backgrounds, including alpha composition.
 Images, gradients, opacity, filters, blending or an unknown background are explicitly unverified.
-Border and focus indicator contrast follow the same rule and read RGB/RGBA, `color(srgb …)` and `oklab()` colours.
-Border images, styles other than solid, browser-default (`auto`) outlines, other colour formats and, when no ring
-passes, offset or blurred shadows are unverified, never passed. A focus indicator drawn only by a background or border
-colour change is not measured.
+Border, fill and focus indicator contrast follow the same rule and read RGB/RGBA, `color(srgb …)` and `oklab()`
+colours. For `borderContrast`, border images and styles other than solid are unverified. For `fillContrast`, an unparsed
+colour, a background image, opacity, a filter, blending, an unknown colour behind the element or a hidden element is
+unverified. For `focusContrast`, browser-default (`auto`) and non-solid outlines, a point under a translucent cover or
+an image and, when no ring passes, offset or blurred shadows are unverified. None of these passes. A focus indicator
+drawn only by a background or border colour change is not measured by `focusContrast`.
 Unsupported assertions/properties also remain unverified and block the gate. Resolve them with a
 focused check or the justified preview path; do not remove the requirement or claim a full
 accessibility audit. Cover relevant DOM state and interaction semantics alongside geometry.

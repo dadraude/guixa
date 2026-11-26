@@ -123,6 +123,7 @@ export function expandMatrix(manifest) {
 const completedWalk = (walk) =>
     walk?.stops?.length > 0 && walk.failures?.length === 0;
 const completedSteps = (records, steps) =>
+    steps?.length > 0 &&
     records?.length === steps.length &&
     records.every(
         (record, index) =>
@@ -187,10 +188,13 @@ export function checkCoverage(manifest, report, candidate) {
                 );
             if (!Array.isArray(record.failures) || record.failures.length)
                 errors.push('Failed measurements: ' + item.id);
-            if (item.view.tabOrder && !completedWalk(record.tabOrder))
+            if (
+                item.view.tabOrder !== undefined &&
+                !completedWalk(record.tabOrder)
+            )
                 errors.push('Missing or failed tab order walk: ' + item.id);
             if (
-                item.view.keys &&
+                item.view.keys !== undefined &&
                 !completedSteps(record.interactions, item.view.keys)
             )
                 errors.push('Missing or failed keyboard steps: ' + item.id);
