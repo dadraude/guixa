@@ -28,7 +28,7 @@ const token = (name: string) => {
 };
 
 // The colours an element actually paints.
-const paintedColours = (element: Element) => {
+export const paintedColours = (element: Element) => {
     const style = getComputedStyle(element);
     const colours = [style.color, style.backgroundColor];
     for (const side of ['top', 'right', 'bottom', 'left'])
@@ -37,18 +37,73 @@ const paintedColours = (element: Element) => {
     if (style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0)
         colours.push(style.outlineColor);
     if (element instanceof SVGElement) colours.push(style.fill, style.stroke);
+    colours.push(
+        ...(style.boxShadow.match(/(?:rgba?|color|oklab)\([^)]*\)/g) ?? []),
+    );
     return colours;
 };
 
+// The oklab() form opacity utilities compute to, back in 8-bit sRGB.
+const fromOklab = ([lightness, a, b]: number[]) => {
+    const [l, m, s] = [
+        lightness + 0.3963377774 * a + 0.2158037573 * b,
+        lightness - 0.1055613458 * a - 0.0638541728 * b,
+        lightness - 0.0894841775 * a - 1.291485548 * b,
+    ].map((value) => value ** 3);
+    return [
+        4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+        -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+        -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+    ].map((value) => {
+        const linear = Math.min(1, Math.max(0, value));
+        return (
+            255 *
+            (linear <= 0.0031308
+                ? linear * 12.92
+                : 1.055 * linear ** (1 / 2.4) - 0.055)
+        );
+    });
+};
+
+// Channels and alpha of the computed colour forms: rgb(), color(srgb) from color-mix() and oklab().
+const channels = (colour: string) => {
+    const match = colour.match(/^(rgba?\(|color\(srgb |oklab\()([^)]*)\)$/);
+    if (!match) return null;
+    const [first, second, third, alpha = 1] = match[2]
+        .split(/[\s,/]+/)
+        .filter(Boolean)
+        .map(Number);
+    const values = [first, second, third];
+    if (match[1] === 'oklab(') return { rgb: fromOklab(values), alpha };
+    return {
+        rgb: match[1].startsWith('color')
+            ? values.map((value) => value * 255)
+            : values,
+        alpha,
+    };
+};
+
+// Whether a painted colour is the token's colour, at any opacity above none.
+export const paintsToken = (colour: string, value: string) => {
+    const painted = channels(colour);
+    const wanted = channels(value);
+    return (
+        !!painted &&
+        !!wanted &&
+        painted.alpha > 0 &&
+        painted.rgb.every(
+            (channel, index) => Math.abs(channel - wanted.rgb[index]) <= 1,
+        )
+    );
+};
+
 const ochreUses = () => {
-    const ochre = token('--welcome-ochre').replace(/\)$/, '');
+    const ochre = token('--welcome-ochre');
     return [...document.body.querySelectorAll('*')]
         .filter(shown)
         .filter((element) =>
-            paintedColours(element).some(
-                (colour) =>
-                    colour.replace(/^rgba/, 'rgb').startsWith(`${ochre})`) ||
-                    colour.replace(/^rgba/, 'rgb').startsWith(`${ochre},`),
+            paintedColours(element).some((colour) =>
+                paintsToken(colour, ochre),
             ),
         ).length;
 };
@@ -74,7 +129,11 @@ const overlayUses = (name: string) => {
         ),
     ]
         .filter(shown)
-        .filter((element) => paintedColours(element).includes(value)).length;
+        .filter((element) =>
+            paintedColours(element).some((colour) =>
+                paintsToken(colour, value),
+            ),
+        ).length;
 };
 
 // Whether the open tooltip and its visible text lie inside the viewport and the tooltip box. The runner's layout check

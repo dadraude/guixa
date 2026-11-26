@@ -1929,6 +1929,19 @@
                                 }
                             },
                             {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 13,05 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/manage/households/household-1\"]",
+                                "count": 0
+                            },
+                            {
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
@@ -2074,6 +2087,19 @@
                                 "attributes": {
                                     "data-ev-error": null
                                 }
+                            },
+                            {
+                                "selector": "#main-content header > p",
+                                "count": 1,
+                                "text": "Saldo: 13,05 €",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/manage/households/household-1\"]",
+                                "count": 0
                             },
                             {
                                 "selector": "body",
