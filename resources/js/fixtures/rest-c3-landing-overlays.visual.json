@@ -1744,6 +1744,195 @@
             ]
         },
         {
+            "id": "mobile-sheet-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "expanded",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cistelles",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Estoc",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Recepcions",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] :is(a,button) svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
             "id": "tooltips",
             "path": "/resources/js/fixtures/rest-c3-landing.html",
             "query": {
@@ -2227,6 +2416,270 @@
                                         "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
                                         "count": 1,
                                         "text": "Administració"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "tooltips-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "default",
+                        "sidebar": "collapsed"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "default",
+                        "sidebar": "collapsed"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia"
                                     }
                                 ]
                             }

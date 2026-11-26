@@ -7766,6 +7766,176 @@
             ]
         },
         {
+            "id": "shell-expanded-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content p,#main-content small,#main-content label,#main-content input:not([type=\"hidden\"]),#main-content a,#main-content button,#main-content td,#main-content dt,#main-content dd,#main-content li,#main-content span:not(.pilot-cell-label),#main-content [data-slot=\"badge\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Populated states walk every control with tabOrder; the other states measure computed styles and layout.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "default",
+                        "sections": "open"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0",
+                                    "data-ev-danger-text": "0/0",
+                                    "data-ev-notice-role": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content, #main-content *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": ".material-skip-link, [data-test=\"material-app-bar\"] *, [data-sidebar=\"sidebar\"] *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": "[data-test=\"material-app-bar\"] :is(a,button) svg, .material-app-brand svg, [data-sidebar=\"sidebar\"] :is(a,button) svg",
+                                "contrast": 3,
+                                "filter": "visible"
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"] [data-test=\"section-link\"]",
+                                "count": 3,
+                                "filter": "visible"
+                            }
+                        ],
+                        "tabOrder": {
+                            "regions": [
+                                ".material-skip-link",
+                                "[data-sidebar=\"sidebar\"]",
+                                "[data-test=\"material-app-bar\"]",
+                                ".reference-mobile-trail",
+                                ".pilot-wallet-form-grid > section:nth-child(1)",
+                                ".pilot-wallet-form-grid > section:nth-child(2)",
+                                ".pilot-wallet-movements",
+                                "#main-content .pilot-back-link"
+                            ],
+                            "focusContrast": 3,
+                            "minTarget": 44
+                        },
+                        "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content p,#main-content small,#main-content label,#main-content input:not([type=\"hidden\"]),#main-content a,#main-content button,#main-content td,#main-content dt,#main-content dd,#main-content li,#main-content span:not(.pilot-cell-label),#main-content [data-slot=\"badge\"],[data-test=\"material-app-bar\"] a,[data-test=\"material-app-bar\"] [data-test=\"appearance-trigger\"],[data-test=\"material-app-bar\"] [data-test=\"sidebar-menu-button\"]"
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "default",
+                        "sections": "open"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0",
+                                    "data-ev-danger-text": "0/0",
+                                    "data-ev-notice-role": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content, #main-content *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": ".material-skip-link, [data-test=\"material-app-bar\"] *, [data-sidebar=\"sidebar\"] *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": "[data-test=\"material-app-bar\"] :is(a,button) svg, .material-app-brand svg, [data-sidebar=\"sidebar\"] :is(a,button) svg",
+                                "contrast": 3,
+                                "filter": "visible"
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"] [data-test=\"section-link\"]",
+                                "count": 3,
+                                "filter": "visible"
+                            }
+                        ],
+                        "tabOrder": {
+                            "regions": [
+                                ".material-skip-link",
+                                "[data-sidebar=\"sidebar\"]",
+                                "[data-test=\"material-app-bar\"]",
+                                ".reference-mobile-trail",
+                                ".pilot-wallet-form-grid > section:nth-child(1)",
+                                ".pilot-wallet-form-grid > section:nth-child(2)",
+                                ".pilot-wallet-movements",
+                                "#main-content .pilot-back-link"
+                            ],
+                            "focusContrast": 3,
+                            "minTarget": 44
+                        },
+                        "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content p,#main-content small,#main-content label,#main-content input:not([type=\"hidden\"]),#main-content a,#main-content button,#main-content td,#main-content dt,#main-content dd,#main-content li,#main-content span:not(.pilot-cell-label),#main-content [data-slot=\"badge\"],[data-test=\"material-app-bar\"] a,[data-test=\"material-app-bar\"] [data-test=\"appearance-trigger\"],[data-test=\"material-app-bar\"] [data-test=\"sidebar-menu-button\"]"
+                    }
+                }
+            ]
+        },
+        {
             "id": "colour-tokens",
             "path": "/resources/js/fixtures/rest-c3-landing.html",
             "query": {
