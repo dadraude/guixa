@@ -1,11 +1,12 @@
 """Regression tests for Vite+ synchronization and privileged workflow boundaries."""
 
+import io
 import json
 from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch
 
-from sync_vite_plus import FILES, repair, resolve_lockfile, synchronize
+from sync_vite_plus import FILES, core_version, repair, resolve_lockfile, synchronize
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,32 +25,54 @@ def fixture(version="1.4.0", core="1.3.0"):
     return json.dumps(package, indent=4) + "\n", workspace
 
 
+def core_of(version):
+    # Vite+ numbers its core independently, so the double must not echo the version.
+    return {"1.4.0": "8.1.0"}[version]
+
+
+class CoreVersionTest(unittest.TestCase):
+    def registry(self, alias):
+        body = io.BytesIO(json.dumps({"dependencies": {"vite": alias}}).encode())
+        return patch("sync_vite_plus.urlopen", return_value=body)
+
+    def test_reads_the_core_that_vite_plus_depends_on(self):
+        with self.registry("npm:@voidzero-dev/vite-plus-core@8.3.8000") as fetch:
+            self.assertEqual(core_version("1.7.0"), "8.3.8000")
+        self.assertEqual(fetch.call_args.args, ("https://registry.npmjs.org/vite-plus/1.7.0",))
+
+    def test_rejects_any_other_dependency_shape(self):
+        for alias in ("npm:other-core@8.3.8000", "npm:@voidzero-dev/vite-plus-core@^8.0.0",
+                      "npm:@voidzero-dev/vite-plus-core@8.3.8000\n  extra: true"):
+            with self.registry(alias), self.assertRaisesRegex(ValueError, "core"):
+                core_version("1.7.0")
+
+
 class SyncTest(unittest.TestCase):
     def test_updates_both_aliases_and_preserves_other_settings(self):
         package, workspace = fixture()
-        updated, catalog, version = synchronize(package, workspace)
-        self.assertEqual(version, "1.4.0")
+        updated, catalog, version, core = synchronize(package, workspace, core_of)
+        self.assertEqual((version, core), ("1.4.0", "8.1.0"))
         expected = json.loads(package)
-        expected["devDependencies"]["vite"] = "npm:@voidzero-dev/vite-plus-core@1.4.0"
+        expected["devDependencies"]["vite"] = "npm:@voidzero-dev/vite-plus-core@8.1.0"
         self.assertEqual(json.loads(updated), expected)
-        self.assertEqual(catalog, workspace.replace("core@1.3.0", "core@1.4.0"))
-        self.assertEqual(synchronize(updated, catalog), (updated, catalog, version))
+        self.assertEqual(catalog, workspace.replace("core@1.3.0", "core@8.1.0"))
+        self.assertEqual(synchronize(updated, catalog, core_of), (updated, catalog, version, core))
 
     def test_repairs_catalog_even_when_package_is_aligned(self):
-        package, _ = fixture(core="1.4.0")
+        package, _ = fixture(core="8.1.0")
         _, workspace = fixture()
-        updated, catalog, _ = synchronize(package, workspace)
+        updated, catalog, _, _ = synchronize(package, workspace, core_of)
         self.assertEqual(updated, package)
-        self.assertIn("core@1.4.0", catalog)
+        self.assertIn("core@8.1.0", catalog)
 
     def test_rejects_unexpected_versions_or_catalog_layout(self):
         for version in ("latest", "^1.4.0", "file:../untrusted"):
             package, workspace = fixture(version=version)
             with self.assertRaises(ValueError):
-                synchronize(package, workspace)
+                synchronize(package, workspace, core_of)
         package, workspace = fixture()
         with self.assertRaises(ValueError):
-            synchronize(package, workspace.replace("    vite:", "    renamed:"))
+            synchronize(package, workspace.replace("    vite:", "    renamed:"), core_of)
 
 
 class LockfileTest(unittest.TestCase):
@@ -67,10 +90,13 @@ class LockfileTest(unittest.TestCase):
             self.assertNotIn("pnpm", clean)
             self.assertEqual(clean["packageManager"], PACKAGE["packageManager"])
             self.assertEqual(clean["dependencies"], data["dependencies"])
+            # A lockfile resolved without the repository's settings fails a frozen install.
+            _, expected = fixture(core="8.1.0")
+            self.assertEqual((cwd / "pnpm-workspace.yaml").read_text(), expected)
             (cwd / "pnpm-lock.yaml").write_text("resolved")
         with patch.dict("os.environ", {"GH_TOKEN": "secret"}):
             with patch("sync_vite_plus.subprocess.run", side_effect=install):
-                self.assertEqual(resolve_lockfile(json.dumps(data), "old", "1.4.0"), "resolved")
+                self.assertEqual(resolve_lockfile(json.dumps(data), "old", "1.4.0", "8.1.0"), "resolved")
 
     def test_non_registry_dependencies_fail_before_pnpm_runs(self):
         package, _ = fixture()
@@ -78,7 +104,7 @@ class LockfileTest(unittest.TestCase):
         data["dependencies"]["malicious"] = "git+https://example.com/code"
         with patch("sync_vite_plus.subprocess.run") as install:
             with self.assertRaisesRegex(ValueError, "registry"):
-                resolve_lockfile(json.dumps(data), "old", "1.4.0")
+                resolve_lockfile(json.dumps(data), "old", "1.4.0", "8.1.0")
             install.assert_not_called()
 
 
@@ -117,7 +143,7 @@ class RepairTest(unittest.TestCase):
         return None
 
     def test_atomic_commit_fast_forward_and_explicit_ci_dispatch(self):
-        self.assertEqual(repair(self.github, self.run, self.resolve), "fixed")
+        self.assertEqual(repair(self.github, self.run, self.resolve, core_of), "fixed")
         self.resolve.assert_called_once()
         calls = self.github.api.call_args_list
         self.assertEqual(calls[-2].args, ("git/refs/heads/dependabot/npm-group", {"sha": "fixed", "force": False}))
@@ -128,25 +154,25 @@ class RepairTest(unittest.TestCase):
         for field, value in (("event", "workflow_dispatch"),
                              ("head_repository", {"full_name": "fork/repo"})):
             run = dict(self.run, **{field: value})
-            self.assertIsNone(repair(self.github, run, self.resolve))
+            self.assertIsNone(repair(self.github, run, self.resolve, core_of))
         self.github.api.assert_not_called()
 
     def test_skips_human_prs_stale_runs_and_changed_code(self):
         self.pr["user"]["login"] = "human"
-        self.assertIsNone(repair(self.github, self.run, self.resolve))
+        self.assertIsNone(repair(self.github, self.run, self.resolve, core_of))
         self.pr["user"]["login"] = "dependabot[bot]"
         self.pr["head"]["sha"] = "newer"
-        self.assertIsNone(repair(self.github, self.run, self.resolve))
+        self.assertIsNone(repair(self.github, self.run, self.resolve, core_of))
         self.pr["head"]["sha"] = "head"
         self.changed.append({"filename": ".pnpmfile.cjs", "status": "added"})
-        self.assertIsNone(repair(self.github, self.run, self.resolve))
+        self.assertIsNone(repair(self.github, self.run, self.resolve, core_of))
         self.resolve.assert_not_called()
         self.github.read.assert_not_called()
 
     def test_no_commit_or_install_when_already_aligned(self):
-        package, workspace = fixture(core="1.4.0")
+        package, workspace = fixture(core="8.1.0")
         self.github.read.side_effect = [package, workspace, "lock"]
-        self.assertIsNone(repair(self.github, self.run, self.resolve))
+        self.assertIsNone(repair(self.github, self.run, self.resolve, core_of))
         self.resolve.assert_not_called()
         self.assertFalse(any(call.args[0] == "git/trees" for call in self.github.api.call_args_list))
 
@@ -158,7 +184,7 @@ class RepairTest(unittest.TestCase):
             return original(path, data, method)
         self.github.api.side_effect = fail_push
         with self.assertRaisesRegex(RuntimeError, "Concurrent update"):
-            repair(self.github, self.run, self.resolve)
+            repair(self.github, self.run, self.resolve, core_of)
         self.assertFalse(any("dispatches" in call.args[0] for call in self.github.api.call_args_list))
 
 
