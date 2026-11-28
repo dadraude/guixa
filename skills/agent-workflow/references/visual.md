@@ -54,11 +54,31 @@ appearance, text enlargement and motion preference.
 - `focus` lists controls to reach with real Tab presses, including below the viewport. An empty list
   needs `noFocusReason`. Verify arrow-key menus with their actual interaction model in a focused probe.
 - State `checks` can override view selectors/assertions for its owning state.
+- Optional `tabOrder` walks the whole page with real Tab presses: `regions` lists selectors in reading order, and every
+  visible tabbable control must be reached, show a focus indicator, sit in a region and keep row-then-column reading
+  order inside it; the regions themselves must be laid out in the declared order. Order is judged with the page and
+  every scroll container back at its start. `focusContrast` and `minTarget` apply to every stop. `regions` is required;
+  unknown keys, empty selectors and minimums below 1 fail the case.
+- Optional `keys` operates a page or overlay with real keys, after the assertions: each step is `tabTo` (a selector to
+  reach by Tab) or `press` (`Tab`, `ShiftTab`, `Enter`, `Escape`, `Space`, `ArrowDown`, `ArrowUp`), with optional
+  `assertions` and a `layout` (`root` and `panels`, optional `content`) measured after it. Use it to open an overlay,
+  follow its order and require focus back on its opener. An empty list, an unknown key or a malformed value fails the
+  case.
 - Optional `assertions` is an array of rules, each with a CSS `selector` and one or more expectations:
   `count` (including zero), `text` (exact trimmed text), `attributes` (exact values; null means absent),
   `styles` (CSS property/value pairs), `fontSizeRem`, `gapRem` (both axes; distinct gaps use `rowGapRem`/`columnGapRem`), `minWidth`/`minHeight` (CSS pixels), or
   `contrast` (minimum ratio). All matching nodes must satisfy the expectations. Rem expectations
   scale with enlarged text. Use selectors covering every instance of a repeated acceptance pattern.
+  `borderContrast` (minimum ratio, 3 for WCAG 1.4.11) measures each border side of a field, or the sides listed in
+  `borderSides` for a divider, against the colour behind the element (painted by its parent and ancestors); a listed
+  side without a visible border fails.
+  `focusContrast` (minimum ratio) requires the matched element to hold focus; see
+  [focus indicator contrast](#focus-indicator-contrast).
+  `fillContrast` (minimum ratio) compares the matched element's own background fill, such as a divider drawn as a thin
+  element or a highlighted option, with the colour behind the element (painted by its parent and ancestors). It needs
+  no focus and measures no outline or shadow; a transparent fill fails.
+  `filter` narrows the matched nodes to the `visible` ones, or to the `text` ones (visible, enabled elements that render
+  their own text), so one rule covers every width.
 
 For example:
 
@@ -78,11 +98,90 @@ For example:
 }
 ```
 
-Contrast handles solid RGB/RGBA foregrounds and ancestor backgrounds, including alpha composition.
-Images, gradients, opacity, filters, blending or an unknown background are explicitly unverified.
+`contrast` handles solid RGB/RGBA foregrounds and ancestor backgrounds, including alpha composition. Any other colour
+format, images, gradients, opacity, filters, blending, an unknown background or a hidden element are explicitly
+unverified.
+
+`borderContrast`, `fillContrast` and `focusContrast` read RGB/RGBA, `color(srgb …)` and `oklab()` colours; any other
+colour format is unverified for all three. `borderContrast` and `fillContrast` compare with the backgrounds of the
+element's ancestors, not with what hit testing finds on screen; they leave unverified a hidden element, an unknown colour
+behind it, and a background image, opacity, filter or blending on it or an ancestor. `borderContrast` also leaves
+unverified a border image and a listed side whose style is not solid, none or hidden.
+
 Unsupported assertions/properties also remain unverified and block the gate. Resolve them with a
 focused check or the justified preview path; do not remove the requirement or claim a full
 accessibility audit. Cover relevant DOM state and interaction semantics alongside geometry.
+
+### Focus indicator contrast
+
+The indicators are the element's solid outline and its zero-offset, zero-blur shadow rings with a positive spread.
+The strongest one counts, graded at its weakest sample point: the middle of the ring on each of the four sides. A ring
+that reaches past the viewport is measured with the page scrolled to centre the control, and the scroll is restored. A
+background or border colour change alone is not measured.
+
+A point is left out only when the ring is proven not to be painted there:
+
+- it lies before the origin of a left-to-right, top-to-bottom page, where nothing can be scrolled into view;
+- an ancestor in the control's containing block chain, other than a `display: contents` or inline box (where `overflow`
+  does not apply), clips it away with `overflow` and no clip margin;
+- an opaque ring of the control painted over it covers it;
+- an opaque background, of an element and ancestors without opacity, filter, blending, clip-path or mask, covers it, and
+  the CSS stacking order puts that element above that kind of indicator.
+
+A ring with no point left does not count; with no ring left the rule fails. Every other point is graded against the
+backgrounds proven to lie beneath it. A box shadow of another element that reaches the point, and a translucent blurred
+or offset shadow of the control over the ring, only lower the result: the ratio is the worst of the untinted one, the
+tint beneath the ring and the tint over both, with mixed tint colours bounded by black and white. A shadow is therefore
+graded as if it could lie over the ring, even where it lies beneath.
+
+For the control's own outline and box shadows painted beneath a ring, **the outer side decides**. Such a layer counts
+only when it shows just past the ring's outer edge, the edge away from the control's centre (for an inward outline,
+the one towards the border edge): it starts less than half a pixel beyond that edge, or nearer the centre, and ends
+more than half a pixel beyond it. A blurred or offset shadow reaches as far as its offset, blur and spread together. A
+passing reading then has to stay passing with every such layer at full strength over the graded colour, bounded like
+any other tint; otherwise the point is unverified, and a passing one under an opaque layer always is. The reported
+ratio leaves these layers out. A layer that ends at the outer edge or nearer the centre is not counted: **the contrast
+between a ring and what lies on its inner side, such as the control's own halo, is not graded**. Such a layer is also
+ignored under a translucent ring, although it changes the colour the ring paints there: the rule can then pass a ring
+whose contrast on the outer side is below the minimum. The control's border is never one of these layers: an inset
+ring or inward outline is graded without a border just past its outer edge, and can pass beside one it does not
+contrast with.
+
+The rule is unverified, never passed, when any ring has a point it cannot prove, for example:
+
+- a non-solid or browser-default (`auto`) outline, or an unreadable colour or shadow;
+- the control or an ancestor with opacity, a filter, blending, a clip-path, mask, `clip`, paint containment,
+  `content-visibility`, rotation, scale, a transform other than a translation, a negative `z-index`, or in the top layer;
+- a point still outside the viewport after that scroll, or with no opaque background beneath it; clipping by an ancestor outside the
+  containing block chain, or with a clip margin;
+- inert content, a painting `::before`/`::after`, an image, drawing or replaced element, a border, a background image, a
+  background clipped to text, or a table row or column background that hit testing leaves out;
+- a translucent cover, or a cover painted through opacity, a filter, blending, a clip-path or a mask;
+- a glyph that may paint at the point, above the first opaque background found there: a character box across, the
+  glyph's own height down; the whole line box under decorated, case-changed or rescaled text;
+- an unproven stacking order: two boxes in the flow of one layer, positioned content under an outline, content under an
+  outset shadow, content with a negative `z-index` under an inset shadow, `order`, `will-change`, containment, a
+  backdrop filter, a 3D transform context, the top layer, or a size container where trapping or not trapping `z-index`
+  would change the answer;
+- a solid outline or ring of the control covering another ring only partly or translucently, or an opaque blurred or
+  offset shadow of the control over it;
+- a layer of the control beneath a ring that shows past its outer edge and could take a passing ring below the minimum;
+- an element that still computes `pointer-events: none` under the runner's override (a layered or inline `!important`)
+  with a box at the point, or any `::before`/`::after` with content that still does;
+- another element's outline at the point; or, anywhere on the page, a filter, text shadow or border image, or a
+  `::before`/`::after` with a box shadow, outline or one of those, since what they paint outside a box is not located;
+- a tint that, beneath the ring, could stop the ring being lighter (or darker) than its backdrop as it is without the
+  tint, or one over both that could reverse them (one that only brings them together lowers the ratio, down to 1);
+- no ring passes while an offset or blurred shadow might be the visible indicator.
+
+Limits: four points per ring. A ring is graded against the backgrounds under it at those points, with the shadows
+above, and against the control's own shadows past its outer edge. Not graded: the control's border, also just past the
+outer edge of an inset ring or inward outline; a shadow of the control beneath a translucent ring that stops at or
+inside the ring's outer edge; other colours beside a ring, on either side. Not detected: other paint outside a box,
+such as column rules, list markers, reflections and selection highlights; what a box that ignores the pointer paints
+outside its own boxes, such as overflowing text; the content of shadow trees; scrollbars and rounded corners. Glyphs
+are bounded by their character box across and their own height down, not by their shape. The stacking order is the
+part of CSS modelled here, checked against Chrome pixels.
 
 ## Pre-review gate
 

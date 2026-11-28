@@ -1,0 +1,2234 @@
+{
+    "baseUrl": "http://127.0.0.1:5307",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "shell-statement-manager",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "[data-sidebar=\"sidebar\"] a,[data-sidebar=\"sidebar\"] button,.material-app-brand,.material-app-brand span,[data-sidebar=\"trigger\"] svg,[data-test=\"material-app-bar\"] [data-slot=\"breadcrumb-page\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "shell-statement-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "[data-sidebar=\"sidebar\"] a,[data-sidebar=\"sidebar\"] button,.material-app-brand,.material-app-brand span,[data-sidebar=\"trigger\"] svg,[data-test=\"material-app-bar\"] [data-slot=\"breadcrumb-page\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "shell-statement-member",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "[data-sidebar=\"sidebar\"] a,[data-sidebar=\"sidebar\"] button,.material-app-brand,.material-app-brand span,[data-sidebar=\"trigger\"] svg,[data-test=\"material-app-bar\"] [data-slot=\"breadcrumb-page\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "shell-baskets-list",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Member/Baskets/Index",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "[data-sidebar=\"sidebar\"] a,[data-sidebar=\"sidebar\"] button,.material-app-brand,.material-app-brand span,[data-sidebar=\"trigger\"] svg,[data-test=\"material-app-bar\"] [data-slot=\"breadcrumb-page\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "pending",
+                    "query": {
+                        "state": "pending"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "shell-basket-detail",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Member/Baskets/Show",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "[data-sidebar=\"sidebar\"] a,[data-sidebar=\"sidebar\"] button,.material-app-brand,.material-app-brand span,[data-sidebar=\"trigger\"] svg,[data-test=\"material-app-bar\"] [data-slot=\"breadcrumb-page\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "validated",
+                    "query": {
+                        "state": "validated"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "shell-stock-list",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Stock/Index",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "[data-sidebar=\"sidebar\"] a,[data-sidebar=\"sidebar\"] button,.material-app-brand,.material-app-brand span,[data-sidebar=\"trigger\"] svg,[data-test=\"material-app-bar\"] [data-slot=\"breadcrumb-page\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "shell-open-combined",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "[data-sidebar=\"sidebar\"] a,[data-sidebar=\"sidebar\"] button,.material-app-brand,.material-app-brand span,[data-sidebar=\"trigger\"] svg,[data-test=\"material-app-bar\"] [data-slot=\"breadcrumb-page\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default",
+                        "sections": "open"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "shell-open-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "[data-sidebar=\"sidebar\"] a,[data-sidebar=\"sidebar\"] button,.material-app-brand,.material-app-brand span,[data-sidebar=\"trigger\"] svg,[data-test=\"material-app-bar\"] [data-slot=\"breadcrumb-page\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default",
+                        "sections": "open"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-slot=\"breadcrumb-page\"]",
+                                "contrast": 4.5,
+                                "filter": "visible"
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": ".material-skip-link:focus",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": ".material-skip-link"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "heads-manager",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid",
+                    "query": {
+                        "state": "invalid"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid-correction",
+                    "query": {
+                        "state": "invalid-correction"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "busy",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "status",
+                    "query": {
+                        "state": "status"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "heads-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "heads-member",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table th",
+                                "count": 5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "tooltips-escape",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "collapsed",
+                    "query": {
+                        "state": "default",
+                        "sidebar": "collapsed"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": "[data-slot=\"tooltip-content\"] svg"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Comandes i moneder"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes i moneder"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": "[data-slot=\"tooltip-content\"] svg"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes i moneder"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Cooperativa"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cooperativa"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": "[data-slot=\"tooltip-content\"] svg"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cooperativa"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": "[data-slot=\"tooltip-content\"] svg"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": "[data-slot=\"tooltip-content\"] svg"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "tooltips-escape-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "collapsed",
+                    "query": {
+                        "state": "default",
+                        "sidebar": "collapsed"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": "[data-slot=\"tooltip-content\"] svg"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "#main-content",
+                                    "content": "[data-slot=\"tooltip-content\"] svg"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "toast-boxes",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": "body",
+            "panels": "#main-content",
+            "content": "[data-sonner-toast], [data-sonner-toast] [data-icon], [data-sonner-toast] [data-icon] svg, [data-sonner-toast] [data-title]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "success",
+                    "query": {
+                        "state": "default",
+                        "toast": "success"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-icon] svg",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "default",
+                        "toast": "error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-icon] svg",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "warning",
+                    "query": {
+                        "state": "default",
+                        "toast": "warning"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-icon] svg",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "info",
+                    "query": {
+                        "state": "default",
+                        "toast": "info"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-icon] svg",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-message",
+                    "query": {
+                        "state": "default",
+                        "toast": "info",
+                        "message": "long"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-icon] svg",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "sheet-open",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "expanded",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes i moneder"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Les meves cistelles"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg d’estoc"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Moneder"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cooperativa"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cicles"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Recepcions"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Unitats de convivència"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cistelles"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Productors"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Estoc"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Envasos retornables"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comptes"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Rols"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Configuració"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"])",
+                                        "count": 20,
+                                        "filter": "visible"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-mobile=\"true\"]",
+                                    "content": "[data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"]), [data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"]) span, [data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"]) svg"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "sheet-open-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Layout and contrast only.",
+            "states": [
+                {
+                    "id": "expanded",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cistelles"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Estoc"
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Recepcions"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"])",
+                                        "count": 6,
+                                        "filter": "visible"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-mobile=\"true\"]",
+                                    "content": "[data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"]), [data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"]) span, [data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"]) svg"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -376,3 +376,107 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
         await rm(cwd, { recursive: true, force: true });
     }
 });
+
+void test('CLI records the declared tab order walk and keyboard steps and fails on a wrong one', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'visual-keyboard-test-'));
+    const server = createServer(async (_req, res) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.end(await readFile(join(cwd, 'index.html')));
+    });
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const git = (...args) =>
+        execFileSync(
+            'git',
+            [
+                '-c',
+                'user.name=Workflow Test',
+                '-c',
+                'user.email=workflow@example.invalid',
+                '-c',
+                'commit.gpgsign=false',
+                ...args,
+            ],
+            { cwd, encoding: 'utf8' },
+        ).trim();
+    const cli = (command) =>
+        new Promise((resolve, reject) => {
+            const child = spawn(
+                process.execPath,
+                [
+                    runner,
+                    command,
+                    'visual.json',
+                    'artifacts',
+                    git('rev-parse', 'HEAD'),
+                ],
+                { cwd },
+            );
+            let output = '';
+            child.stdout.on('data', (d) => (output += d));
+            child.stderr.on('data', (d) => (output += d));
+            child.on('error', reject);
+            child.on('exit', (code) => resolve({ code, output }));
+        });
+    const manifest = (expected) => ({
+        baseUrl: `http://127.0.0.1:${server.address().port}`,
+        matrix: { widths: [375], modes: ['light'], text: [100] },
+        views: [
+            {
+                id: 'wallet',
+                path: '/',
+                root: 'main',
+                panels: 'main',
+                fonts: ['16px Arial'],
+                systemFonts: true,
+                focus: [],
+                noFocusReason: 'The walk reaches every control',
+                tabOrder: { regions: ['main'], minTarget: 44 },
+                keys: [
+                    { tabTo: '#save' },
+                    {
+                        press: 'Enter',
+                        assertions: [{ selector: '#save', text: expected }],
+                    },
+                ],
+                states: [
+                    {
+                        id: 'populated',
+                        cases: [{ width: 375, mode: 'light', text: 100 }],
+                    },
+                ],
+            },
+        ],
+    });
+    const commit = async (expected) => {
+        await writeFile(
+            join(cwd, 'visual.json'),
+            JSON.stringify(manifest(expected)),
+        );
+        git('add', '.gitignore', 'index.html', 'visual.json');
+        git('commit', '-qm', expected);
+    };
+    try {
+        await writeFile(
+            join(cwd, 'index.html'),
+            `<!doctype html><style>html{background:white}button{min-width:60px;min-height:44px}button:focus-visible{outline:2px solid black}</style><main><button id="save" onclick="this.textContent='Saved'">Save</button></main>`,
+        );
+        await writeFile(join(cwd, '.gitignore'), 'artifacts/\n');
+        git('init', '-q');
+        await commit('Saved');
+        const passing = await cli('run');
+        assert.equal(passing.code, 0, passing.output);
+        const [record] = JSON.parse(
+            await readFile(join(cwd, 'artifacts/report.json')),
+        ).cases;
+        assert.equal(record.tabOrder.stops[0].element, 'button#save');
+        assert.equal(record.interactions.length, 2);
+        await commit('Deleted');
+        const failing = await cli('run');
+        assert.notEqual(failing.code, 0);
+        assert.match(failing.output, /step 2 \(Enter\): #save: Wrong text/);
+        assert.notEqual((await cli('verify')).code, 0);
+    } finally {
+        server.close();
+        await rm(cwd, { recursive: true, force: true });
+    }
+});

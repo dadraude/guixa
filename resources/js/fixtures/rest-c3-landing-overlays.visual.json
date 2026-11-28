@@ -1,0 +1,3279 @@
+{
+    "baseUrl": "http://127.0.0.1:5307",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "select-popup",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "#correction-source",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus",
+                                        "fillContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0"
+                                        }
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-slot=\"select-content\"]",
+                                    "content": "[data-slot=\"select-item\"], [data-slot=\"select-item\"] span"
+                                }
+                            },
+                            {
+                                "press": "ArrowDown",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-item\"] ~ [data-slot=\"select-item\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus",
+                                        "fillContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "#correction-source:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-item\"][aria-selected=\"true\"] svg",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"] svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-slot=\"select-content\"]",
+                                    "content": "[data-slot=\"select-item\"], [data-slot=\"select-item\"] span"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "#correction-source:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-labels",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "#correction-source",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"]:focus",
+                                        "fillContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0"
+                                        }
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-slot=\"select-content\"]",
+                                    "content": "[data-slot=\"select-item\"], [data-slot=\"select-item\"] span"
+                                }
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "#correction-source:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-item\"][aria-selected=\"true\"] svg",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"select-item\"] svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-slot=\"select-content\"]",
+                                    "content": "[data-slot=\"select-item\"], [data-slot=\"select-item\"] span"
+                                }
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"select-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "#correction-source:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "account-menu",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-test=\"sidebar-menu-button\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [role^=\"menuitem\"] svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-overlay-danger": "0"
+                                        }
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [data-slot=\"dropdown-menu-separator\"]",
+                                        "count": 2,
+                                        "fillContrast": 3
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [data-slot=\"dropdown-menu-item\"]",
+                                        "count": 2,
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": "a[data-slot=\"dropdown-menu-item\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-slot=\"dropdown-menu-content\"]",
+                                    "content": "[data-slot=\"dropdown-menu-content\"] a, [data-slot=\"dropdown-menu-content\"] button, [data-slot=\"dropdown-menu-content\"] span, [data-slot=\"dropdown-menu-content\"] [role=\"menuitemradio\"]"
+                                }
+                            },
+                            {
+                                "press": "ArrowDown",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-test=\"logout-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [role^=\"menuitem\"] svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-overlay-danger": "0"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "ArrowUp",
+                                "assertions": [
+                                    {
+                                        "selector": "a[data-slot=\"dropdown-menu-item\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-test=\"sidebar-menu-button\"]:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-user",
+                    "query": {
+                        "state": "default",
+                        "user": "long"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-test=\"sidebar-menu-button\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [role^=\"menuitem\"] svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-overlay-danger": "0"
+                                        }
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [data-slot=\"dropdown-menu-separator\"]",
+                                        "count": 2,
+                                        "fillContrast": 3
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [data-slot=\"dropdown-menu-item\"]",
+                                        "count": 2,
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": "a[data-slot=\"dropdown-menu-item\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-slot=\"dropdown-menu-content\"]",
+                                    "content": "[data-slot=\"dropdown-menu-content\"] a, [data-slot=\"dropdown-menu-content\"] button, [data-slot=\"dropdown-menu-content\"] span, [data-slot=\"dropdown-menu-content\"] [role=\"menuitemradio\"]"
+                                }
+                            },
+                            {
+                                "press": "ArrowDown",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-test=\"logout-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [role^=\"menuitem\"] svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-overlay-danger": "0"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "ArrowUp",
+                                "assertions": [
+                                    {
+                                        "selector": "a[data-slot=\"dropdown-menu-item\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-test=\"sidebar-menu-button\"]:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "appearance-menu",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-test=\"appearance-trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [role^=\"menuitem\"] svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-overlay-danger": "0"
+                                        }
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [role=\"menuitemradio\"]",
+                                        "count": 3,
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": "[role=\"menuitemradio\"][aria-checked=\"true\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[role=\"menuitemradio\"][aria-checked=\"true\"] .lucide-circle",
+                                        "count": 1,
+                                        "contrast": 3
+                                    },
+                                    {
+                                        "selector": "[role=\"menuitemradio\"]:focus",
+                                        "count": 1,
+                                        "text": "Clar"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-slot=\"dropdown-menu-content\"]",
+                                    "content": "[data-slot=\"dropdown-menu-content\"] a, [data-slot=\"dropdown-menu-content\"] button, [data-slot=\"dropdown-menu-content\"] span, [data-slot=\"dropdown-menu-content\"] [role=\"menuitemradio\"]"
+                                }
+                            },
+                            {
+                                "press": "ArrowDown",
+                                "assertions": [
+                                    {
+                                        "selector": "[role=\"menuitemradio\"]:focus",
+                                        "count": 1,
+                                        "text": "Fosc"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"] [role^=\"menuitem\"] svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-overlay-danger": "0"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "ArrowDown",
+                                "assertions": [
+                                    {
+                                        "selector": "[role=\"menuitemradio\"]:focus",
+                                        "count": 1,
+                                        "text": "Sistema"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"dropdown-menu-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-test=\"appearance-trigger\"]:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "mobile-sheet",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "walk",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] :is(a,button) svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"])",
+                                        "count": 10,
+                                        "minHeight": 44,
+                                        "minWidth": 44,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] a[data-active=\"true\"]",
+                                        "attributes": {
+                                            "aria-current": "page"
+                                        }
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] a[data-active=\"true\"]",
+                                        "styles": {
+                                            "font-weight": "500"
+                                        }
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] .reference-sidebar-brand:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0"
+                                        }
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-mobile=\"true\"]",
+                                    "content": "[data-mobile=\"true\"] :is(.reference-sidebar-brand,[data-sidebar=\"menu-button\"])"
+                                }
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes i moneder"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cooperativa"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cicles"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Recepcions"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Unitats de convivència"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cistelles"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] .reference-sidebar-brand:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"trigger\"]:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "expanded",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes i moneder",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comandes",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Les meves cistelles",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg d’estoc",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Moneder",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cooperativa",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cicles",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Recepcions",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Unitats de convivència",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cistelles",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Productors",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Estoc",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Envasos retornables",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Administració",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Comptes",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Rols",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Configuració",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] :is(a,button) svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "escape-on-entry",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"trigger\"]:focus",
+                                        "count": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "mobile-sheet-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "expanded",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"trigger\"]",
+                                "assertions": []
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"]",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Inici",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Enter",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "attributes": {
+                                            "aria-expanded": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Cistelles",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Estoc",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-mobile=\"true\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Recepcions",
+                                        "minHeight": 44,
+                                        "minWidth": 44
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-mobile=\"true\"] :is(a,button) svg",
+                                        "contrast": 3,
+                                        "filter": "visible"
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "tooltips",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "default",
+                        "sidebar": "collapsed"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Comandes i moneder"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Cooperativa"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "default",
+                        "sidebar": "collapsed"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Comandes i moneder"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Cooperativa"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Catàleg i estoc"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Administració"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "tooltips-finance",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "default",
+                        "sidebar": "collapsed"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "default",
+                        "sidebar": "collapsed"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "tabTo": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Inici"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Tab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"] [role=\"tooltip\"]",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    },
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"], [data-slot=\"tooltip-content\"] *",
+                                        "contrast": 4.5,
+                                        "filter": "text"
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": "body",
+                                        "attributes": {
+                                            "data-ev-ochre-uses": "0",
+                                            "data-ev-tooltip-fits": "true"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "press": "Escape",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-slot=\"tooltip-content\"]",
+                                        "count": 0
+                                    },
+                                    {
+                                        "selector": "[data-sidebar=\"sidebar\"] [data-sidebar=\"menu-button\"]:focus",
+                                        "count": 1,
+                                        "text": "Economia"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "toasts",
+            "path": "/resources/js/fixtures/rest-c3-landing.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member,manager,finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlays are opened and walked with the declared keyboard steps.",
+            "states": [
+                {
+                    "id": "success",
+                    "query": {
+                        "state": "default",
+                        "toast": "success"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 1,
+                                "attributes": {
+                                    "data-type": "success"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-overlay-success": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg",
+                                "contrast": 3,
+                                "filter": "visible"
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg.lucide-circle-check",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-ochre-uses": "0",
+                                    "data-ev-overlay-danger": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-title]",
+                                "count": 1
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "ShiftTab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-sonner-toast]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-sonner-toast]",
+                                    "content": "[data-sonner-toast] [data-title]"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "default",
+                        "toast": "error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 1,
+                                "attributes": {
+                                    "data-type": "error"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-overlay-success": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg",
+                                "contrast": 3,
+                                "filter": "visible"
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg.lucide-octagon-x",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-ochre-uses": "0",
+                                    "data-ev-overlay-danger": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-title]",
+                                "count": 1
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "ShiftTab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-sonner-toast]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-sonner-toast]",
+                                    "content": "[data-sonner-toast] [data-title]"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "warning",
+                    "query": {
+                        "state": "default",
+                        "toast": "warning"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 1,
+                                "attributes": {
+                                    "data-type": "warning"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-overlay-success": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg",
+                                "contrast": 3,
+                                "filter": "visible"
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg.lucide-triangle-alert",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-ochre-uses": "0",
+                                    "data-ev-overlay-danger": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-title]",
+                                "count": 1
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "ShiftTab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-sonner-toast]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-sonner-toast]",
+                                    "content": "[data-sonner-toast] [data-title]"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "info",
+                    "query": {
+                        "state": "default",
+                        "toast": "info"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 1,
+                                "attributes": {
+                                    "data-type": "info"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-overlay-success": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg",
+                                "contrast": 3,
+                                "filter": "visible"
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg.lucide-info",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-ochre-uses": "0",
+                                    "data-ev-overlay-danger": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-title]",
+                                "count": 1
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "ShiftTab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-sonner-toast]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-sonner-toast]",
+                                    "content": "[data-sonner-toast] [data-title]"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-message",
+                    "query": {
+                        "state": "default",
+                        "toast": "info",
+                        "message": "long"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style", "[data-sonner-toast]"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-ochre-uses": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 1,
+                                "attributes": {
+                                    "data-type": "info"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] *",
+                                "contrast": 4.5,
+                                "filter": "text"
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-overlay-success": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg",
+                                "contrast": 3,
+                                "filter": "visible"
+                            },
+                            {
+                                "selector": "[data-sonner-toast] svg.lucide-info",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-ochre-uses": "0",
+                                    "data-ev-overlay-danger": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sonner-toast] [data-title]",
+                                "count": 1
+                            }
+                        ],
+                        "keys": [
+                            {
+                                "press": "ShiftTab",
+                                "assertions": [
+                                    {
+                                        "selector": "[data-sonner-toast]:focus",
+                                        "count": 1
+                                    },
+                                    {
+                                        "selector": ":focus",
+                                        "focusContrast": 3
+                                    },
+                                    {
+                                        "selector": ":focus-visible",
+                                        "count": 1
+                                    }
+                                ],
+                                "layout": {
+                                    "root": "body",
+                                    "panels": "[data-sonner-toast]",
+                                    "content": "[data-sonner-toast] [data-title]"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

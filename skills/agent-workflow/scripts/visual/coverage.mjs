@@ -120,6 +120,15 @@ export function expandMatrix(manifest) {
     }
     return cases;
 }
+const completedWalk = (walk) =>
+    walk?.stops?.length > 0 && walk.failures?.length === 0;
+const completedSteps = (records, steps) =>
+    steps?.length > 0 &&
+    records?.length === steps.length &&
+    records.every(
+        (record, index) =>
+            record.index === index && record.failures?.length === 0,
+    );
 export function checkCoverage(manifest, report, candidate) {
     const expected = expandMatrix(manifest);
     const errors = [];
@@ -179,6 +188,16 @@ export function checkCoverage(manifest, report, candidate) {
                 );
             if (!Array.isArray(record.failures) || record.failures.length)
                 errors.push('Failed measurements: ' + item.id);
+            if (
+                item.view.tabOrder !== undefined &&
+                !completedWalk(record.tabOrder)
+            )
+                errors.push('Missing or failed tab order walk: ' + item.id);
+            if (
+                item.view.keys !== undefined &&
+                !completedSteps(record.interactions, item.view.keys)
+            )
+                errors.push('Missing or failed keyboard steps: ' + item.id);
         }
         const m = record.measurements;
         if (

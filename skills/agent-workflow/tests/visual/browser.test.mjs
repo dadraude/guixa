@@ -250,3 +250,1027 @@ void test('gap assertions check both axes and leave unresolved percentages unver
             .length,
     );
 });
+
+const measureRules = (rules) =>
+    browser.evaluate(
+        '(' + measureAssertions.toString() + ')(' + JSON.stringify(rules) + ')',
+    );
+
+void test('non-text contrast fails a field border or divider below 3:1 and passes at 3:1', async () => {
+    // On white, #949494 is 3.03:1 and #959595 is 2.99:1.
+    await render(
+        'html{background:white}input{border:1px solid #949494}#faint{border-color:#959595}#underline{border-width:0 0 1px}li+li{border-top:1px solid color-mix(in srgb, black 60%, transparent)}ul.faint li+li{border-top-color:color-mix(in srgb, black 12%, transparent)}',
+        '<input id="field"><input id="faint"><input id="underline"><ul><li>a</li><li id="divider">b</li></ul><ul class="faint"><li>a</li><li id="faint-divider">b</li></ul>',
+    );
+    const passing = await measureRules([
+        { selector: '#field', borderContrast: 3 },
+        { selector: '#underline', borderContrast: 3, borderSides: ['bottom'] },
+        { selector: '#divider', borderContrast: 3, borderSides: ['top'] },
+    ]);
+    assert.deepEqual(passing.unverified, []);
+    assert.deepEqual(passing.failures, []);
+    assert.equal(
+        passing.results[0].observed[0].borderContrast.toFixed(2),
+        '3.03',
+    );
+    const failing = await measureRules([
+        { selector: '#faint', borderContrast: 3 },
+        { selector: '#faint-divider', borderContrast: 3, borderSides: ['top'] },
+        { selector: '#underline', borderContrast: 3 },
+    ]);
+    assert.deepEqual(failing.unverified, []);
+    assert.deepEqual(failing.results[0].failures, [
+        'Insufficient border contrast: top 2.99',
+        'Insufficient border contrast: right 2.99',
+        'Insufficient border contrast: bottom 2.99',
+        'Insufficient border contrast: left 2.99',
+    ]);
+    assert.match(
+        failing.results[1].failures[0],
+        /^Insufficient border contrast: top 1\./,
+    );
+    assert.ok(failing.results[2].failures.includes('No visible border: top'));
+});
+
+void test('non-text contrast never passes a border whose colours it cannot resolve', async () => {
+    const unresolved = [
+        [
+            'gradient behind',
+            '.panel{background-image:linear-gradient(red,blue)}',
+        ],
+        [
+            'gradient on field',
+            'input{background-image:linear-gradient(red,blue)}',
+        ],
+        ['dimmed ancestor', '.panel{opacity:.5}'],
+        ['border image', 'input{border-image:linear-gradient(red,blue) 1}'],
+        ['unparsed background', '.panel{background:lab(50 0 0)}'],
+        ['unparsed border', 'input{border-color:lab(20 0 0)}'],
+        ['no opaque background', 'html{background:transparent}'],
+        ['three-dimensional edge', 'input{border-style:inset}'],
+        ['hidden field', 'input{visibility:hidden}'],
+    ];
+    for (const [name, css] of unresolved) {
+        await render(
+            'html{background:white}input{border:1px solid black}' + css,
+            '<input id="field">',
+        );
+        const result = await measureRules([
+            { selector: '#field', borderContrast: 3 },
+        ]);
+        assert.deepEqual(
+            result.unverified,
+            ['#field: Border contrast colours or compositing are unsupported'],
+            name,
+        );
+        assert.equal(result.results[0].passed, false, name);
+    }
+    for (const rule of [
+        { borderContrast: 0.5 },
+        { borderContrast: 3, borderSides: [] },
+        { borderContrast: 3, borderSides: ['middle'] },
+        { borderSides: ['top'] },
+    ]) {
+        const result = await measureRules([{ selector: '#field', ...rule }]);
+        assert.deepEqual(
+            result.unverified,
+            ['#field: Invalid border contrast rule'],
+            JSON.stringify(rule),
+        );
+    }
+});
+
+async function measureFocused(css, markup, rule = { focusContrast: 3 }) {
+    await render(
+        'html{background:white}#target:focus,#target:focus-visible{outline:none}' +
+            css,
+        markup,
+    );
+    await browser.evaluate("document.querySelector('#target').focus()");
+    return measureRules([{ selector: '#target', ...rule }]);
+}
+const button = '<button id="target">Save</button>';
+
+void test('focus indicator contrast reads outlines and rings against what is painted next to them', async () => {
+    const passing = [
+        [
+            'outline',
+            '#target:focus{outline:2px solid #949494;outline-offset:2px}',
+            button,
+        ],
+        [
+            'inset ring against own fill',
+            '#target{background:black}#target:focus{box-shadow:inset 0 0 0 1px white}',
+            button,
+        ],
+        [
+            'outer oklab ring',
+            '#target:focus{box-shadow:0 0 0 3px oklab(0.558165 0.0633351 0.107746)}',
+            button,
+        ],
+        [
+            'strong outline beside a faint ring',
+            '#target:focus{outline:2px solid black;box-shadow:0 0 0 3px oklab(0.558165 0.0633351 0.107746 / 0.2)}',
+            button,
+        ],
+    ];
+    for (const [name, css, markup] of passing) {
+        const result = await measureFocused(css, markup);
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(result.failures, [], name);
+    }
+    // The oklab ring above is the computed form of #a85f12, 4.9:1 on white.
+    const ring = await measureFocused(passing[2][1], button);
+    assert.ok(
+        Math.abs(ring.results[0].observed[0].focusContrast - 4.9) < 0.1,
+        String(ring.results[0].observed[0].focusContrast),
+    );
+    const failing = [
+        [
+            'faint outline',
+            '#target:focus{outline:2px solid #959595}',
+            button,
+            /^#target: Insufficient focus indicator contrast: 2\.99$/,
+        ],
+        [
+            'ring lost on own fill',
+            '#target{background:black}#target:focus{box-shadow:inset 0 0 0 1px #222}',
+            button,
+            /Insufficient focus indicator contrast: 1\./,
+        ],
+        [
+            'painted backdrop, not the DOM ancestor',
+            '.panel{position:relative;height:200px}#cover{position:absolute;inset:0;background:black}#target{position:absolute;top:60px;left:60px}#target:focus{outline:2px solid #222}',
+            '<div id="cover"></div>' + button,
+            /Insufficient focus indicator contrast: 1\./,
+        ],
+        ['no indicator', '', button, /No visible focus indicator/],
+        [
+            'clipped away',
+            '.clip{overflow:hidden;width:max-content}.clip button{display:block}#target:focus{outline:2px solid black;outline-offset:4px}',
+            '<div class="clip">' + button + '</div>',
+            /No visible focus indicator/,
+        ],
+    ];
+    for (const [name, css, markup, expected] of failing) {
+        const result = await measureFocused(css, markup);
+        assert.deepEqual(result.unverified, [], name);
+        assert.equal(result.failures.length, 1, name);
+        assert.match(result.failures[0], expected, name);
+    }
+    await browser.evaluate("document.querySelector('#target').blur()");
+    assert.deepEqual(
+        (await measureRules([{ selector: '#target', focusContrast: 3 }]))
+            .failures,
+        ['#target: Element is not focused'],
+    );
+});
+
+void test('focus indicator contrast never passes an indicator it cannot resolve', async () => {
+    const outline = '#target:focus{outline:2px solid black}';
+    const unresolved = [
+        ['unparsed outline', '#target:focus{outline:2px solid lab(10 0 0)}'],
+        [
+            'unparsed ring beside a good outline',
+            '#target:focus{outline:2px solid black;box-shadow:0 0 0 3px lab(50 0 0)}',
+        ],
+        ['browser default ring', '#target:focus{outline:auto}'],
+        ['dashed outline', '#target:focus{outline:2px dashed black}'],
+        ['only a blurred shadow', '#target:focus{box-shadow:0 0 8px black}'],
+        [
+            'gradient behind',
+            outline + '.panel{background-image:linear-gradient(red,blue)}',
+        ],
+        ['dimmed ancestor', outline + '.panel{opacity:.5}'],
+        ['no opaque backdrop', outline + 'html{background:transparent}'],
+    ];
+    for (const [name, css] of unresolved) {
+        const result = await measureFocused(css, button);
+        assert.deepEqual(
+            result.unverified,
+            ['#target: Focus indicator colours or compositing are unsupported'],
+            name,
+        );
+        assert.deepEqual(result.failures, [], name);
+        assert.equal(result.results[0].passed, false, name);
+    }
+    const invalid = await measureFocused(outline, button, {
+        focusContrast: 0,
+    });
+    assert.deepEqual(invalid.unverified, [
+        '#target: Invalid focus contrast rule',
+    ]);
+});
+
+void test('a text or visible filter measures what is on screen and cannot pass on nothing', async () => {
+    await render(
+        'html{background:white}.off{display:none}.sr{position:absolute;width:1px;height:1px;overflow:hidden;color:white}.clipped{position:absolute;width:1px;height:1px;padding:16px;overflow:hidden;clip-path:inset(50%);color:white}',
+        '<div id="group"><p id="read">Read</p><p class="off">Hidden</p><span class="sr">Spoken</span><div class="sr"><h2>Announced</h2></div><div class="clipped"><h2>Padded</h2></div><button disabled style="color:#ddd;background:white">Off</button><div><span>Nested</span></div></div>',
+    );
+    const rule = { selector: '#group, #group *', contrast: 4.5 };
+    const text = await measureRules([{ ...rule, filter: 'text' }]);
+    assert.deepEqual(text.failures, []);
+    assert.deepEqual(text.unverified, []);
+    assert.equal(text.results[0].observed.length, 2);
+    // `visible` drops only what is not rendered, so the unreadable disabled and screen-reader text still fail it.
+    const visible = await measureRules([{ ...rule, filter: 'visible' }]);
+    assert.ok(visible.failures.length > 0);
+    assert.ok(visible.results[0].observed.length > 2);
+    for (const filter of ['text', 'visible']) {
+        const none = await measureRules([
+            { selector: '.off', contrast: 4.5, filter },
+        ]);
+        assert.deepEqual(none.failures, ['.off: Missing element'], filter);
+    }
+    assert.deepEqual(
+        (await measureRules([{ ...rule, filter: 'shown' }])).unverified,
+        ['#group, #group *: Unsupported element filter'],
+    );
+});
+
+void test('a divider painted as a filled line meets the same ratio against what is behind it', async () => {
+    const css =
+        'html{background:white}hr{border:0;height:1px;background:#949494}#faint{background:#959595}#none{background:transparent}#unparsed{background:lab(50 0 0)}#striped{background-image:linear-gradient(red,blue)}';
+    await render(
+        css,
+        '<hr id="line"><hr id="faint"><hr id="none"><hr id="unparsed"><hr id="striped">',
+    );
+    const rule = (selector) => ({ selector, fillContrast: 3 });
+    const passing = await measureRules([rule('#line')]);
+    assert.deepEqual(passing.failures, []);
+    assert.deepEqual(passing.unverified, []);
+    assert.deepEqual(
+        (await measureRules([rule('#faint'), rule('#none')])).failures,
+        ['#faint: Insufficient fill contrast: 2.99', '#none: No visible fill'],
+    );
+    const unresolved = await measureRules([
+        rule('#unparsed'),
+        rule('#striped'),
+        { selector: '#line', fillContrast: 0 },
+    ]);
+    assert.deepEqual(unresolved.failures, []);
+    assert.deepEqual(unresolved.unverified, [
+        '#unparsed: Fill contrast colours or compositing are unsupported',
+        '#striped: Fill contrast colours or compositing are unsupported',
+        '#line: Invalid fill contrast rule',
+    ]);
+});
+
+void test('a focus indicator behind a modal is read through the page that stopped taking the pointer', async () => {
+    const result = await measureFocused(
+        'html{background:transparent}body{background:white;min-height:100vh;pointer-events:none}#shade,#dialog{position:fixed;pointer-events:auto;top:0;bottom:0}#shade{left:0;right:0;background:rgb(0 0 0 / 0.8)}#dialog{left:0;width:200px;background:black}#target{position:absolute;top:40px;left:0;width:199px}#target:focus{outline:2px solid white;outline-offset:2px}',
+        '<div id="shade"></div><div id="dialog">' + button + '</div>',
+    );
+    assert.deepEqual(result.unverified, []);
+    assert.deepEqual(result.failures, []);
+    assert.equal(
+        await browser.evaluate('document.querySelectorAll("style").length'),
+        1,
+    );
+});
+
+// A focused control in a low layer, ringed in white on its black bar, with something else reaching over one side.
+const layered = (cover, css = '') =>
+    measureFocused(
+        `#bar,#over{position:fixed;top:0;height:200px}#bar{left:0;width:200px;z-index:10;background:black}#target{position:absolute;top:40px;left:0;width:199px;height:44px}#target:focus{outline:2px solid white;outline-offset:2px}${cover}${css}`,
+        '<div id="bar">' + button + '</div><div id="over"></div>',
+    );
+
+const unsupportedFocus =
+    '#target: Focus indicator colours or compositing are unsupported';
+
+void test('an indicator point covered by a higher layer is not visible and cannot change the verdict', async () => {
+    // The right side lies under a white bar of a higher layer, as the sidebar brand under the app bar: the other
+    // sides still show the ring on black.
+    const aside = await layered(
+        '#over{left:200px;right:0;z-index:30;background:white}',
+    );
+    assert.deepEqual(aside.unverified, []);
+    assert.deepEqual(aside.failures, []);
+    assert.equal(aside.results[0].observed[0].focusContrast.toFixed(0), '21');
+    // Wholly covered, the ring would contrast with the cover; that contrast is not the ring's.
+    const hidden = await layered(
+        '#over{left:0;right:0;z-index:30;background:black}',
+    );
+    assert.deepEqual(hidden.failures, ['#target: No visible focus indicator']);
+    const tinted = await layered(
+        '#over{left:200px;right:0;z-index:30;background:rgb(255 0 0 / 0.5)}',
+    );
+    assert.deepEqual(tinted.unverified, [
+        '#target: Focus indicator colours or compositing are unsupported',
+    ]);
+});
+
+void test('what paints beneath an indicator stays its adjacent colour', async () => {
+    const beneath = [
+        ['lower layer', '#over{left:200px;right:0;z-index:5;background:white}'],
+        [
+            'transparent higher layer',
+            '#over{left:200px;right:0;z-index:30;background:transparent}',
+        ],
+    ];
+    const lower = await layered(beneath[0][1]);
+    assert.deepEqual(lower.failures, [
+        '#target: Insufficient focus indicator contrast: 1.00',
+    ]);
+    const transparent = await layered(beneath[1][1]);
+    assert.deepEqual(transparent.unverified, []);
+    // Whether a following in-flow box paints over an indicator is not proven, so it is neither dropped nor graded.
+    const flow = await measureFocused(
+        '#target{display:block;height:44px;width:100px}#target:focus{outline:2px solid #222;outline-offset:2px}#after{height:60px;margin-top:-4px;background:black}',
+        button + '<div id="after"></div>',
+    );
+    assert.deepEqual(flow.unverified, [unsupportedFocus]);
+});
+
+void test('an inset ring covered by the control content is not visible', async () => {
+    const result = await measureFocused(
+        '#target{position:relative;width:100px;height:44px;border:0;background:white}#target:focus{box-shadow:inset 0 0 0 4px black}#fill{position:absolute;inset:0;background:black}',
+        '<div tabindex="0" id="target"><div id="fill"></div></div>',
+    );
+    assert.deepEqual(result.failures, ['#target: No visible focus indicator']);
+});
+
+void test('an element filter named like an inherited property is unsupported', async () => {
+    await render('', '<p id="read">Read</p>');
+    const result = await measureRules([
+        { selector: '#read', count: 1, filter: 'toString' },
+    ]);
+    assert.deepEqual(result.unverified, ['#read: Unsupported element filter']);
+});
+
+void test('positioned boxes and clipping hide indicator points on either side of the box edge', async () => {
+    const ringed =
+        '#target{position:relative;width:100px;height:44px;border:0;background:black;color:white}';
+    const hidden = {
+        'later positioned box of the same layer': [
+            '#target:focus{outline:2px solid #222;outline-offset:2px}#after{position:relative;margin:-60px -10px 0;height:90px;background:white}',
+            button + '<div id="after"></div>',
+        ],
+        'inset ring clipped by an ancestor': [
+            '#clip{width:40px;height:20px;overflow:hidden;margin:10px}#target{margin:-10px 0 0 -30px}#target:focus{box-shadow:inset 0 0 0 4px white}',
+            '<div id="clip">' + button + '</div>',
+        ],
+    };
+    for (const [name, [css, markup]] of Object.entries(hidden)) {
+        const result = await measureFocused(ringed + css, markup);
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(
+            result.failures,
+            ['#target: No visible focus indicator'],
+            name,
+        );
+    }
+});
+
+// A 100 by 44 white control, 40 px into the panel, and a 4 px black outline 2 px outside it.
+const control =
+    '#target{display:block;margin:40px;width:100px;height:44px;border:0;padding:0;background:white}';
+const outside = '#target:focus{outline:4px solid black;outline-offset:2px}';
+const plain = '<div tabindex="0" id="target"></div>';
+// A dark strip painted behind the top side, and a white box reaching over the same place.
+const strip =
+    '#strip,#cover{position:absolute;left:0;width:375px;height:14px;top:var(--top)}#strip{background:#111;z-index:-1}:root{--top:62px}';
+
+// The cases that were graded or dropped although they cannot be proven: each one has to stay unverified.
+async function resolved(cases) {
+    const wrong = [];
+    for (const [name, [css, markup]] of Object.entries(cases)) {
+        const result = await measureFocused(control + outside + css, markup);
+        if (result.unverified[0] !== unsupportedFocus || result.failures.length)
+            wrong.push(name);
+    }
+    return wrong;
+}
+
+void test('a point is left out or graded only when the page proves what is painted there', async () => {
+    const unverified = {
+        'cover made invisible by an ancestor': [
+            strip + '#ghost{opacity:0}#cover{background:white;z-index:5}',
+            '<div id="strip"></div>' +
+                plain +
+                '<div id="ghost"><div id="cover"></div></div>',
+        ],
+        'cover inside a filtered ancestor': [
+            strip +
+                '#ghost{position:absolute;left:0;top:0;width:375px;height:80px;filter:opacity(0)}#cover{background:white;z-index:5}',
+            '<div id="strip"></div>' +
+                plain +
+                '<div id="ghost"><div id="cover"></div></div>',
+        ],
+        'masked cover': [
+            strip +
+                '#cover{background:white;z-index:5;mask-image:linear-gradient(transparent,transparent)}',
+            '<div id="strip"></div>' + plain + '<div id="cover"></div>',
+        ],
+        'z-index kept inside a will-change ancestor': [
+            strip +
+                '#trap{will-change:transform}#cover{background:white;z-index:5}#target{position:relative;z-index:1}',
+            '<div id="trap"><div id="cover"></div></div>' + plain,
+        ],
+        'z-index kept inside a containing ancestor': [
+            strip +
+                '#trap{contain:layout}#cover{background:white;z-index:5}#target{position:relative;z-index:1}',
+            '<div id="trap"><div id="cover"></div></div>' + plain,
+        ],
+        'inert cover': [
+            strip + '#cover{background:white;z-index:5}',
+            '<div id="strip"></div>' + plain + '<div id="cover" inert></div>',
+        ],
+        'pseudo-element cover': [
+            strip +
+                '#host::after{content:"";position:absolute;left:0;width:375px;height:14px;top:62px;background:white;z-index:5}',
+            '<div id="strip"></div>' + plain + '<div id="host"></div>',
+        ],
+        'border painted over the point': [
+            strip + '#cover{height:0;border-top:14px solid white;z-index:5}',
+            '<div id="strip"></div>' + plain + '<div id="cover"></div>',
+        ],
+        'drawing painted over the point': [
+            strip + '#cover{z-index:5}',
+            '<div id="strip"></div>' +
+                plain +
+                '<svg id="cover" width="375" height="14"><rect width="375" height="14" fill="white"/></svg>',
+        ],
+    };
+    assert.deepEqual(await resolved(unverified), []);
+    // Clipped to its content box, the cover paints nothing there: the ring is graded on the strip behind it.
+    const clipped = await measureFocused(
+        control +
+            outside +
+            strip +
+            '#cover{height:0;padding-bottom:14px;background:white;background-clip:content-box;z-index:5}',
+        '<div id="strip"></div>' + plain + '<div id="cover"></div>',
+    );
+    assert.deepEqual(clipped.unverified, []);
+    assert.deepEqual(clipped.failures, [
+        '#target: Insufficient focus indicator contrast: 1.11',
+    ]);
+});
+
+void test('an outline drawn inside the box is graded against the content beneath it', async () => {
+    const result = await measureFocused(
+        control +
+            '#fill{height:30px;background:#111}#target:focus{outline:2px solid black;outline-offset:-4px}',
+        '<div tabindex="0" id="target"><div id="fill"></div></div>',
+    );
+    assert.deepEqual(result.unverified, []);
+    assert.deepEqual(result.failures, [
+        '#target: Insufficient focus indicator contrast: 1.11',
+    ]);
+});
+
+void test('a shadow ring is not graded where a following box or its own layers may hide it', async () => {
+    const ring = '#target:focus{box-shadow:0 0 0 8px black}';
+    const following = await measureFocused(
+        control +
+            ring +
+            '#after{height:20px;margin-top:-46px;background:white}',
+        plain + '<div id="after"></div>',
+    );
+    assert.deepEqual(following.unverified, [unsupportedFocus]);
+    for (const [name, css] of Object.entries({
+        'under an earlier shadow': 'box-shadow:0 0 0 8px white,0 0 0 6px black',
+        'under an inset earlier shadow':
+            'box-shadow:inset 0 0 0 8px white,inset 0 0 0 6px black',
+        'under the outline':
+            'outline:8px solid white;outline-offset:0;box-shadow:0 0 0 8px black',
+    })) {
+        const result = await measureFocused(
+            control + `#target:focus{${css}}`,
+            plain,
+        );
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(
+            result.failures,
+            ['#target: Insufficient focus indicator contrast: 1.00'],
+            name,
+        );
+    }
+    const blurred = await measureFocused(
+        control +
+            '#target:focus{box-shadow:0 0 1px 10px white,0 0 0 6px black}',
+        plain,
+    );
+    assert.deepEqual(blurred.unverified, [unsupportedFocus]);
+});
+
+void test('a control whose indicator cannot be located or may be clipped is never passed', async () => {
+    const wrapped = '<div id="wrap">' + plain + '</div>';
+    const cases = {
+        'masked ancestor': [
+            '#wrap{mask-image:linear-gradient(transparent,transparent)}',
+            wrapped,
+        ],
+        'clip-path ancestor': ['#wrap{clip-path:inset(40px)}', wrapped],
+        'paint containment': [
+            '#wrap{contain:paint;margin:40px;width:100px}#target{margin:0}',
+            wrapped,
+        ],
+        'rotated control': ['#target{rotate:20deg}', plain],
+        'control below its layer': [
+            '#target{position:relative;z-index:-1}.panel{background:white}',
+            plain,
+        ],
+        'absolute control past a clipping ancestor': [
+            '#wrap{width:10px;height:10px;overflow:hidden}#target{position:absolute;top:60px;left:60px;margin:0}',
+            wrapped,
+        ],
+        'side below a viewport that cannot scroll to it': [
+            '#target{position:fixed;top:560px;left:0}',
+            plain,
+        ],
+    };
+    assert.deepEqual(await resolved(cases), []);
+});
+
+void test('each way of painting that the rule does not model keeps the point unverified', async () => {
+    // A white cover of a higher layer over the top side, trapped or reordered by the CSS of its ancestor.
+    const trapped = (ancestor) => [
+        strip +
+            `#trap{${ancestor}}#cover{background:white;z-index:5}#target{position:relative;z-index:1}`,
+        '<div id="trap"><div id="cover"></div></div>' + plain,
+    ];
+    const over = (css, markup = '<div id="cover"></div>') => [
+        strip + css,
+        '<div id="strip"></div>' + plain + markup,
+    ];
+    const shown = (id) =>
+        `<script>document.querySelector('${id}').showPopover()</script>`;
+    const cases = {
+        'cover under a size container': trapped('container-type:inline-size'),
+        'cover under a backdrop filter': trapped('backdrop-filter:blur(1px)'),
+        'cover under a 3d context': trapped('transform-style:preserve-3d'),
+        'cover reordered in a flex row': [
+            strip +
+                '#trap{order:1}#cover{background:white;z-index:5}.panel{display:flex}',
+            '<div id="trap"><div id="cover"></div></div>' + plain,
+        ],
+        'cover in the top layer': over(
+            '#cover{margin:0;border:0;padding:0;inset:auto;top:62px;background:white}',
+            '<div id="cover" popover="manual"></div>' + shown('#cover'),
+        ),
+        'unparsed cover colour': over(
+            '#cover{background:lab(100 0 0);z-index:5}',
+        ),
+        'image background cover': over(
+            '#cover{background-image:linear-gradient(white,white);z-index:5}',
+        ),
+        'cover clipped to its text': over(
+            '#cover{background:white;background-clip:text;z-index:5}',
+        ),
+        'image over the point': over(
+            '#cover{z-index:5}',
+            '<img id="cover" alt="" width="375" height="14" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=">',
+        ),
+        'pseudo-element cover that ignores the pointer': over(
+            '#cover::after{content:"";position:absolute;inset:0;background:white;pointer-events:none}#cover{z-index:5}',
+        ),
+        'translucent shadow of the control over its ring': [
+            '#target:focus{outline:none;box-shadow:0 0 0 8px rgb(255 255 255 / 0.5),0 0 0 6px black}',
+            plain,
+        ],
+        'ring at the edge of another layer of the control': [
+            '#target:focus{outline:none;box-shadow:0 0 0 3px white,0 0 0 6px black}',
+            plain,
+        ],
+        'pseudo-element of a box elsewhere that ignores the pointer': over(
+            '#host::after{content:"";position:absolute;left:0;top:62px;width:375px;height:14px;background:white;z-index:5;pointer-events:none}',
+            '<div id="host"></div>',
+        ),
+        'blurred layer of the control over a ring beside a good outline': [
+            '#target:focus{outline:4px solid black;outline-offset:14px;box-shadow:0 0 1px 10px white,0 0 0 6px black}',
+            plain,
+        ],
+        'table row group background that hit testing leaves out': [
+            'table{border-collapse:collapse}tbody{background:#111}td{padding:0}',
+            '<table><tbody><tr><td>' + plain + '</td></tr></tbody></table>',
+        ],
+        'outline over positioned content': [
+            '#target{position:relative}#fill{position:absolute;inset:-8px;background:white}',
+            '<div tabindex="0" id="target"><div id="fill"></div></div>',
+        ],
+        'inset ring over content below its layer': [
+            '#target{position:relative;z-index:0}#target:focus{outline:none;box-shadow:inset 0 0 0 8px black}#fill{position:absolute;z-index:-1;inset:0;background:white}',
+            '<div tabindex="0" id="target"><div id="fill"></div></div>',
+        ],
+        'skipped content ancestor': [
+            '#wrap{content-visibility:auto}',
+            '<div id="wrap">' + plain + '</div>',
+        ],
+        'legacy clip ancestor': [
+            '#wrap{position:absolute;clip:rect(0,300px,300px,0)}',
+            '<div id="wrap">' + plain + '</div>',
+        ],
+        'skewed control': ['#target{transform:skewX(10deg)}', plain],
+        'scaled control': ['#target{scale:1.2}', plain],
+        'control in the top layer': [
+            '#wrap{margin:0;border:0;background:white}',
+            '<div id="wrap" popover="manual">' +
+                plain +
+                '</div>' +
+                shown('#wrap'),
+        ],
+        'ring in a clip margin': [
+            '#wrap{overflow:clip;overflow-clip-margin:1px;margin:40px;width:100px}#target{margin:0}',
+            '<div id="wrap">' + plain + '</div>',
+        ],
+    };
+    assert.deepEqual(await resolved(cases), []);
+});
+
+void test('what is proven to lie beneath a point is graded and nothing else counts', async () => {
+    const graded = {
+        // The fixed box keeps its child's z-index, so the child stays beneath the higher control.
+        'z-index kept inside a fixed box': [
+            '#trap{position:fixed;left:0;top:62px;width:375px;height:14px}#cover{height:14px;background:#111;position:relative;z-index:5}#target{position:relative;z-index:1}',
+            '<div id="trap"><div id="cover"></div></div>' + plain,
+            ['#target: Insufficient focus indicator contrast: 1.11'],
+        ],
+    };
+    for (const [name, [css, markup, failures]] of Object.entries(graded)) {
+        const result = await measureFocused(control + outside + css, markup);
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(result.failures, failures, name);
+    }
+});
+
+void test('a shadow of another box lowers a ratio to its worst case and never raises it', async () => {
+    const ringed = (colour, shadow) =>
+        measureFocused(
+            control +
+                `#target:focus{outline:4px solid ${colour};outline-offset:2px}#caster{position:absolute;left:0;width:375px;height:1px;top:20px;box-shadow:${shadow}}`,
+            '<div tabindex="0" id="target"></div><div id="caster"></div>',
+        );
+    // A 10% tint over the top side of a black ring on white: still far above 3:1, and below the untinted 21:1.
+    const light = await ringed('black', '0 49px 0 5px rgb(0 0 0 / 0.1)');
+    assert.deepEqual(light.unverified, []);
+    assert.deepEqual(light.failures, []);
+    assert.ok(light.results[0].observed[0].focusContrast < 17);
+    // An opaque shadow of the page's colour can hide the ring altogether.
+    const hiding = await ringed('black', '0 49px 0 5px white');
+    assert.deepEqual(hiding.failures, [
+        '#target: Insufficient focus indicator contrast: 1.00',
+    ]);
+    // A grey ring between the bare and the tinted backdrop may vanish into it: no ratio can be told.
+    const crossing = await ringed('#777', '0 49px 0 5px rgb(0 0 0 / 0.9)');
+    assert.deepEqual(crossing.unverified, [unsupportedFocus]);
+    const inside = await measureFocused(
+        control +
+            '#target:focus{outline:4px solid black;outline-offset:2px}#caster{position:absolute;left:0;width:375px;height:14px;top:62px;box-shadow:inset 0 0 0 9px white}',
+        '<div tabindex="0" id="target"></div><div id="caster"></div>',
+    );
+    assert.deepEqual(inside.failures, [
+        '#target: Insufficient focus indicator contrast: 1.00',
+    ]);
+    // Tints of two colours are bounded by black and by white at their joint strength.
+    const mixed = await ringed(
+        'black',
+        '0 49px 0 5px rgb(0 0 0 / 0.1), 0 49px 0 5px rgb(255 0 0 / 0.1)',
+    );
+    assert.deepEqual(mixed.unverified, []);
+    assert.deepEqual(mixed.failures, []);
+    assert.ok(
+        mixed.results[0].observed[0].focusContrast <
+            light.results[0].observed[0].focusContrast,
+    );
+    // A grey ring that one of those extremes can bring to its backdrop's colour has no bound.
+    const unbounded = await ringed(
+        '#999',
+        '0 49px 0 5px rgb(0 0 0 / 0.6), 0 49px 0 5px rgb(255 0 0 / 0.6)',
+    );
+    assert.deepEqual(unbounded.unverified, [unsupportedFocus]);
+});
+
+void test('a soft shadow of the control over its own ring is bounded like any other tint', async () => {
+    // A toast: a faint drop shadow listed over a faint ring, beside an outline that shows the focus.
+    const toast = await measureFocused(
+        control +
+            '#target:focus{outline:2px solid black;outline-offset:2px;box-shadow:0 4px 12px rgb(0 0 0 / 0.1),0 0 0 2px rgb(0 0 0 / 0.2)}',
+        '<div tabindex="0" id="target"></div>',
+    );
+    assert.deepEqual(toast.unverified, []);
+    assert.deepEqual(toast.failures, []);
+    // Without the outline no ring passes, and the blurred shadow might be what shows the focus: unverified.
+    const faint = await measureFocused(
+        control +
+            '#target:focus{outline:none;box-shadow:0 4px 12px rgb(0 0 0 / 0.1),0 0 0 2px rgb(0 0 0 / 0.2)}',
+        '<div tabindex="0" id="target"></div>',
+    );
+    assert.deepEqual(faint.unverified, [unsupportedFocus]);
+    const opaque = await measureFocused(
+        control +
+            '#target:focus{outline:none;box-shadow:0 4px 12px black,0 0 0 2px black}',
+        '<div tabindex="0" id="target"></div>',
+    );
+    assert.deepEqual(opaque.unverified, [unsupportedFocus]);
+});
+
+void test('the worst case of a tint decides the ratio, and a tint that cannot be bounded decides nothing', async () => {
+    const shaded = (ring, shadow, extra = '') =>
+        measureFocused(
+            control +
+                `#target:focus{${ring}}#caster{position:absolute;left:0;width:375px;height:1px;top:20px;box-shadow:${shadow}}${extra}`,
+            '<div tabindex="0" id="target"></div><div id="dim"><div id="caster"></div></div>',
+        );
+    const outline = (colour) =>
+        `outline:4px solid ${colour};outline-offset:2px`;
+    const fails = async (ring, shadow, ratio) => {
+        const result = await shaded(ring, shadow);
+        assert.deepEqual(result.unverified, [], shadow);
+        assert.match(result.failures[0], ratio, shadow);
+    };
+    // A grey ring is closest to its backdrop when the tint lies beneath it.
+    await fails(outline('#777'), '0 49px 0 5px rgb(0 0 0 / 0.3)', /: 2\.1/);
+    // Black and white at the joint strength of two tints: the white one is the worst for a black ring.
+    await fails(
+        outline('black'),
+        '0 49px 0 5px rgb(0 0 0 / 0.5), 0 49px 0 5px rgb(255 255 255 / 0.5)',
+        /: 1\.8/,
+    );
+    const own = await shaded(
+        'outline:none;box-shadow:0 0 1px 10px rgb(0 0 0 / 0.3),0 0 0 6px #777',
+        'none',
+    );
+    assert.deepEqual(own.unverified, [unsupportedFocus]);
+    for (const [name, shadow, extra] of [
+        ['unparsed shadow colour', '0 49px 0 5px lab(100 0 0)', ''],
+        [
+            'shadow of a dimmed box',
+            '0 49px 0 5px rgb(0 0 0 / 0.1)',
+            '#dim{opacity:.5}',
+        ],
+    ]) {
+        const result = await shaded(outline('black'), shadow, extra);
+        assert.deepEqual(result.unverified, [unsupportedFocus], name);
+    }
+});
+
+void test('text lying under a sample point leaves the adjacent colour unproven', async () => {
+    // A control over a line of text, as a skip link over the app bar: the ring crosses the glyphs.
+    const over = (css) =>
+        measureFocused(
+            control +
+                outside +
+                '#target{position:relative;z-index:5}#words{position:absolute;left:0;top:62px;margin:0;font:14px/14px Arial;white-space:nowrap}' +
+                css,
+            '<p id="words">MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM</p><div tabindex="0" id="target"></div>',
+        );
+    assert.deepEqual((await over('')).unverified, [unsupportedFocus]);
+    // Hidden under an opaque box that lies over the text and under the control, it paints nothing there.
+    const hidden = await over(
+        '#words{z-index:1}.panel::after{content:none}#target{box-shadow:none}#words{visibility:hidden}',
+    );
+    assert.deepEqual(hidden.unverified, []);
+    assert.deepEqual(hidden.failures, []);
+});
+
+void test('only the ink of a text under a sample point leaves it unproven', async () => {
+    // The left midpoint, at (36, 62), lies below the baseline of this line: its descenders reach it, other letters do not.
+    const over = (words, css = '') =>
+        measureFocused(
+            control +
+                outside +
+                '#target{position:absolute;top:40px;left:40px;margin:0;z-index:5}#words{position:absolute;left:0;top:23px;margin:0;font:40px/40px Arial;white-space:nowrap}' +
+                css,
+            `<p id="words">${words.slice(0, 2)}</p><div tabindex="0" id="target"></div>`,
+        );
+    const clear = await over('aaaa');
+    assert.deepEqual(clear.unverified, []);
+    assert.deepEqual(clear.failures, []);
+    // With the point above the x-height, small letters stay clear and capitals reach it.
+    const above = await over('aaaa', '#words{top:54px}');
+    assert.deepEqual(above.unverified, []);
+    for (const [name, words, css] of [
+        ['capital', 'AAAA', '#words{top:54px}'],
+        ['descender', 'gggg', ''],
+        ['underline', 'aaaa', '#words{text-decoration:underline}'],
+        ['underline of an ancestor', 'aaaa', 'body{text-decoration:underline}'],
+        ['transformed case', 'aaaa', '#words{text-transform:uppercase}'],
+        ['text shadow', 'aaaa', '#words{text-shadow:0 8px black}'],
+        ['scaled line', 'aaaa', '#words{scale:1 1.2}'],
+    ]) {
+        const result = await over(words, css);
+        assert.deepEqual(result.unverified, [unsupportedFocus], name);
+    }
+});
+
+void test('a ring that reaches past the viewport is graded with the page scrolled to it', async () => {
+    const below = (outline) =>
+        measureFocused(
+            control +
+                `#target:focus{outline:4px solid ${outline};outline-offset:2px}#target{position:absolute;top:556px;left:40px;margin:0}.panel{height:900px}`,
+            plain,
+        );
+    await browser.evaluate('0');
+    const seen = await below('black');
+    assert.deepEqual(seen.unverified, []);
+    assert.deepEqual(seen.failures, []);
+    const faint = await below('#eee');
+    assert.match(faint.failures[0], /Insufficient focus indicator contrast/);
+    assert.equal(await browser.evaluate('scrollY'), 0);
+});
+
+void test('paint that reaches a point from outside its box keeps the point unverified', async () => {
+    // Each caster lies above the control and paints over its top side only, or may, from outside its own box.
+    const caster =
+        '#target{position:absolute;top:40px;left:40px;margin:0}#caster{position:absolute;left:0;width:375px;top:20px;height:10px;z-index:5}';
+    const pseudo =
+        '#caster::after{content:"";position:absolute;left:0;top:0;width:375px;height:4px;';
+    const cases = {};
+    for (const [name, css] of [
+        [
+            'outline of another box',
+            '#caster{outline:10px solid white;height:4px;top:24px}',
+        ],
+        ['pseudo-element shadow', `${pseudo}box-shadow:0 14px 0 0 white}`],
+        [
+            'pseudo-element outline',
+            `${pseudo}top:4px;outline:10px solid white}`,
+        ],
+        [
+            'filter shadow',
+            '#caster{background:white;filter:drop-shadow(0 14px 0 white)}',
+        ],
+        ['text shadow', '#caster{color:white;text-shadow:0 14px white}'],
+        [
+            'border image',
+            '#caster{border:1px solid transparent;border-image:linear-gradient(white,white) 1 / 1px / 12px}',
+        ],
+    ])
+        cases[name] = [
+            caster + css,
+            '<div tabindex="0" id="target"></div><div id="caster">MMMMMMMMMMMM</div>',
+        ];
+    assert.deepEqual(await resolved(cases), []);
+    // An outline that does not reach any point changes nothing.
+    const away = await measureFocused(
+        control +
+            outside +
+            '#other{height:10px;margin-top:200px;outline:2px solid red}',
+        plain + '<div id="other"></div>',
+    );
+    assert.deepEqual(away.unverified, []);
+    assert.deepEqual(away.failures, []);
+});
+
+void test("another box's inset shadow is measured from inside its border", async () => {
+    // The shadow paints 4 to 10 px inside the box, behind its 4 px border; the top midpoint lies 7 px inside.
+    const result = await measureFocused(
+        control +
+            outside +
+            '#box{position:absolute;left:0;top:0;width:360px;height:200px;border:4px solid white;box-shadow:inset 0 0 0 6px #111;background:white}#target{position:absolute;left:40px;top:7px;margin:0}',
+        '<div id="box">' + plain + '</div>',
+    );
+    assert.deepEqual(result.unverified, []);
+    assert.deepEqual(result.failures, [
+        '#target: Insufficient focus indicator contrast: 1.00',
+    ]);
+});
+
+void test('a box that ignores the pointer despite the runner keeps the point unverified', async () => {
+    const cover =
+        '#cover{position:absolute;left:0;top:0;width:375px;height:300px;background:#111;z-index:5}';
+    const inert = 'pointer-events:none!important';
+    const markup = plain + '<div id="cover"></div>';
+    const cases = {
+        'layered declaration': [cover + `@layer u{#cover{${inert}}}`, markup],
+        'inline declaration': [
+            cover,
+            plain + `<div id="cover" style="${inert}"></div>`,
+        ],
+        'layered pseudo-element declaration': [
+            `@layer u{#cover::after{content:"";position:absolute;left:0;top:0;width:375px;height:300px;background:#111;${inert}}}#cover{position:absolute;left:0;top:0;width:375px;height:1px;z-index:5}`,
+            markup,
+        ],
+    };
+    assert.deepEqual(await resolved(cases), []);
+    // Away from every point, such a box changes nothing, and an ordinary declaration on a pseudo-element is
+    // overridden by the runner.
+    const away = await measureFocused(
+        control +
+            outside +
+            '#cover{height:20px;margin-top:200px}#cover::after{content:"x";pointer-events:none}',
+        plain + `<div id="cover" style="${inert}"></div>`,
+    );
+    assert.deepEqual(away.unverified, []);
+    assert.deepEqual(away.failures, []);
+});
+
+void test('a point before the origin is left out only in a page that scrolls from there', async () => {
+    // The control straddles x = 0 of a page that scrolls leftwards, beside a dark band painted there.
+    for (const flow of ['direction:rtl', 'writing-mode:vertical-rl']) {
+        const result = await measureFocused(
+            control +
+                outside +
+                `html{${flow}}#wide{width:1200px;height:10px}#target{position:absolute;top:100px;left:-50px;margin:0}#band{position:absolute;top:0;height:400px;left:-70px;width:19px;background:#111}`,
+            '<div id="wide"></div><div id="band"></div>' + plain,
+        );
+        assert.deepEqual(result.unverified, [], flow);
+        assert.match(
+            result.failures[0],
+            /Insufficient focus indicator contrast: 1\.1/,
+            flow,
+        );
+    }
+});
+
+void test('overflow on a wrapper it does not apply to clips nothing', async () => {
+    for (const [name, wrapper, markup] of [
+        [
+            'display contents',
+            '#wrap{display:contents;overflow:hidden}',
+            '<div id="wrap">' + plain + '</div>',
+        ],
+        [
+            'inline box',
+            '#wrap{overflow:hidden}#target{display:inline-block;vertical-align:top;margin:80px}',
+            '<span id="wrap">' + plain + '</span>',
+        ],
+    ]) {
+        const result = await measureFocused(
+            control + outside + wrapper,
+            markup,
+        );
+        assert.deepEqual(result.unverified, [], name);
+        assert.deepEqual(result.failures, [], name);
+    }
+});
+
+void test("the control's own layers beneath a ring never let it pass below the minimum", async () => {
+    const focused = (focus) =>
+        measureFocused(control + `#target:focus{${focus}}`, plain);
+    for (const [name, focus] of [
+        [
+            'blurred shadow under an outline',
+            'outline:2px solid black;box-shadow:0 0 12px 8px #111',
+        ],
+        [
+            'solid ring under an outline',
+            'outline:2px solid black;box-shadow:0 0 0 8px #111',
+        ],
+        [
+            'translucent ring under an outline',
+            'outline:2px solid #777;box-shadow:0 0 0 8px rgb(0 0 0 / 0.5)',
+        ],
+        [
+            'ring under another ring',
+            'outline:none;box-shadow:0 0 0 3px black,0 0 0 10px #111',
+        ],
+        [
+            'inset shadow under an inward outline',
+            'outline:2px solid black;outline-offset:-4px;box-shadow:inset 0 0 0 10px #111',
+        ],
+    ]) {
+        const result = await focused(focus);
+        assert.deepEqual(result.unverified, [unsupportedFocus], name);
+        assert.deepEqual(result.failures, [], name);
+    }
+    // A faint shadow beneath that cannot take the ring below the minimum leaves the reading as it was.
+    const faint = await focused(
+        'outline:2px solid black;outline-offset:2px;box-shadow:0 4px 12px rgb(0 0 0 / 0.1)',
+    );
+    assert.deepEqual(faint.unverified, []);
+    assert.deepEqual(faint.failures, []);
+    assert.equal(faint.results[0].observed[0].focusContrast, 21);
+});
+
+void test('a layer beneath a ring counts only where it reaches past the outer edge of the ring', async () => {
+    const focused = (focus) =>
+        measureFocused(control + `#target:focus{${focus}}`, plain);
+    // The outline spans 2 to 4 px outside the control; the dark layer beneath it ends at or before that edge, or past it.
+    const ringed = (shadow) =>
+        focused(
+            `outline:2px solid black;outline-offset:2px;box-shadow:${shadow} #111`,
+        );
+    for (const shadow of ['0 0 0 3px', '0 0 1px 3px']) {
+        const inside = await ringed(shadow);
+        assert.deepEqual(inside.unverified, [], shadow);
+        assert.deepEqual(inside.failures, [], shadow);
+        assert.equal(inside.results[0].observed[0].focusContrast, 21);
+    }
+    for (const shadow of ['0 0 1px 4px', '0 0 0 5px'])
+        assert.deepEqual(
+            (await ringed(shadow)).unverified,
+            [unsupportedFocus],
+            shadow,
+        );
+});
+
+void test('a layer just outside an inward outline counts although it lies beneath none of it', async () => {
+    // An outer shadow lies beyond the border edge, nowhere next to an outline 18 px inside it.
+    const apart = await measureFocused(
+        control +
+            '#target:focus{outline:2px solid black;outline-offset:-20px;box-shadow:0 0 0 5px #111}',
+        plain,
+    );
+    assert.deepEqual(apart.unverified, []);
+    assert.deepEqual(apart.failures, []);
+    // The layer lies only between the outer edge of the outline and the border edge.
+    const result = await measureFocused(
+        control +
+            '#target:focus{outline:2px solid black;outline-offset:-4px;box-shadow:inset 0 0 0 2px #111}',
+        plain,
+    );
+    assert.deepEqual(result.unverified, [unsupportedFocus]);
+});
