@@ -14,6 +14,22 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 use Tests\Support\FrozenClock;
 
+/**
+ * A reception that exists: the demo also seeds producers outside every cycle, whose reception page answers 404.
+ *
+ * @return array{string, string} cycle id and producer id
+ */
+function settledReception(): array
+{
+    $sent = DB::table('cycle_producers')
+        ->join('cycles', 'cycles.id', '=', 'cycle_producers.cycle_id')
+        ->whereNotNull('cycles.settled_at')
+        ->whereNotNull('cycle_producers.sent_at')
+        ->first(['cycle_producers.cycle_id', 'cycle_producers.producer_id']);
+
+    return [$sent->cycle_id, $sent->producer_id];
+}
+
 it('seeds a usable cooperative with accounts, orders, reception and pickups', function () {
     Mail::fake();
     $this->seed(DatabaseSeeder::class);
@@ -275,12 +291,10 @@ it('lets every demo role log in and open its main screens', function (string $em
         foreach (DB::table('cycles')->pluck('id') as $cycleId) {
             $this->get(route('orders.edit', $cycleId))->assertOk();
         }
-        $this->get(route('receptions.show', [DB::table('cycles')->whereNotNull('settled_at')->value('id'), DB::table('producers')->value('id')]))->assertOk();
+        $this->get(route('receptions.show', settledReception()))->assertOk();
     }
     if ($email === 'gestora@demo.guixa.test') {
-        $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
-        $producer = DB::table('producers')->value('id');
-        $this->get(route('receptions.show', [$cycle, $producer]))->assertOk();
+        $this->get(route('receptions.show', settledReception()))->assertOk();
         $this->get('/manage/cycles/'.DB::table('cycles')->orderByDesc('pickup_date')->value('id'))->assertOk();
         $this->get('/manage/stock/'.DB::table('products')->where('name', 'Arròs integral')->value('id').'/movements')->assertOk();
     }
