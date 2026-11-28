@@ -13,17 +13,21 @@ from urllib.request import Request, urlopen
 
 FILES = ("package.json", "pnpm-workspace.yaml", "pnpm-lock.yaml")
 VERSION = r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?"
+CORE_ALIAS = "npm:@voidzero-dev/vite-plus-core@"
+REGISTRY = "https://registry.npmjs.org/"
+ROOT = Path(__file__).resolve().parents[2]
 
 
-def synchronize(package_text, workspace):
-    package = json.loads(package_text)
-    version = package["devDependencies"]["vite-plus"]
-    if not re.fullmatch(VERSION, version):
-        raise ValueError("vite-plus must have an exact version")
-    alias = "npm:@voidzero-dev/vite-plus-core@" + version
-    old = package["devDependencies"]["vite"]
-    if not re.fullmatch("npm:@voidzero-dev/vite-plus-core@" + VERSION, old):
-        raise ValueError("Unexpected Vite alias")
+def core_version(version):
+    """Vite+ numbers its core independently, so ask the registry which one this release pins."""
+    with urlopen(REGISTRY + "vite-plus/" + quote(version, safe=""), timeout=30) as response:
+        alias = json.load(response)["dependencies"]["vite"]
+    if not re.fullmatch(CORE_ALIAS + VERSION, alias):
+        raise ValueError("Unexpected vite-plus core dependency")
+    return alias.removeprefix(CORE_ALIAS)
+
+
+def set_catalog(workspace, alias, version):
     for name, value in (("vite", alias), ("vite-plus", version)):
         # Match the existing catalog layout; fail closed if its shape changes.
         workspace, count = re.subn(
@@ -31,18 +35,32 @@ def synchronize(package_text, workspace):
         )
         if count != 1:
             raise ValueError(f"Expected exactly one catalog entry for {name}")
+    return workspace
+
+
+def synchronize(package_text, workspace, core_of=core_version):
+    package = json.loads(package_text)
+    version = package["devDependencies"]["vite-plus"]
+    if not re.fullmatch(VERSION, version):
+        raise ValueError("vite-plus must have an exact version")
+    old = package["devDependencies"]["vite"]
+    if not re.fullmatch(CORE_ALIAS + VERSION, old):
+        raise ValueError("Unexpected Vite alias")
+    core = core_of(version)
+    alias = CORE_ALIAS + core
+    workspace = set_catalog(workspace, alias, version)
     package["devDependencies"]["vite"] = alias
     if old == alias:
         updated = package_text
     else:
         updated = json.dumps(package, indent=4, ensure_ascii=False) + "\n"
-    return updated, workspace, version
+    return updated, workspace, version, core
 
 
-def resolve_lockfile(package_text, lockfile, version):
+def resolve_lockfile(package_text, lockfile, version, core):
     # Never give pnpm PR-supplied hooks, scripts, plugins, packageManager or config.
     package = json.loads(package_text)
-    trusted = json.loads((Path(__file__).resolve().parents[2] / "package.json").read_text())
+    trusted = json.loads((ROOT / "package.json").read_text())
     clean = {"private": True, "packageManager": trusted["packageManager"]}
     for section in ("dependencies", "devDependencies", "optionalDependencies"):
         clean[section] = package.get(section, {})
@@ -57,12 +75,10 @@ def resolve_lockfile(package_text, lockfile, version):
         root = Path(directory)
         (root / "package.json").write_text(json.dumps(clean))
         (root / "pnpm-lock.yaml").write_text(lockfile)
+        # The default branch's settings: overrides missing here would fail a frozen install.
+        workspace = (ROOT / "pnpm-workspace.yaml").read_text()
         (root / "pnpm-workspace.yaml").write_text(
-            "packages:\n  - '.'\nignoreScripts: true\ncatalog:\n"
-            f"  vite: npm:@voidzero-dev/vite-plus-core@{version}\n"
-            f"  vite-plus: {version}\noverrides:\n  vite@*: 'catalog:'\n"
-            "peerDependencyRules:\n  allowAny:\n    - vite\n"
-            "  allowedVersions:\n    vite: '*'\n"
+            set_catalog(workspace, CORE_ALIAS + core, version)
         )
         env = {key: value for key, value in os.environ.items()
                if key not in ("GH_TOKEN", "GITHUB_TOKEN", "NODE_AUTH_TOKEN", "NPM_TOKEN")}
@@ -98,7 +114,7 @@ class GitHub:
         return base64.b64decode(result["content"]).decode()
 
 
-def repair(github, run, resolve=resolve_lockfile):
+def repair(github, run, resolve=resolve_lockfile, core_of=core_version):
     if run["event"] != "pull_request" or run["head_repository"]["full_name"] != github.repo:
         return None
     owner = github.repo.split("/")[0]
@@ -117,11 +133,13 @@ def repair(github, run, resolve=resolve_lockfile):
         ):
             continue
         original = {path: github.read(path, sha) for path in FILES}
-        package, workspace, version = synchronize(original[FILES[0]], original[FILES[1]])
+        package, workspace, version, core = synchronize(
+            original[FILES[0]], original[FILES[1]], core_of
+        )
         if package == original[FILES[0]] and workspace == original[FILES[1]]:
             continue
         updated = {FILES[0]: package, FILES[1]: workspace,
-                   FILES[2]: resolve(package, original[FILES[2]], version)}
+                   FILES[2]: resolve(package, original[FILES[2]], version, core)}
         parent = github.api("git/commits/" + sha)
         tree = github.api("git/trees", {"base_tree": parent["tree"]["sha"], "tree": [
             {"path": path, "mode": "100644", "type": "blob", "content": content}
