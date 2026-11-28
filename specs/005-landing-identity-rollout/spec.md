@@ -80,7 +80,10 @@ wherever they appear on a Catalogue page, so that a page is never half-themed. `
 - **R5 — Contrast.** At least 4.5:1 for normal text and 3:1 for large text, essential borders (fields,
   controls, dividers that carry meaning) and focus indicators, in both appearances. A field's
   boundary is measured at 3:1 or more; the decorative landing border (1.28:1 light, 2.31:1 dark) alone does not
-  qualify. Primary action text on primary action background meets the ratio in each appearance.
+  qualify. Primary action text on primary action background meets the ratio in each appearance. Where a control
+  draws focus as an outline with a translucent halo of its colour beneath or inside it, or as a border in the focus
+  colour with a line just inside it, the two form one focus indicator: its 3:1 is that of the outline or border
+  against the colour on its outer side, and the halo or the inner line need not meet it.
 - **R6 — Touch and keyboard.** Interactive targets are at least 44 x 44 px. Focus is visible on every
   control. Tab order follows reading order. Escape closes an overlay and focus returns to the control that
   opened it. Nothing depends on hover (constitution, UI).
